@@ -24,6 +24,16 @@ void string_runTests(void)
         AssertEquals(first, second);
     }
 
+    // String stream
+    {
+        crank_talk_oop_t stringStream = crank_talk_StringStream_create(context);
+        crank_talk_StringStream_insertCString(context, stringStream, "Hello World!!!");
+        crank_talk_StringStream_insertCString(context, stringStream, "Wuff");
+        crank_talk_oop_t string = crank_talk_StringStream_asString(context, stringStream);
+        Assert(crank_talk_String_equalsCString(string, "Hello World!!!Wuff"));
+        
+    }
+
 
     crank_talk_vm_destroyContext(context);
 }
