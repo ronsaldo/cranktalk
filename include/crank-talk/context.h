@@ -87,6 +87,12 @@ struct crank_talk_VMContextRoots_s
     // Interned symbols
     crank_talk_oop_t internedSymbolSet;
 
+    crank_talk_oop_t doesNotUnderstandSymbol;
+    crank_talk_oop_t asStringSymbol;
+    crank_talk_oop_t printStringSymbol;
+    crank_talk_oop_t printOnSymbol;
+    crank_talk_oop_t fullPrintOnSymbol;
+
 };
 
 struct crank_talk_VMContext_s

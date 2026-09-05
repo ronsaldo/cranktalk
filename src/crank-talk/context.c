@@ -1,7 +1,14 @@
 #include "crank-talk/context.h"
+#include "crank-talk/array.h"
+#include "crank-talk/behavior.h"
 #include "crank-talk/gc.h"
+#include "crank-talk/ordered-collection.h"
 #include "crank-talk/set.h"
+#include "crank-talk/string.h"
+#include <stdarg.h>
 #include <stdlib.h>
+
+#define CrankTalkSlotDef(clazz, fieldName) #fieldName, offsetof(crank_talk_ ## clazz ##_t, fieldName)
 
 static crank_talk_oop_t
 crank_talk_context_createAnonymousClassAndMetaclass(crank_talk_VMContext_t *context, crank_talk_oop_t superclass, size_t instanceSize, crank_talk_GCObjectDataType_t dataType)
@@ -30,15 +37,91 @@ crank_talk_context_fixupMetaclassType(crank_talk_VMContext_t *context, crank_tal
     crank_talk_object_setBehavior((crank_talk_oop_t)metaclass, (crank_talk_Behavior_t*)context->roots.MetaclassClass);
 }
 
+static void
+crank_talk_context_setClassTypeMetadata(crank_talk_VMContext_t *context, crank_talk_oop_t classValue, const char *name, ...)
+{
+    assert(!crank_talk_oop_isNil(classValue));
+    crank_talk_Class_t *clazz = (crank_talk_Class_t*)classValue;
+    // Set the name.
+    if(name)
+    {
+        crank_talk_oop_t nameSymbol = crank_talk_Symbol_internWithCString(context, name);
+        clazz->name = (crank_talk_Symbol_t*)nameSymbol;
+        // TODO: create the system environment
+        //crank_talk_Namespace_setSymbolBinding(context, context->roots.globalNamespace, nameSymbol, classValue);
+    }
+
+    crank_talk_oop_t slots = crank_talk_OrderedCollection_create(context);
+    
+    va_list valist;
+    va_start(valist, name);
+    const char *fieldName;
+    while((fieldName = va_arg(valist, const char *)) != NULL)
+    {
+        size_t offset = va_arg(valist, size_t);
+
+        crank_talk_oop_t slotValue = CrankAllocateValuesObjectWithClassName(context, Slot);
+        crank_talk_Slot_t *slot = (crank_talk_Slot_t*)slotValue;
+
+        assert(offset >= sizeof(crank_talk_ObjectHeader_t));
+        slot->super.name = (crank_talk_Symbol_t*)crank_talk_Symbol_internWithCString(context, fieldName);
+        slot->index = crank_talk_oop_encodeSmallInteger((offset - sizeof(crank_talk_ObjectHeader_t)) / sizeof(crank_talk_oop_t));
+        crank_talk_OrderedCollection_add(context, slots, slotValue);
+    }
+    va_end(valist);
+
+    clazz->super.super.slots = crank_talk_OrderedCollection_asArray(context, slots);
+
+    crank_talk_oop_t metaclassValue = (crank_talk_oop_t)crank_talk_oop_getClass(context, classValue);
+    assert(!crank_talk_oop_isNil(metaclassValue));
+    crank_talk_Metaclass_t *metaClass = (crank_talk_Metaclass_t*)metaclassValue;
+    if(crank_talk_oop_isNil(metaClass->super.super.slots))
+        metaClass->super.super.slots = crank_talk_Array_create(context, 0);
+}
+
+static void
+crank_talk_context_createBehaviorSlotsTables(crank_talk_VMContext_t *context, crank_talk_oop_t behaviorValue)
+{
+    crank_talk_Behavior_t *behavior = (crank_talk_Behavior_t*)behaviorValue;
+    assert(!crank_talk_oop_isNil(behavior->slots));
+    if(!crank_talk_oop_isNil(behavior->allSlots))
+        return;
+
+    // Add the super type slots.
+    crank_talk_oop_t allSlots = behavior->slots;
+    crank_talk_oop_t superBehaviorValue = (crank_talk_oop_t)behavior->superclass;
+    if(!crank_talk_oop_isNil(superBehaviorValue)) {
+        crank_talk_Behavior_t *superBehavior = (crank_talk_Behavior_t*)superBehaviorValue;
+        crank_talk_context_createBehaviorSlotsTables(context,superBehaviorValue);
+        if(!crank_talk_oop_isNil(behavior->allSlots))
+            return;
+
+        allSlots = crank_talk_Array_concat(context, superBehavior->allSlots, behavior->slots);
+    }
+    behavior->allSlots = allSlots;
+
+    crank_talk_Behavior_enumerateSlots(context, behaviorValue);
+}
+
+static void
+crank_talk_context_createClassTables(crank_talk_VMContext_t *context, crank_talk_oop_t classValue)
+{
+    crank_talk_context_createBehaviorSlotsTables(context, classValue);
+    crank_talk_oop_t metaclass = (crank_talk_oop_t)crank_talk_oop_getClass(context, classValue);
+    crank_talk_context_createBehaviorSlotsTables(context, metaclass);
+}
+
+
 static void 
 crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 {
     context->roots.ProtoObjectClass = crank_talk_context_createAnonymousClassAndMetaclass(context, crank_talk_oop_nil(),            sizeof(crank_talk_ProtoObject_t), CrankTalkGCObjectDataTypeOops);
     context->roots.ObjectClass      = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ProtoObjectClass, sizeof(crank_talk_Object_t),      CrankTalkGCObjectDataTypeOops);
 
-    context->roots.BehaviorClass    = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass,      sizeof(crank_talk_Behavior_t),    CrankTalkGCObjectDataTypeOops);
-    context->roots.ClassClass       = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.BehaviorClass,    sizeof(crank_talk_Class_t),       CrankTalkGCObjectDataTypeOops);
-    context->roots.MetaclassClass   = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.BehaviorClass,    sizeof(crank_talk_Metaclass_t),   CrankTalkGCObjectDataTypeOops);
+    context->roots.BehaviorClass         = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass,      sizeof(crank_talk_Behavior_t),    CrankTalkGCObjectDataTypeOops);
+    context->roots.ClassDescriptionClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.BehaviorClass,      sizeof(crank_talk_ClassDescription_t),    CrankTalkGCObjectDataTypeOops);
+    context->roots.ClassClass            = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ClassDescriptionClass,    sizeof(crank_talk_Class_t),       CrankTalkGCObjectDataTypeOops);
+    context->roots.MetaclassClass        = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ClassDescriptionClass,    sizeof(crank_talk_Metaclass_t),   CrankTalkGCObjectDataTypeOops);
 
     //// Short circuit.
     {
@@ -51,6 +134,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_context_fixupMetaclassType(context, context->roots.ObjectClass);
 
     crank_talk_context_fixupMetaclassType(context, context->roots.BehaviorClass);
+    crank_talk_context_fixupMetaclassType(context, context->roots.ClassDescriptionClass);
     crank_talk_context_fixupMetaclassType(context, context->roots.ClassClass);
     crank_talk_context_fixupMetaclassType(context, context->roots.MetaclassClass);
 
@@ -119,6 +203,42 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     // Symbol set
     context->roots.internedSymbolSet = crank_talk_IdentitySet_create(context);
+
+    // Symbols
+    context->roots.doesNotUnderstandSymbol = crank_talk_Symbol_internWithCString(context, "doesNotUnderstand:");
+    context->roots.asStringSymbol          = crank_talk_Symbol_internWithCString(context, "asString");
+    context->roots.printStringSymbol       = crank_talk_Symbol_internWithCString(context, "printString");
+    context->roots.printOnSymbol           = crank_talk_Symbol_internWithCString(context, "printOn:");
+    context->roots.fullPrintOnSymbol       = crank_talk_Symbol_internWithCString(context, "fullPrintOn:");
+
+    // Field definitions
+    crank_talk_context_setClassTypeMetadata(context, context->roots.ProtoObjectClass, "ProtoObject", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.ObjectClass, "Object", NULL);
+
+    crank_talk_context_setClassTypeMetadata(context, context->roots.BehaviorClass, "Behavior",
+        CrankTalkSlotDef(Behavior, superclass),
+        CrankTalkSlotDef(Behavior, methodDictionary),
+        CrankTalkSlotDef(Behavior, instanceSize),
+        CrankTalkSlotDef(Behavior, instanceDataType),
+        CrankTalkSlotDef(Behavior, slots),
+        CrankTalkSlotDef(Behavior, allSlots),
+        NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.ClassDescriptionClass, "ClassDescription", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.ClassClass, "Class",
+        CrankTalkSlotDef(Class, name),
+        NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.MetaclassClass, "Metaclass",
+        CrankTalkSlotDef(Metaclass, thisClass),
+        NULL);
+
+    // Tables
+    crank_talk_context_createClassTables(context, context->roots.ProtoObjectClass);
+    crank_talk_context_createClassTables(context, context->roots.ObjectClass);
+    crank_talk_context_createClassTables(context, context->roots.BehaviorClass);
+    crank_talk_context_createClassTables(context, context->roots.ClassDescriptionClass);
+    crank_talk_context_createClassTables(context, context->roots.ClassClass);
+    crank_talk_context_createClassTables(context, context->roots.MetaclassClass);
+
 }
 
 static void 

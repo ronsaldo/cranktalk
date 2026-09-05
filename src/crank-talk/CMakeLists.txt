@@ -1,11 +1,13 @@
 set(CrankTalk_Sources
     array.c
+    behavior.c
     context.c
     dynarray.c
     errors.c
     gc.c
     heap.c
     object-model.c
+    ordered-collection.c
     set.c
     stack-frame.c
     string.c

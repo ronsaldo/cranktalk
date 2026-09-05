@@ -372,6 +372,8 @@ struct crank_talk_Behavior_s {
     crank_talk_MethodDictionary_t *methodDictionary;
     crank_talk_oop_t instanceSize;
     crank_talk_oop_t instanceDataType;
+    crank_talk_oop_t slots;
+    crank_talk_oop_t allSlots;
 };
 
 struct crank_talk_ClassDescription_s {
