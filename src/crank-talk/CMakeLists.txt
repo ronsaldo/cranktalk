@@ -1,4 +1,6 @@
 set(CrankTalk_Sources
+    context.c
+    dynarray.c
     heap.c
     object-model.c
 )

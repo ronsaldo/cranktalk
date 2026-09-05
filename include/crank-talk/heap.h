@@ -25,9 +25,9 @@ typedef struct crank_talk_heap_s
 
 CRANK_TALK_API void crank_talk_heap_initialize(crank_talk_heap_t *heap);
 
-CRANK_TALK_API crank_talk_ObjectHeader_t *crank_talk_heap_allocateObject(crank_talk_heap_t *heap, size_t objectSize);
-CRANK_TALK_API crank_talk_ObjectHeader_t *crank_talk_heap_allocateObjectWithSizeAndType(crank_talk_heap_t *heap, size_t objectSize, crank_talk_Behavior_t *behavior);
-CRANK_TALK_API crank_talk_oop_t crank_talk_heap_allocateOopWithSizeAndType(crank_talk_heap_t *heap, size_t objectSize, crank_talk_Behavior_t *behavior);
+CRANK_TALK_API crank_talk_ObjectHeader_t *crank_talk_heap_allocateObject(crank_talk_heap_t *heap, size_t objectSize, crank_talk_GCObjectDataType_t dataType);
+CRANK_TALK_API crank_talk_ObjectHeader_t *crank_talk_heap_allocateObjectWithSizeAndType(crank_talk_heap_t *heap, size_t objectSize, crank_talk_GCObjectDataType_t dataType, crank_talk_oop_t behavior);
+CRANK_TALK_API crank_talk_oop_t crank_talk_heap_allocateOopWithSizeAndType(crank_talk_heap_t *heap, size_t objectSize, crank_talk_GCObjectDataType_t dataType, crank_talk_oop_t behavior);
 
 CRANK_TALK_API void crank_talk_heap_sweep(crank_talk_heap_t *heap);
 CRANK_TALK_API void crank_talk_heap_swapGCColors(crank_talk_heap_t *heap);

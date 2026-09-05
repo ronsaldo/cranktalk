@@ -16,10 +16,10 @@ typedef struct crank_talk_VMContext_s crank_talk_VMContext_t;
 
 typedef enum crank_talk_GCObjectDataType_e
 {
-    SysmelGCObjectDataTypeBytes = 0,
-    SysmelGCObjectDataTypeOops,
-    SysmelGCObjectDataTypeWeakOops,
-    SysmelGCObjectDataTypeImmediate,
+    CrankTalkGCObjectDataTypeBytes = 0,
+    CrankTalkGCObjectDataTypeOops,
+    CrankTalkGCObjectDataTypeWeakOops,
+    CrankTalkGCObjectDataTypeImmediate,
 } crank_talk_GCObjectDataType_t;
 
 enum crank_talk_oop_tag_e
@@ -120,6 +120,8 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
         typedef struct crank_talk_EmptySourcePosition_s crank_talk_EmptySourcePosition_t;
         typedef struct crank_talk_SourcePosition_s crank_talk_SourcePosition_t;
 
+    typedef struct crank_talk_CrankTalkToken_s crank_talk_CrankTalkToken_t;
+
     typedef struct crank_talk_Collection_s crank_talk_Collection_t;
         typedef struct crank_talk_HashedCollection_s crank_talk_HashedCollection_t;
             typedef struct crank_talk_Dictionary_s crank_talk_Dictionary_t;
@@ -152,6 +154,14 @@ struct crank_talk_ObjectHeader_s {
     uint8_t dataType;
     uint8_t gcColor;
 };
+
+#define crank_talk_oop_nil() ((crank_talk_oop_t)0)
+
+CRANK_TALK_INLINE bool
+crank_talk_oop_isNil(crank_talk_oop_t oop)
+{
+    return oop == crank_talk_oop_nil();
+}
 
 CRANK_TALK_INLINE bool
 crank_talk_oop_isPointers(crank_talk_oop_t oop)
@@ -286,7 +296,7 @@ crank_talk_object_getBehavior(crank_talk_oop_t oop)
 }
 
 CRANK_TALK_INLINE void
-crank_talk_object_setType(crank_talk_oop_t oop, crank_talk_Behavior_t *newType)
+crank_talk_object_setBehavior(crank_talk_oop_t oop, crank_talk_Behavior_t *newType)
 {
     crank_talk_object_getHeader(oop)->behavior = newType;
 }
@@ -346,7 +356,7 @@ struct crank_talk_Object_s {
 
 struct crank_talk_Behavior_s {
     crank_talk_Object_t super;
-    crank_talk_Behavior_t *supertype;
+    crank_talk_Behavior_t *superclass;
     crank_talk_MethodDictionary_t *methodDictionary;
     crank_talk_oop_t instanceSize;
     crank_talk_oop_t instanceDataType;
@@ -619,6 +629,7 @@ crank_talk_decodeFloatFromOop(crank_talk_oop_t oop)
     return ((crank_talk_BoxedFloat_t*)oop)->value;
 }
 
-CRANK_TALK_API crank_talk_oop_t sysmel_vm_oopFromFloat(crank_talk_VMContext_t *context, double value);
+CRANK_TALK_API crank_talk_oop_t crank_talk_oopFromFloat(crank_talk_VMContext_t *context, double value);
+CRANK_TALK_API crank_talk_Behavior_t *crank_talk_oop_getClass(crank_talk_VMContext_t *context, crank_talk_oop_t value);
 
 #endif //CRANK_TALK_OBJECT_MODEL_H

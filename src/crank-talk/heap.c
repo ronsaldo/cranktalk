@@ -25,13 +25,14 @@ crank_talk_heap_checkForGCThreshold(crank_talk_heap_t *heap)
 }
 
 CRANK_TALK_API crank_talk_ObjectHeader_t *
-crank_talk_heap_allocateObject(crank_talk_heap_t *heap, size_t objectSize)
+crank_talk_heap_allocateObject(crank_talk_heap_t *heap, size_t objectSize, crank_talk_GCObjectDataType_t dataType)
 {
     size_t allocationSize = sizeof(crank_talk_ObjectHeader_t) + objectSize;
     crank_talk_ObjectHeader_t *objectHeader = calloc(1, allocationSize);
     objectHeader->byteSize = objectSize;
     objectHeader->identityHash = heap->identityHashSeed;
     objectHeader->gcColor = heap->gcWhiteColor;
+    objectHeader->dataType = dataType;
     heap->identityHashSeed = crank_talk_hashMultiply(heap->identityHashSeed);
 
     // Count the allocated data
@@ -53,17 +54,17 @@ crank_talk_heap_allocateObject(crank_talk_heap_t *heap, size_t objectSize)
 }
 
 CRANK_TALK_API crank_talk_ObjectHeader_t *
-crank_talk_heap_allocateObjectWithSizeAndType(crank_talk_heap_t *heap, size_t objectSize, crank_talk_Behavior_t *behavior)
+crank_talk_heap_allocateObjectWithSizeAndType(crank_talk_heap_t *heap, size_t objectSize, crank_talk_GCObjectDataType_t dataType, crank_talk_oop_t behavior)
 {
-    crank_talk_ObjectHeader_t *object = crank_talk_heap_allocateObject(heap, objectSize);
-    object->behavior = behavior;
+    crank_talk_ObjectHeader_t *object = crank_talk_heap_allocateObject(heap, objectSize, dataType);
+    object->behavior = (crank_talk_Behavior_t*)behavior;
     return object;
 }
 
 CRANK_TALK_API crank_talk_oop_t
-crank_talk_heap_allocateOopWithSizeAndType(crank_talk_heap_t *heap, size_t objectSize, crank_talk_Behavior_t *behavior)
+crank_talk_heap_allocateOopWithSizeAndType(crank_talk_heap_t *heap, size_t objectSize, crank_talk_GCObjectDataType_t dataType, crank_talk_oop_t behavior)
 {
-    return (crank_talk_oop_t)crank_talk_heap_allocateObjectWithSizeAndType(heap, objectSize, behavior);
+    return (crank_talk_oop_t)crank_talk_heap_allocateObjectWithSizeAndType(heap, objectSize, dataType, behavior);
 }
 
 static void
