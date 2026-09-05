@@ -1,6 +1,7 @@
 set(CrankTalkTest_Sources
     main.c
     scanner.c
+    string.c
 )
 
 add_executable(CrankTalkTests ${CrankTalkTest_Sources})

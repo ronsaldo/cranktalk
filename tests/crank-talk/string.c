@@ -1,0 +1,29 @@
+#include "crank-talk/string.h"
+#include "crank-talk/context.h"
+#include "assertions.h"
+#include <stdio.h>
+
+void string_runTests(void)
+{
+    crank_talk_VMContext_t *context = crank_talk_vm_createContext();
+
+    // Hello world string creation
+    {
+        crank_talk_oop_t helloWorld = crank_talk_String_createWithCString(context, "Hello World");
+        Assert(crank_talk_String_equalsCString(helloWorld, "Hello World"));
+    }
+
+    // Symbol internation
+    {
+        crank_talk_oop_t first = crank_talk_Symbol_internWithCString(context, "testSymbol");
+        Assert(crank_talk_Symbol_equalsCString(first, "testSymbol"));
+
+        crank_talk_oop_t second = crank_talk_Symbol_internWithCString(context, "testSymbol");
+        Assert(crank_talk_Symbol_equalsCString(second, "testSymbol"));
+
+        AssertEquals(first, second);
+    }
+
+
+    crank_talk_vm_destroyContext(context);
+}

@@ -317,6 +317,18 @@ crank_talk_object_getSizeInSlots(crank_talk_oop_t oop)
     return crank_talk_object_getSizeInBytes(oop) / sizeof(crank_talk_oop_t);
 }
 
+CRANK_TALK_INLINE crank_talk_oop_t *
+crank_talk_oop_getSlotsData(crank_talk_oop_t oop)
+{
+    return (crank_talk_oop_t*)(crank_talk_object_getHeader(oop) + 1);
+}
+
+CRANK_TALK_INLINE uint8_t *
+crank_talk_oop_getBytesData(crank_talk_oop_t oop)
+{
+    return (uint8_t*)crank_talk_oop_getSlotsData(oop);
+}
+
 CRANK_TALK_INLINE uint32_t
 crank_talk_object_getGCColor(crank_talk_oop_t oop)
 {

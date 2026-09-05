@@ -83,6 +83,10 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t StringStreamClass;
 
     crank_talk_oop_t ExternalAddressClass;
+
+    // Interned symbols
+    crank_talk_oop_t internedSymbolSet;
+
 };
 
 struct crank_talk_VMContext_s

@@ -1,4 +1,5 @@
 #include "crank-talk/context.h"
+#include "crank-talk/set.h"
 #include <stdlib.h>
 
 static crank_talk_oop_t
@@ -114,6 +115,9 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.OrderedCollectionClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.SequenceableCollectionClass,      sizeof(crank_talk_OrderedCollection_t),      CrankTalkGCObjectDataTypeOops);
 
     context->roots.ExternalAddressClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_ExternalAddress_t), CrankTalkGCObjectDataTypeBytes);
+
+    // Symbol set
+    context->roots.internedSymbolSet = crank_talk_IdentitySet_create(context);
 }
 
 static void 
