@@ -3,9 +3,11 @@ set(CrankTalk_Sources
     context.c
     dynarray.c
     errors.c
+    gc.c
     heap.c
     object-model.c
     set.c
+    stack-frame.c
     string.c
 )
 

@@ -1,4 +1,5 @@
 #include "crank-talk/context.h"
+#include "crank-talk/gc.h"
 #include "crank-talk/set.h"
 #include <stdlib.h>
 
@@ -133,7 +134,7 @@ crank_talk_vm_createContext(void)
     crank_talk_dynarray_initialize(&context->markingStack, sizeof(crank_talk_oop_t), 1<<17);
     crank_talk_context_createCoreDefinitions(context);
     crank_talk_registerPrimitives(context);
-    //crank_talk_gc_collect(context);
+    crank_talk_gc_collect(context);
     return context;
 }
 
