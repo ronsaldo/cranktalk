@@ -12,6 +12,8 @@
 
 typedef intptr_t crank_talk_oop_t;
 
+typedef struct crank_talk_VMContext_s crank_talk_VMContext_t;
+
 typedef enum crank_talk_GCObjectDataType_e
 {
     SysmelGCObjectDataTypeBytes = 0,
@@ -85,7 +87,6 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
 
     typedef struct crank_talk_CompiledFunction_s crank_talk_CompiledFunction_t;
     typedef struct crank_talk_BlockClosure_s crank_talk_BlockClosure_t;
-    typedef struct crank_talk_MacroContext_s crank_talk_MacroContext_t;
     typedef struct crank_talk_Message_s crank_talk_Message_t;
 
     typedef struct crank_talk_Magnitude_s crank_talk_Magnitude_t;
@@ -105,6 +106,8 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
     typedef struct crank_talk_Boolean_s crank_talk_Boolean_t;
         typedef struct crank_talk_False_s crank_talk_False_t;
         typedef struct crank_talk_True_s crank_talk_True_t;
+
+    typedef struct crank_talk_Tombstone_s crank_talk_Tombstone_t;
 
        typedef struct crank_talk_Variable_s crank_talk_Variable_t;
         typedef struct crank_talk_Slot_s crank_talk_Slot_t;
@@ -136,6 +139,8 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
             typedef struct crank_talk_OrderedCollection_s crank_talk_OrderedCollection_t;
 
     typedef struct crank_talk_StringStream_s crank_talk_StringStream_t;
+
+    typedef struct crank_talk_ExternalAddress_s crank_talk_ExternalAddress_t;
 
 
 struct crank_talk_ObjectHeader_s {
@@ -360,5 +365,260 @@ struct crank_talk_Metaclass_s {
     crank_talk_ClassDescription_t super;
     crank_talk_Class_t *thisClass;
 };
+
+struct crank_talk_CompiledFunction_s {
+    crank_talk_Object_t super;
+    crank_talk_oop_t argumentCount;
+    crank_talk_ExternalAddress_t *nativeEntryPoint;
+    crank_talk_ByteArray_t *bytecode;
+    crank_talk_Array_t *literalVector;
+};
+
+struct crank_talk_BlockClosure_s {
+    crank_talk_Object_t super;
+    crank_talk_CompiledFunction_t *function;
+    crank_talk_Array_t *captureVector;
+};
+
+struct crank_talk_Message_s {
+    crank_talk_Object_t super;
+    crank_talk_Symbol_t *selector;
+    crank_talk_Array_t *arguments;
+    crank_talk_Behavior_t *lookupClass;
+};
+
+
+struct crank_talk_Magnitude_s {
+    crank_talk_Object_t super;
+};
+
+struct crank_talk_Character_s {
+    crank_talk_Magnitude_t super;
+};
+
+struct crank_talk_Number_s {
+    crank_talk_Magnitude_t super;
+};
+
+struct crank_talk_Float_s {
+    crank_talk_Number_t super;
+};
+
+struct crank_talk_BoxedFloat_s {
+    crank_talk_Float_t super;
+    double value;
+};
+
+struct crank_talk_Fraction_s {
+    crank_talk_Number_t super;
+    crank_talk_oop_t numerator;
+    crank_talk_oop_t denominator;
+};
+
+struct crank_talk_SmallFloat_s {
+    crank_talk_Float_t super;
+};
+
+struct crank_talk_Integer_s {
+    crank_talk_Number_t super;
+};
+
+struct crank_talk_LargeInteger_s {
+    crank_talk_Integer_t super;
+};
+
+struct crank_talk_LargeNegativeInteger_s {
+    crank_talk_LargeInteger_t super;
+};
+
+struct crank_talk_LargePositiveInteger_s {
+    crank_talk_LargeInteger_t super;
+};
+
+struct crank_talk_SmallInteger_s {
+    crank_talk_Integer_t super;
+};
+
+struct crank_talk_UndefinedObject_s {
+    crank_talk_Object_t super;
+};
+
+struct crank_talk_Boolean_s {
+    crank_talk_Object_t super;
+};
+
+struct crank_talk_False_s {
+    crank_talk_Boolean_t super;
+};
+
+struct crank_talk_True_s {
+    crank_talk_Boolean_t super;
+};
+
+struct crank_talk_Tombstone_s {
+    crank_talk_Object_t super;
+};
+
+struct crank_talk_Variable_s {
+    crank_talk_Object_t super;
+    crank_talk_Symbol_t *name;
+};
+
+struct crank_talk_Slot_s {
+    crank_talk_Variable_t super;
+    crank_talk_oop_t index;
+};
+
+struct crank_talk_LookupKey_s
+{
+    crank_talk_Object_t super;
+    crank_talk_oop_t key;
+};
+
+struct crank_talk_Association_s
+{
+    crank_talk_LookupKey_t super;
+    crank_talk_oop_t value;
+};
+
+struct crank_talk_SourceCode_s
+{
+    crank_talk_Object_t super;
+    crank_talk_String_t *text;
+    crank_talk_String_t *directory;
+    crank_talk_String_t *name;
+};
+
+struct crank_talk_AbstractSourcePosition_s
+{
+    crank_talk_Object_t super;
+};
+
+struct crank_talk_EmptySourcePosition_s
+{
+    crank_talk_AbstractSourcePosition_t super;
+};
+
+struct crank_talk_SourcePosition_s
+{
+    crank_talk_AbstractSourcePosition_t super;
+    crank_talk_SourceCode_t *sourceCode;
+    
+    crank_talk_oop_t startIndex;
+    crank_talk_oop_t endIndex;
+    crank_talk_oop_t startLine;
+    crank_talk_oop_t endLine;
+    crank_talk_oop_t startColumn;
+    crank_talk_oop_t endColumn;
+};
+
+struct crank_talk_CrankTalkToken_s
+{
+    crank_talk_Object_t super;
+    crank_talk_SourcePosition_t *sourcePosition;
+    crank_talk_String_t *errorMessage;
+    crank_talk_oop_t kind;
+};
+
+struct crank_talk_Collection_s
+{
+    crank_talk_Object_t super;
+};
+
+struct crank_talk_HashedCollection_s
+{
+    crank_talk_Collection_t super;
+    crank_talk_oop_t size;
+    crank_talk_Array_t *storage;
+};
+
+struct crank_talk_Dictionary_s
+{
+    crank_talk_HashedCollection_t super;
+};
+
+struct crank_talk_IdentityDictionary_s
+{
+    crank_talk_Dictionary_t super;
+};
+
+struct crank_talk_MethodDictionary_s
+{
+    crank_talk_Dictionary_t super;
+};
+
+struct crank_talk_Set_s
+{
+    crank_talk_HashedCollection_t super;
+};
+
+struct crank_talk_IdentitySet_s
+{
+    crank_talk_Set_t super;
+};
+
+struct crank_talk_SequenceableCollection_s
+{
+    crank_talk_Collection_t super;
+};
+
+struct crank_talk_ArrayedCollection_s
+{
+    crank_talk_SequenceableCollection_t super;
+};
+
+struct crank_talk_Array_s
+{
+    crank_talk_ArrayedCollection_t super;
+    crank_talk_oop_t elements[];
+};
+
+struct crank_talk_ByteArray_s
+{
+    crank_talk_ArrayedCollection_t super;
+    uint8_t elements[];
+};
+
+struct crank_talk_String_s
+{
+    crank_talk_ArrayedCollection_t super;
+    char elements[];
+};
+
+struct crank_talk_Symbol_s
+{
+    crank_talk_ArrayedCollection_t super;
+    char elements[];
+};
+
+struct crank_talk_OrderedCollection_s
+{
+    crank_talk_SequenceableCollection_t super;
+    crank_talk_oop_t size;
+    crank_talk_Array_t *storage;
+};
+
+struct crank_talk_StringStream_s
+{
+    crank_talk_Object_t super;
+    crank_talk_oop_t size;
+    crank_talk_String_t *storage;
+};
+
+struct crank_talk_ExternalAddress_s
+{
+    crank_talk_Object_t super;
+    void* address;
+};
+
+CRANK_TALK_INLINE double
+crank_talk_decodeFloatFromOop(crank_talk_oop_t oop)
+{
+    if(crank_talk_oop_isSmallFloat(oop))
+        return crank_talk_oop_decodeSmallFloat(oop);
+    return ((crank_talk_BoxedFloat_t*)oop)->value;
+}
+
+CRANK_TALK_API crank_talk_oop_t sysmel_vm_oopFromFloat(crank_talk_VMContext_t *context, double value);
 
 #endif //CRANK_TALK_OBJECT_MODEL_H

@@ -1,4 +1,5 @@
 set(CrankTalk_Sources
+    heap.c
     object-model.c
 )
 
