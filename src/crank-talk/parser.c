@@ -602,7 +602,36 @@ crank_talk_parseBinaryExpressionSequence(crank_talk_VMContext_t *context, crank_
 static crank_talk_oop_t
 crank_talk_parseKeywordMessageSend(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
 {
-    return crank_talk_parseBinaryExpressionSequence(context, state);
+    size_t startPosition = state->position;
+    crank_talk_oop_t receiver = crank_talk_parseBinaryExpressionSequence(context, state);
+    if(crank_talk_ParserState_peekKind(state, 0) != CrankTalkTokenKindKeyword)
+        return receiver;
+
+    crank_talk_oop_t symbolBuilder = crank_talk_StringStream_create(context);
+    crank_talk_oop_t arguments = crank_talk_OrderedCollection_create(context);
+
+    while (crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindKeyword)
+    {
+        crank_talk_CrankTalkToken_t *keywordToken = crank_talk_ParserState_next(state);
+        crank_talk_StringSlice_t keywordTokenString = crank_talk_SourcePosition_asStringSlice(keywordToken->sourcePosition);
+        crank_talk_StringStream_insertString(context, symbolBuilder, keywordTokenString.size, keywordTokenString.text);
+
+        crank_talk_oop_t argument = crank_talk_parseBinaryExpressionSequence(context, state);
+        crank_talk_OrderedCollection_add(context, arguments, argument);        
+    }
+
+    crank_talk_oop_t selectorValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+    crank_talk_ParseTreeLiteralNode_t *selector = (crank_talk_ParseTreeLiteralNode_t *)selectorValue;
+    selector->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startPosition);
+    selector->value = crank_talk_StringStream_asSymbol(context, symbolBuilder);
+
+    crank_talk_oop_t messageValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeMessageSendNode);
+    crank_talk_ParseTreeMessageSendNode_t *message = (crank_talk_ParseTreeMessageSendNode_t*)messageValue;
+    message->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startPosition);
+    message->receiver = (crank_talk_ParseTreeNode_t*)receiver;
+    message->selector = (crank_talk_ParseTreeNode_t*)selectorValue;
+    message->arguments = (crank_talk_Array_t*)crank_talk_OrderedCollection_asArray(context, arguments);
+    return messageValue;
 }
 
 static crank_talk_oop_t
