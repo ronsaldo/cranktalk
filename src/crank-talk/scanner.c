@@ -366,6 +366,44 @@ crank_talk_ScannerState_scanNextToken(crank_talk_VMContext_t *context, crank_tal
         }
     }
 
+    switch (c)
+    {
+    case '(':
+        crank_talk_ScannerState_advance(state);
+        return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindLeftParent, &initialState);
+    
+    default:
+        if(isOperatorCharacter(c))
+        {
+            crank_talk_ScannerState_advance(state);
+            bool hasMultiChars = false;
+            while(isOperatorCharacter(crank_talk_ScannerState_peekAt(state, 0)))
+            {
+                hasMultiChars = true;
+                crank_talk_ScannerState_advance(state);
+            }
+
+            if(hasMultiChars)
+                return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindOperator, &initialState);
+
+            switch (c)
+            {
+            case '!':
+                if(crank_talk_ScannerState_peekAt(state, 0) == '[')
+                {
+                    crank_talk_ScannerState_advance(state);
+                    return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindMethodStart, &initialState);
+                }
+
+                return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindOperator, &initialState);
+            default:
+                return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindOperator, &initialState);
+            }
+
+        }
+        break;
+    }
+
     // Unexpected character.
     crank_talk_ScannerState_advance(state);
     return crank_talk_ScannerState_makeErrorTokenStartingFrom(context, state, "Unexpected character.", &initialState);

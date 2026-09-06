@@ -223,5 +223,32 @@ void scanner_runTests(void)
         AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
     }
 
+    // Hash punctuations
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "#[");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindByteArrayStart, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "#(");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindLiteralArrayStart, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+    // Method start
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "![");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindMethodStart, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+
     crank_talk_vm_destroyContext(context);
 }
