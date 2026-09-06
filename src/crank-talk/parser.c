@@ -497,10 +497,58 @@ crank_talk_parseTerm(crank_talk_VMContext_t *context, crank_talk_ParserState_t *
         return crank_talk_parseLiteral(context, state);
     }
 }
+
+static bool isUnaryPostfixOperator(crank_talk_TokenKind_t kind)
+{
+    switch(kind)
+    {
+    case CrankTalkTokenKindIdentifier:
+    case CrankTalkTokenKindMethodStart:
+        return true;
+    default: return false;
+    }
+}
+
 static crank_talk_oop_t
 crank_talk_parseUnaryPostfixExpression(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
 {
-    return crank_talk_parseTerm(context, state);
+    size_t startPosition = state->position;
+    crank_talk_oop_t receiver = crank_talk_parseTerm(context, state);
+
+    while(isUnaryPostfixOperator(crank_talk_ParserState_peekKind(state, 0)))
+    {
+        crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_peek(state, 0);
+        switch(crank_talk_oop_decodeSmallInteger(token->kind))
+        {
+        case CrankTalkTokenKindIdentifier:
+        {
+            crank_talk_ParserState_advance(state);
+
+            crank_talk_StringSlice_t tokenString = crank_talk_SourcePosition_asStringSlice(token->sourcePosition);
+
+            crank_talk_oop_t selectorValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+            crank_talk_ParseTreeLiteralNode_t *selector = (crank_talk_ParseTreeLiteralNode_t *)selectorValue;
+            selector->super.sourcePosition = token->sourcePosition;
+            selector->value = crank_talk_Symbol_internWithString(context, tokenString.size, tokenString.text);
+
+            crank_talk_oop_t unaryMessageValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeMessageSendNode);
+            crank_talk_ParseTreeMessageSendNode_t *unaryMessage = (crank_talk_ParseTreeMessageSendNode_t*)unaryMessageValue;
+            unaryMessage->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startPosition);
+            unaryMessage->receiver = (crank_talk_ParseTreeNode_t*)receiver;
+            unaryMessage->selector = (crank_talk_ParseTreeNode_t*)selectorValue;
+            unaryMessage->arguments = (crank_talk_Array_t*)crank_talk_Array_create(context, 0);
+            
+            receiver = unaryMessageValue;
+        } break;
+        case CrankTalkTokenKindMethodStart:
+        {
+            abort();
+        } break;
+        }
+
+    }
+
+    return receiver;
 }
 
 static bool

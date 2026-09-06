@@ -231,5 +231,16 @@ void parser_runTests(void)
         Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)binarySequence->arguments->elements[0]));        
     }
 
+    // Unary message send
+    {
+        crank_talk_oop_t ast = parseString(context, "a negated");
+        Assert(crank_talk_isParseTreeMessageSendNode(context, ast));
+
+        crank_talk_ParseTreeMessageSendNode_t *sendNode = (crank_talk_ParseTreeMessageSendNode_t*)ast;
+        Assert(crank_talk_isParseTreeIdentifierReferenceNode(context, (crank_talk_oop_t)sendNode->receiver));
+        Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)sendNode->selector));
+        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)sendNode->arguments));
+    }
+
     crank_talk_vm_destroyContext(context);
 }
