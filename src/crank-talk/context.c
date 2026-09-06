@@ -149,6 +149,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     
     context->roots.NumberClass =               crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.MagnitudeClass, sizeof(crank_talk_Number_t), CrankTalkGCObjectDataTypeOops);
     context->roots.FloatClass =                crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.NumberClass, sizeof(crank_talk_Float_t), CrankTalkGCObjectDataTypeOops);
+    context->roots.BoxedFloatClass =           crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.FloatClass, sizeof(crank_talk_BoxedFloat_t), CrankTalkGCObjectDataTypeBytes);
+    context->roots.SmallFloatClass =           crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.FloatClass, sizeof(crank_talk_SmallFloat_t), CrankTalkGCObjectDataTypeImmediate);
     context->roots.FractionClass =             crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.NumberClass, sizeof(crank_talk_Fraction_t), CrankTalkGCObjectDataTypeOops);
     context->roots.IntegerClass =              crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.NumberClass, sizeof(crank_talk_Integer_t), CrankTalkGCObjectDataTypeOops);
     context->roots.LargeIntegerClass =         crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.IntegerClass, sizeof(crank_talk_LargeInteger_t), CrankTalkGCObjectDataTypeOops);
@@ -199,6 +201,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     context->roots.OrderedCollectionClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.SequenceableCollectionClass,      sizeof(crank_talk_OrderedCollection_t),      CrankTalkGCObjectDataTypeOops);
 
+    context->roots.StringStreamClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_StringStream_t), CrankTalkGCObjectDataTypeOops);
+
     context->roots.ExternalAddressClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_ExternalAddress_t), CrankTalkGCObjectDataTypeBytes);
 
     // Symbol set
@@ -231,6 +235,113 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(Metaclass, thisClass),
         NULL);
 
+    crank_talk_context_setClassTypeMetadata(context, context->roots.CompiledFunctionClass, "CompiledFunction",
+        CrankTalkSlotDef(CompiledFunction, argumentCount),
+        CrankTalkSlotDef(CompiledFunction, nativeEntryPoint),
+        CrankTalkSlotDef(CompiledFunction, bytecode),
+        CrankTalkSlotDef(CompiledFunction, literalVector),
+        NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.BlockClosureClass, "BlockClosure",
+        CrankTalkSlotDef(BlockClosure, function),
+        CrankTalkSlotDef(BlockClosure, captureVector),
+        NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.MessageClass, "Message",
+        CrankTalkSlotDef(Message, selector),
+        CrankTalkSlotDef(Message, arguments),
+        CrankTalkSlotDef(Message, lookupClass),
+        NULL);
+
+    crank_talk_context_setClassTypeMetadata(context, context->roots.MagnitudeClass, "Magnitude", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.CharacterClass, "Character", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.NumberClass, "Number", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.FloatClass, "Float", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.BoxedFloatClass, "BoxedFloat", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.SmallFloatClass, "SmallFloat", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.FractionClass, "Fraction",
+        CrankTalkSlotDef(Fraction, numerator),
+        CrankTalkSlotDef(Fraction, denominator),
+        NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.IntegerClass, "Integer", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.LargeIntegerClass, "LargeInteger", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.LargeNegativeIntegerClass, "LargeNegativeInteger", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.LargePositiveIntegerClass, "LargePositiveInteger", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.SmallIntegerClass, "SmallInteger", NULL);
+
+    crank_talk_context_setClassTypeMetadata(context, context->roots.UndefinedObjectClass, "UndefinedObject", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.BooleanClass, "Boolean", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.FalseClass, "False", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.TrueClass, "True", NULL);
+
+    crank_talk_context_setClassTypeMetadata(context, context->roots.TombstoneClass, "Tombstone", NULL);
+
+    crank_talk_context_setClassTypeMetadata(context, context->roots.VariableClass, "Variable",
+        CrankTalkSlotDef(Variable, name),
+        NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.SlotClass, "Slot",
+        CrankTalkSlotDef(Slot, index),
+        NULL);
+
+    crank_talk_context_setClassTypeMetadata(context, context->roots.LookupKeyClass, "LookupKey",
+        CrankTalkSlotDef(LookupKey, key),
+        NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.AssociationClass, "Association",
+        CrankTalkSlotDef(Association, value),
+        NULL);
+
+    crank_talk_context_setClassTypeMetadata(context, context->roots.SourceCodeClass, "SourceCode",
+        CrankTalkSlotDef(SourceCode, text),
+        CrankTalkSlotDef(SourceCode, directory),
+        CrankTalkSlotDef(SourceCode, name),
+        NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.AbstractSourcePositionClass, "AbstractSourcePosition", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.EmptySourcePositionClass, "EmptySourcePosition", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.SourcePositionClass, "SourcePosition",
+        CrankTalkSlotDef(SourcePosition, sourceCode),
+        CrankTalkSlotDef(SourcePosition, startIndex),
+        CrankTalkSlotDef(SourcePosition, endIndex),
+        CrankTalkSlotDef(SourcePosition, startLine),
+        CrankTalkSlotDef(SourcePosition, endLine),
+        CrankTalkSlotDef(SourcePosition, startColumn),
+        CrankTalkSlotDef(SourcePosition, endColumn),
+        NULL);
+
+    crank_talk_context_setClassTypeMetadata(context, context->roots.CrankTalkTokenClass, "CrankTalkToken",
+        CrankTalkSlotDef(CrankTalkToken, sourcePosition),
+        CrankTalkSlotDef(CrankTalkToken, errorMessage),
+        CrankTalkSlotDef(CrankTalkToken, kind),
+        NULL);
+
+    crank_talk_context_setClassTypeMetadata(context, context->roots.CollectionClass, "Collection", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.HashedCollectionClass, "HashedCollection",
+        CrankTalkSlotDef(HashedCollection, size),
+        CrankTalkSlotDef(HashedCollection, storage),
+        NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.DictionaryClass, "Dictionary", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.IdentityDictionaryClass, "IdentityDictionary", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.MethodDictionaryClass, "MethodDictionary", NULL);
+
+    crank_talk_context_setClassTypeMetadata(context, context->roots.SetClass, "Set", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.IdentitySetClass, "IdentitySet", NULL);
+
+    crank_talk_context_setClassTypeMetadata(context, context->roots.SequenceableCollectionClass, "SequenceableCollection", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.ArrayedCollectionClass, "ArrayedCollection", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.ArrayClass, "Array", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.ByteArrayClass, "ByteArray", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.StringClass, "String", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.SymbolClass, "Symbol", NULL);
+
+    crank_talk_context_setClassTypeMetadata(context, context->roots.OrderedCollectionClass, "OrderedCollection",
+        CrankTalkSlotDef(OrderedCollection, size),
+        CrankTalkSlotDef(OrderedCollection, storage),
+        NULL);
+
+    crank_talk_context_setClassTypeMetadata(context, context->roots.StringStreamClass, "StringStream",
+        CrankTalkSlotDef(StringStream, size),
+        CrankTalkSlotDef(StringStream, storage),
+        NULL);
+
+    crank_talk_context_setClassTypeMetadata(context, context->roots.ExternalAddressClass, "ExternalAddress", NULL);
+
     // Tables
     crank_talk_context_createClassTables(context, context->roots.ProtoObjectClass);
     crank_talk_context_createClassTables(context, context->roots.ObjectClass);
@@ -239,6 +350,64 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_context_createClassTables(context, context->roots.ClassClass);
     crank_talk_context_createClassTables(context, context->roots.MetaclassClass);
 
+    crank_talk_context_createClassTables(context, context->roots.CompiledFunctionClass);
+    crank_talk_context_createClassTables(context, context->roots.BlockClosureClass);
+    crank_talk_context_createClassTables(context, context->roots.MessageClass);
+
+    crank_talk_context_createClassTables(context, context->roots.MagnitudeClass);
+    crank_talk_context_createClassTables(context, context->roots.CharacterClass);
+    crank_talk_context_createClassTables(context, context->roots.NumberClass);
+    crank_talk_context_createClassTables(context, context->roots.FloatClass);
+    crank_talk_context_createClassTables(context, context->roots.BoxedFloatClass);
+    crank_talk_context_createClassTables(context, context->roots.SmallFloatClass);
+    crank_talk_context_createClassTables(context, context->roots.FractionClass);
+    crank_talk_context_createClassTables(context, context->roots.IntegerClass);
+    crank_talk_context_createClassTables(context, context->roots.LargeIntegerClass);
+    crank_talk_context_createClassTables(context, context->roots.LargeNegativeIntegerClass);
+    crank_talk_context_createClassTables(context, context->roots.LargePositiveIntegerClass);
+    crank_talk_context_createClassTables(context, context->roots.SmallIntegerClass);
+
+    crank_talk_context_createClassTables(context, context->roots.UndefinedObjectClass);
+    crank_talk_context_createClassTables(context, context->roots.BooleanClass);
+    crank_talk_context_createClassTables(context, context->roots.FalseClass);
+    crank_talk_context_createClassTables(context, context->roots.TrueClass);
+
+    crank_talk_context_createClassTables(context, context->roots.TombstoneClass);
+
+    crank_talk_context_createClassTables(context, context->roots.VariableClass);
+    crank_talk_context_createClassTables(context, context->roots.SlotClass);
+
+    crank_talk_context_createClassTables(context, context->roots.LookupKeyClass);
+    crank_talk_context_createClassTables(context, context->roots.AssociationClass);
+
+    crank_talk_context_createClassTables(context, context->roots.SourceCodeClass);
+    crank_talk_context_createClassTables(context, context->roots.AbstractSourcePositionClass);
+    crank_talk_context_createClassTables(context, context->roots.EmptySourcePositionClass);
+    crank_talk_context_createClassTables(context, context->roots.SourcePositionClass);
+
+    crank_talk_context_createClassTables(context, context->roots.CrankTalkTokenClass);
+
+    crank_talk_context_createClassTables(context, context->roots.CollectionClass);
+    crank_talk_context_createClassTables(context, context->roots.HashedCollectionClass);
+    crank_talk_context_createClassTables(context, context->roots.DictionaryClass);
+    crank_talk_context_createClassTables(context, context->roots.IdentityDictionaryClass);
+    crank_talk_context_createClassTables(context, context->roots.MethodDictionaryClass);
+
+    crank_talk_context_createClassTables(context, context->roots.SetClass);
+    crank_talk_context_createClassTables(context, context->roots.IdentitySetClass);
+
+    crank_talk_context_createClassTables(context, context->roots.SequenceableCollectionClass);
+    crank_talk_context_createClassTables(context, context->roots.ArrayedCollectionClass);
+    crank_talk_context_createClassTables(context, context->roots.ArrayClass);
+    crank_talk_context_createClassTables(context, context->roots.ByteArrayClass);
+    crank_talk_context_createClassTables(context, context->roots.StringClass);
+    crank_talk_context_createClassTables(context, context->roots.SymbolClass);
+    
+    crank_talk_context_createClassTables(context, context->roots.OrderedCollectionClass);
+
+    crank_talk_context_createClassTables(context, context->roots.StringStreamClass);
+
+    crank_talk_context_createClassTables(context, context->roots.ExternalAddressClass);
 }
 
 static void 
