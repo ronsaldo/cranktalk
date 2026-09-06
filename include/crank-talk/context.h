@@ -93,6 +93,42 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t printOnSymbol;
     crank_talk_oop_t fullPrintOnSymbol;
 
+    // Front end classes
+    crank_talk_oop_t ParseTreeNodeClass;
+    crank_talk_oop_t ParseTreeParseErrorNodeClass;
+    crank_talk_oop_t ParseTreeAssignmentNodeClass;
+    crank_talk_oop_t ParseTreeBinaryExpressionSequenceNodeClass;
+    crank_talk_oop_t ParseTreeIdentifierReferenceNodeClass;
+    crank_talk_oop_t ParseTreePseudoVariableReferenceNodeClass;
+    
+    crank_talk_oop_t ParseTreeNilReferenceNodeClass;
+    crank_talk_oop_t ParseTreeFalseReferenceNodeClass;
+    crank_talk_oop_t ParseTreeTrueReferenceNodeClass;
+    crank_talk_oop_t ParseTreeSelfReferenceNodeClass;
+    crank_talk_oop_t ParseTreeSuperReferenceNodeClass;
+    crank_talk_oop_t ParseTreeThisContextReferenceNodeClass;
+
+    crank_talk_oop_t ParseTreeArgumentDefinitionNodeClass;
+    crank_talk_oop_t ParseTreeBlockNodeClass;
+    crank_talk_oop_t ParseTreeLiteralNodeClass;
+    
+    crank_talk_oop_t ParseTreeLiteralCharacterNodeClass;
+    crank_talk_oop_t ParseTreeLiteralFloatNodeClass;
+    crank_talk_oop_t ParseTreeLiteralIntegerNodeClass;
+    crank_talk_oop_t ParseTreeLiteralStringNodeClass;
+    crank_talk_oop_t ParseTreeLiteralSymbolNodeClass;
+    crank_talk_oop_t ParseTreeLiteralValueNodeClass;
+    
+    crank_talk_oop_t ParseTreeCascadedMessageNodeClass;
+    crank_talk_oop_t ParseTreeMessageCascadeNodeClass;
+    crank_talk_oop_t ParseTreeMessageSendNodeClass;
+    crank_talk_oop_t ParseTreeSequenceNodeClass;
+    crank_talk_oop_t ParseTreeArrayNodeClass;
+    crank_talk_oop_t ParseTreeReturnNodeClass;
+    crank_talk_oop_t ParseTreeAddMethodNodeClass;
+    crank_talk_oop_t ParseTreeMethodDefinitionNodeClass;
+
+
 };
 
 struct crank_talk_VMContext_s

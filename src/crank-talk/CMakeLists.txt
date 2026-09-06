@@ -8,6 +8,7 @@ set(CrankTalk_Sources
     heap.c
     object-model.c
     ordered-collection.c
+    parse-tree.c
     scanner.c
     set.c
     stack-frame.c

@@ -3,6 +3,7 @@
 #include "crank-talk/behavior.h"
 #include "crank-talk/gc.h"
 #include "crank-talk/ordered-collection.h"
+#include "crank-talk/parse-tree.h"
 #include "crank-talk/set.h"
 #include "crank-talk/string.h"
 #include <stdarg.h>
@@ -38,7 +39,7 @@ crank_talk_context_fixupMetaclassType(crank_talk_VMContext_t *context, crank_tal
 }
 
 static void
-crank_talk_context_setClassTypeMetadata(crank_talk_VMContext_t *context, crank_talk_oop_t classValue, const char *name, ...)
+crank_talk_context_setClassTypeMetadataVList(crank_talk_VMContext_t *context, crank_talk_oop_t classValue, const char *name, va_list valist)
 {
     assert(!crank_talk_oop_isNil(classValue));
     crank_talk_Class_t *clazz = (crank_talk_Class_t*)classValue;
@@ -53,8 +54,6 @@ crank_talk_context_setClassTypeMetadata(crank_talk_VMContext_t *context, crank_t
 
     crank_talk_oop_t slots = crank_talk_OrderedCollection_create(context);
     
-    va_list valist;
-    va_start(valist, name);
     const char *fieldName;
     while((fieldName = va_arg(valist, const char *)) != NULL)
     {
@@ -68,7 +67,6 @@ crank_talk_context_setClassTypeMetadata(crank_talk_VMContext_t *context, crank_t
         slot->index = crank_talk_oop_encodeSmallInteger((offset - sizeof(crank_talk_ObjectHeader_t)) / sizeof(crank_talk_oop_t));
         crank_talk_OrderedCollection_add(context, slots, slotValue);
     }
-    va_end(valist);
 
     clazz->super.super.slots = crank_talk_OrderedCollection_asArray(context, slots);
 
@@ -77,6 +75,15 @@ crank_talk_context_setClassTypeMetadata(crank_talk_VMContext_t *context, crank_t
     crank_talk_Metaclass_t *metaClass = (crank_talk_Metaclass_t*)metaclassValue;
     if(crank_talk_oop_isNil(metaClass->super.super.slots))
         metaClass->super.super.slots = crank_talk_Array_create(context, 0);
+}
+
+static void
+crank_talk_context_setClassTypeMetadata(crank_talk_VMContext_t *context, crank_talk_oop_t classValue, const char *name, ...)
+{
+    va_list valist;
+    va_start(valist, name);
+    crank_talk_context_setClassTypeMetadataVList(context, classValue, name, valist);
+    va_end(valist);
 }
 
 static void
@@ -109,6 +116,24 @@ crank_talk_context_createClassTables(crank_talk_VMContext_t *context, crank_talk
     crank_talk_context_createBehaviorSlotsTables(context, classValue);
     crank_talk_oop_t metaclass = (crank_talk_oop_t)crank_talk_oop_getClass(context, classValue);
     crank_talk_context_createBehaviorSlotsTables(context, metaclass);
+}
+
+
+static crank_talk_oop_t
+crank_talk_context_createClassAndMetaclass(crank_talk_VMContext_t *context, const char *name, crank_talk_oop_t superclass, size_t instanceSize, crank_talk_GCObjectDataType_t dataType, ...)
+{
+    // Create the class object.
+    crank_talk_oop_t classValue = crank_talk_context_createAnonymousClassAndMetaclass(context, superclass, instanceSize, dataType);
+    
+    // Set the slots.
+    va_list valist;
+    va_start(valist, dataType);
+    crank_talk_context_setClassTypeMetadataVList(context, classValue, name, valist);
+    va_end(valist);
+
+    // Create the allSlots table.
+    crank_talk_context_createClassTables(context, classValue);
+    return classValue;
 }
 
 
@@ -411,6 +436,14 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 }
 
 static void 
+crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
+{
+    context->roots.ParseTreeNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeNode", context->roots.ObjectClass, sizeof(crank_talk_ParseTreeNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeNode, sourcePosition),
+        NULL);
+}
+
+static void 
 crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
 {
 }
@@ -422,6 +455,7 @@ crank_talk_vm_createContext(void)
     crank_talk_heap_initialize(&context->heap);
     crank_talk_dynarray_initialize(&context->markingStack, sizeof(crank_talk_oop_t), 1<<17);
     crank_talk_context_createCoreDefinitions(context);
+    crank_talk_context_createFrontEndDefinitions(context);
     crank_talk_registerPrimitives(context);
     crank_talk_gc_collect(context);
     return context;
