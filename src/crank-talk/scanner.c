@@ -366,6 +366,32 @@ crank_talk_ScannerState_scanNextToken(crank_talk_VMContext_t *context, crank_tal
         }
     }
 
+    // String literals
+    if(c == '\'')
+    {
+        crank_talk_ScannerState_advance(state);
+        while(!crank_talk_ScannerState_atEnd(state) && crank_talk_ScannerState_peekAt(state, 0) != '\'')
+        {
+            if(crank_talk_ScannerState_peekAt(state, 0) == '\'' && crank_talk_ScannerState_peekAt(state, 1) == '\'')
+                crank_talk_ScannerState_advanceCount(state, 2);
+            else
+                crank_talk_ScannerState_advance(state);
+        }
+
+        // End of string
+        if(crank_talk_ScannerState_peekAt(state, 0) != '\'')
+            return crank_talk_ScannerState_makeErrorTokenStartingFrom(context, state, "Incomplete string literal.", &initialState);
+        crank_talk_ScannerState_advance(state);
+        return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindString, &initialState);
+    }
+
+    // Character literals
+    if(c == '$')
+    {
+        crank_talk_ScannerState_advanceCount(state, 2);
+        return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindCharacter, &initialState);
+    }
+
     switch (c)
     {
     case '(':

@@ -249,6 +249,35 @@ void scanner_runTests(void)
         AssertEquals(CrankTalkTokenKindMethodStart, getTokenKind(tokens->elements[0]));
         AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
     }
+    // String
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "'Hello Symbol'");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindString, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+
+    // Incomplete String
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "'Hello Symbol");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindError, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+
+    // Character
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "$a");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindCharacter, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
 
     crank_talk_vm_destroyContext(context);
 }
