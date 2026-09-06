@@ -1,6 +1,7 @@
 #include "crank-talk/context.h"
 #include "crank-talk/message.h"
 #include "crank-talk/string.h"
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -26,6 +27,144 @@ crank_talk_Float_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_o
 }
 
 static crank_talk_oop_t
+crank_talk_Float_negated_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+
+    double value = crank_talk_oop_asFloat(self);
+    return crank_talk_oop_fromFloat(context, -value);
+}
+
+static crank_talk_oop_t
+crank_talk_Float_sqrt_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+
+    double value = crank_talk_oop_asFloat(self);
+    return crank_talk_oop_fromFloat(context, sqrt(value));
+}
+
+static crank_talk_oop_t
+crank_talk_Float_add_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    double value = crank_talk_oop_asFloat(self);
+    double operandValue = crank_talk_oop_numberAsFloat(operand);
+    return crank_talk_oop_fromFloat(context, value + operandValue);
+}
+
+static crank_talk_oop_t
+crank_talk_Float_minus_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    double value = crank_talk_oop_asFloat(self);
+    double operandValue = crank_talk_oop_numberAsFloat(operand);
+    return crank_talk_oop_fromFloat(context, value - operandValue);
+}
+
+static crank_talk_oop_t
+crank_talk_Float_times_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    double value = crank_talk_oop_asFloat(self);
+    double operandValue = crank_talk_oop_numberAsFloat(operand);
+    return crank_talk_oop_fromFloat(context, value * operandValue);
+}
+
+static crank_talk_oop_t
+crank_talk_Float_divide_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    double value = crank_talk_oop_asFloat(self);
+    double operandValue = crank_talk_oop_numberAsFloat(operand);
+    return crank_talk_oop_fromFloat(context, value / operandValue);
+}
+
+static crank_talk_oop_t
+crank_talk_Float_exp_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+
+    double value = crank_talk_oop_asFloat(self);
+    return crank_talk_oop_fromFloat(context, exp(value));
+}
+
+static crank_talk_oop_t
+crank_talk_Float_ln_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+
+    double value = crank_talk_oop_asFloat(self);
+    return crank_talk_oop_fromFloat(context, log(value));
+}
+
+static crank_talk_oop_t
+crank_talk_Float_cos_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+
+    double value = crank_talk_oop_asFloat(self);
+    return crank_talk_oop_fromFloat(context, cos(value));
+}
+
+static crank_talk_oop_t
+crank_talk_Float_sin_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+
+    double value = crank_talk_oop_asFloat(self);
+    return crank_talk_oop_fromFloat(context, sin(value));
+}
+
+static crank_talk_oop_t
 crank_talk_SmallInteger_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -48,5 +187,18 @@ crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "printOn:", 2, crank_talk_Float_printOn_primitive);
 
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "negated", 1, crank_talk_Float_negated_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "sqrt", 1, crank_talk_Float_sqrt_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "+", 2, crank_talk_Float_add_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "-", 2, crank_talk_Float_minus_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "*", 2, crank_talk_Float_times_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "/", 2, crank_talk_Float_divide_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "exp", 1, crank_talk_Float_exp_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "ln",  1, crank_talk_Float_ln_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "cos", 1, crank_talk_Float_cos_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "sin", 1, crank_talk_Float_sin_primitive);
+    
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "printOn:", 2, crank_talk_SmallInteger_printOn_primitive);
 }

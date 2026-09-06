@@ -2,6 +2,16 @@
 #include "crank-talk/context.h"
 #include <stdlib.h>
 
+CRANK_TALK_API double
+crank_talk_oop_numberAsFloat(crank_talk_oop_t oop)
+{
+    if(crank_talk_oop_isSmallFloat(oop))
+        return crank_talk_oop_decodeSmallFloat(oop);
+    else if(crank_talk_oop_isSmallInteger(oop))
+        return crank_talk_oop_decodeSmallInteger(oop);
+    return ((crank_talk_BoxedFloat_t*)oop)->value;
+}
+
 CRANK_TALK_API crank_talk_oop_t
 crank_talk_oop_fromFloat(crank_talk_VMContext_t *context, double value)
 {

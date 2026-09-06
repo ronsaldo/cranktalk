@@ -21,6 +21,7 @@ set(CrankTalk_Sources
 )
 
 add_library(CrankTalk ${CrankTalk_Sources})
+target_link_libraries(CrankTalk m)
 
 add_executable(crank-talk main.c)
 target_link_libraries(crank-talk CrankTalk)
