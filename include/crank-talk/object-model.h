@@ -638,14 +638,15 @@ struct crank_talk_ExternalAddress_s
 };
 
 CRANK_TALK_INLINE double
-crank_talk_decodeFloatFromOop(crank_talk_oop_t oop)
+crank_talk_oop_asFloat(crank_talk_oop_t oop)
 {
     if(crank_talk_oop_isSmallFloat(oop))
         return crank_talk_oop_decodeSmallFloat(oop);
     return ((crank_talk_BoxedFloat_t*)oop)->value;
 }
 
-CRANK_TALK_API crank_talk_oop_t crank_talk_oopFromFloat(crank_talk_VMContext_t *context, double value);
+CRANK_TALK_API crank_talk_oop_t crank_talk_oop_fromFloat(crank_talk_VMContext_t *context, double value);
 CRANK_TALK_API crank_talk_Behavior_t *crank_talk_oop_getClass(crank_talk_VMContext_t *context, crank_talk_oop_t value);
+
 
 #endif //CRANK_TALK_OBJECT_MODEL_H

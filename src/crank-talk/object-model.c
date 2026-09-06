@@ -2,6 +2,22 @@
 #include "crank-talk/context.h"
 #include <stdlib.h>
 
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_oop_fromFloat(crank_talk_VMContext_t *context, double value)
+{
+    if(crank_talk_oop_isFloatInSmallFloatRange(value))
+    {
+        return crank_talk_oop_encodeSmallFloat(value);
+    }
+    else
+    {
+        crank_talk_oop_t boxedFloatValue = CrankAllocateBytesObjectWithClassName(context, BoxedFloat);
+        crank_talk_BoxedFloat_t *boxedFloat = (crank_talk_BoxedFloat_t *)boxedFloatValue;
+        boxedFloat->value = value;
+        return boxedFloatValue;
+    }
+}
+
 CRANK_TALK_API crank_talk_Behavior_t *
 crank_talk_oop_getClass(crank_talk_VMContext_t *context, crank_talk_oop_t value)
 {

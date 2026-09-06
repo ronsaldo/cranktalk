@@ -8,6 +8,7 @@
 #define CrankAllocateVariadicObjectWithClassName(context, objectClassName, dataType, variadicByteSize) \
     crank_talk_heap_allocateOopWithSizeAndType(&context->heap, sizeof(crank_talk_ ## objectClassName##_t) + variadicByteSize, dataType, context->roots.objectClassName##Class)
 
+#define CrankAllocateBytesObjectWithClassName(context, objectClassName) CrankAllocateVariadicObjectWithClassName(context, objectClassName, CrankTalkGCObjectDataTypeBytes, 0)
 #define CrankAllocateValuesObjectWithClassName(context, objectClassName) CrankAllocateVariadicObjectWithClassName(context, objectClassName, CrankTalkGCObjectDataTypeOops, 0)
 
 typedef struct crank_talk_VMContext_s crank_talk_VMContext_t;

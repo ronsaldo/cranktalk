@@ -56,39 +56,55 @@ void string_runTests(void)
     // Class as string
     {
         crank_talk_oop_t classAsString = crank_talk_oop_asString(context, context->roots.ObjectClass);
-        Assert(crank_talk_Symbol_equalsCString(classAsString, "Object"));
+        Assert(crank_talk_String_equalsCString(classAsString, "Object"));
     }
 
     // Metaclass as string
     {
         crank_talk_oop_t classAsString = crank_talk_oop_asString(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.ObjectClass));
-        Assert(crank_talk_Symbol_equalsCString(classAsString, "Object class"));
+        Assert(crank_talk_String_equalsCString(classAsString, "Object class"));
     }
 
     // Object print string
     {
         crank_talk_oop_t objectValue = CrankAllocateValuesObjectWithClassName(context, Object);
         crank_talk_oop_t objectAsString = crank_talk_oop_asString(context, objectValue);
-        Assert(crank_talk_Symbol_equalsCString(objectAsString, "a Object"));
+        Assert(crank_talk_String_equalsCString(objectAsString, "a Object"));
     }
 
     // Nil print string
     {
         crank_talk_oop_t objectAsString = crank_talk_oop_asString(context, crank_talk_oop_nil());
-        Assert(crank_talk_Symbol_equalsCString(objectAsString, "nil"));
+        Assert(crank_talk_String_equalsCString(objectAsString, "nil"));
     }
 
     // False print string
     {
         crank_talk_oop_t objectAsString = crank_talk_oop_asString(context, context->roots.falseValue);
-        Assert(crank_talk_Symbol_equalsCString(objectAsString, "false"));
+        Assert(crank_talk_String_equalsCString(objectAsString, "false"));
     }
 
     // True print string
     {
         crank_talk_oop_t objectAsString = crank_talk_oop_asString(context, context->roots.trueValue);
-        Assert(crank_talk_Symbol_equalsCString(objectAsString, "true"));
+        Assert(crank_talk_String_equalsCString(objectAsString, "true"));
     }
+
+    // Small integer
+    {
+        crank_talk_oop_t printString = crank_talk_oop_printString(context, crank_talk_oop_encodeSmallInteger(42));
+        Assert(crank_talk_String_equalsCString(printString, "42"));
+    }
+
+    // Float
+    {
+        crank_talk_oop_t printString = crank_talk_oop_printString(context, crank_talk_oop_fromFloat(context, 42.0));
+        Assert(crank_talk_String_equalsCString(printString, "42.0"));
+
+        printString = crank_talk_oop_printString(context, crank_talk_oop_fromFloat(context, 42.5));
+        Assert(crank_talk_String_equalsCString(printString, "42.5"));
+    }
+
 
     crank_talk_vm_destroyContext(context);
 }

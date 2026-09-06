@@ -7,7 +7,7 @@
 CRANK_TALK_API crank_talk_CompiledFunction_t*
 crank_talk_CompiledFunction_createForPrimitive(crank_talk_VMContext_t *context, crank_talk_oop_t name, size_t argumentCount, crank_talk_CompiledFunctionNativeEntryPoint_t entryPoint)
 {
-    crank_talk_ExternalAddress_t *entryPointAddress = (crank_talk_ExternalAddress_t*)CrankAllocateValuesObjectWithClassName(context, ExternalAddress);
+    crank_talk_ExternalAddress_t *entryPointAddress = (crank_talk_ExternalAddress_t*)CrankAllocateBytesObjectWithClassName(context, ExternalAddress);
     entryPointAddress->address = entryPoint;
 
     crank_talk_CompiledFunction_t *primitiveFunction = (crank_talk_CompiledFunction_t*)CrankAllocateValuesObjectWithClassName(context, CompiledFunction);
