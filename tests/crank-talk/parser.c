@@ -216,7 +216,19 @@ void parser_runTests(void)
         crank_talk_oop_t *arrayElements = arrayNode->elements->elements;
         Assert(crank_talk_isParseTreeLiteralNode(context, arrayElements[0]));
         Assert(crank_talk_isParseTreeLiteralNode(context, arrayElements[1]));
-      
+    }
+
+    // Binary expression sequence
+    {
+        crank_talk_oop_t ast = parseString(context, "1 + 2");
+        Assert(crank_talk_isParseTreeMessageSendNode(context, ast));
+
+        crank_talk_ParseTreeMessageSendNode_t *binarySequence = (crank_talk_ParseTreeMessageSendNode_t*)ast;
+        AssertEquals(1, crank_talk_object_getSizeInSlots((crank_talk_oop_t)binarySequence->arguments));
+        
+        Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)binarySequence->receiver));
+        Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)binarySequence->selector));
+        Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)binarySequence->arguments->elements[0]));        
     }
 
     crank_talk_vm_destroyContext(context);

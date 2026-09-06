@@ -497,11 +497,70 @@ crank_talk_parseTerm(crank_talk_VMContext_t *context, crank_talk_ParserState_t *
         return crank_talk_parseLiteral(context, state);
     }
 }
+static crank_talk_oop_t
+crank_talk_parseUnaryPostfixExpression(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    return crank_talk_parseTerm(context, state);
+}
+
+static bool
+isBinaryExpressionOperator(crank_talk_TokenKind_t kind)
+{
+    switch(kind)
+    {
+    case CrankTalkTokenKindOperator:
+    case CrankTalkTokenKindLessThan:
+    case CrankTalkTokenKindGreaterThan:
+    case CrankTalkTokenKindBar:
+        return true;
+    default:
+        return false;
+    }
+}
+
+static crank_talk_oop_t
+crank_talk_parseBinaryExpressionSequence(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    size_t startPosition = state->position;
+    crank_talk_oop_t receiver = crank_talk_parseUnaryPostfixExpression(context, state);
+    while(isBinaryExpressionOperator(crank_talk_ParserState_peekKind(state, 0)))
+    {
+        // Operator symbol.
+        crank_talk_CrankTalkToken_t *operatorToken = crank_talk_ParserState_next(state);
+        crank_talk_StringSlice_t operatorTokenString = crank_talk_SourcePosition_asStringSlice(operatorToken->sourcePosition);
+
+        crank_talk_oop_t operatorValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+        crank_talk_ParseTreeLiteralNode_t *operator = (crank_talk_ParseTreeLiteralNode_t *)operatorValue;
+        operator->super.sourcePosition = operatorToken->sourcePosition;
+        operator->value = crank_talk_Symbol_internWithString(context, operatorTokenString.size, operatorTokenString.text);
+
+        // Binary operand
+        crank_talk_oop_t operand = crank_talk_parseUnaryPostfixExpression(context, state);
+
+        // Create the message send
+        crank_talk_oop_t messageSendValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeMessageSendNode);
+        crank_talk_ParseTreeMessageSendNode_t *messageSend = (crank_talk_ParseTreeMessageSendNode_t*)messageSendValue;
+        messageSend->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startPosition);
+        messageSend->receiver = (crank_talk_ParseTreeNode_t*)receiver;
+        messageSend->selector = (crank_talk_ParseTreeNode_t*)operatorValue;
+        messageSend->arguments = (crank_talk_Array_t*)crank_talk_Array_With(context, operand);
+
+        receiver = messageSendValue;
+    }
+
+    return receiver;
+}
+
+static crank_talk_oop_t
+crank_talk_parseKeywordMessageSend(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    return crank_talk_parseBinaryExpressionSequence(context, state);
+}
 
 static crank_talk_oop_t
 crank_talk_parseMessageCascade(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
 {
-    return crank_talk_parseTerm(context, state);
+    return crank_talk_parseKeywordMessageSend(context, state);
 }
 
 static crank_talk_oop_t
