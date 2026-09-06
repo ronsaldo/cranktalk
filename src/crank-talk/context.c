@@ -528,6 +528,15 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(ParseTreeMethodDefinitionNode, arguments),
         CrankTalkSlotDef(ParseTreeMethodDefinitionNode, body),
         NULL);
+
+    context->roots.ParseTreePragmaNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreePragmaNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeMethodDefinitionNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreePragmaNode, selector),
+        CrankTalkSlotDef(ParseTreePragmaNode, arguments),
+        NULL);
+
+    context->roots.ParseTreeVariableDefinitionNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeVariableDefinitionNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeMethodDefinitionNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeVariableDefinitionNode, name),
+        NULL);
 }
 
 static void 

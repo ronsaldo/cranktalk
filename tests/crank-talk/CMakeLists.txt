@@ -1,5 +1,6 @@
 set(CrankTalkTest_Sources
     main.c
+    parser.c
     scanner.c
     string.c
 )

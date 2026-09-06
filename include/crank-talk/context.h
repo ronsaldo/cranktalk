@@ -125,6 +125,8 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t ParseTreeReturnNodeClass;
     crank_talk_oop_t ParseTreeAddMethodNodeClass;
     crank_talk_oop_t ParseTreeMethodDefinitionNodeClass;
+    crank_talk_oop_t ParseTreePragmaNodeClass;
+    crank_talk_oop_t ParseTreeVariableDefinitionNodeClass;
 
 
 };

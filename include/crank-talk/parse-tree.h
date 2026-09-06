@@ -28,6 +28,8 @@ typedef struct crank_talk_ParseTreeArrayNode_s crank_talk_ParseTreeArrayNode_t;
 typedef struct crank_talk_ParseTreeReturnNode_s crank_talk_ParseTreeReturnNode_t;
 typedef struct crank_talk_ParseTreeAddMethodNode_s crank_talk_ParseTreeAddMethodNode_t;
 typedef struct crank_talk_ParseTreeMethodDefinitionNode_s crank_talk_ParseTreeMethodDefinitionNode_t;
+typedef struct crank_talk_ParseTreePragmaNode_s crank_talk_ParseTreePragmaNode_t;
+typedef struct crank_talk_ParseTreeVariableDefinitionNode_s crank_talk_ParseTreeVariableDefinitionNode_t;
 
 struct crank_talk_ParseTreeNode_s
 {
@@ -164,5 +166,45 @@ struct crank_talk_ParseTreeMethodDefinitionNode_s
     crank_talk_Array_t *arguments;
     crank_talk_ParseTreeNode_t *body;
 };
+
+struct crank_talk_ParseTreePragmaNode_s
+{
+    crank_talk_ParseTreeNode_t super;
+    crank_talk_Symbol_t *selector;
+    crank_talk_Array_t *arguments;
+};
+
+struct crank_talk_ParseTreeVariableDefinitionNode_s
+{
+    crank_talk_ParseTreeNode_t super;
+    crank_talk_Symbol_t *name;
+};
+
+CRANK_TALK_API bool crank_talk_isParseTreeNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeErrorNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeAssignmentNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeIdentifierReferenceNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreePseudoVariableReferenceNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+
+CRANK_TALK_API bool crank_talk_isParseTreeNilReferenceNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeFalseReferenceNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeTrueReferenceNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeSelfReferenceNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeSuperReferenceNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeThisContextReferenceNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+
+CRANK_TALK_API bool crank_talk_isParseTreeArgumentDefinitionNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeBlockNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeLiteralNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeCascadedMessageNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeMessageCascadeNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeMessageSendNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeSequenceNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeArrayNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeReturnNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeAddMethodNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeMethodDefinitionNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreePragmaNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeVariableDefinitionNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
 
 #endif //CRANK_TALK_PARSE_TREE_H

@@ -14,6 +14,7 @@ set(CrankTalk_Sources
     object-model.c
     ordered-collection.c
     parse-tree.c
+    parser.c
     scanner.c
     set.c
     stack-frame.c

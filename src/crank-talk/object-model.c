@@ -50,3 +50,29 @@ crank_talk_oop_getClass(crank_talk_VMContext_t *context, crank_talk_oop_t value)
     default: abort();
     }
 }
+
+CRANK_TALK_API bool
+sysmel_vm_Behavior_isDirectSubtype(crank_talk_oop_t type, crank_talk_oop_t supertype)
+{
+    if(crank_talk_oop_isNil(type) || crank_talk_oop_isNil(supertype))
+        return false;
+
+    crank_talk_oop_t position = type;
+    while(!crank_talk_oop_isNil(position))
+    {
+        if(position == supertype)
+            return true;
+
+        crank_talk_Behavior_t *positionBehavior = (crank_talk_Behavior_t*)position;
+        position = (crank_talk_oop_t)positionBehavior->superclass;
+    }
+
+    return false;
+}
+
+CRANK_TALK_API bool
+crank_talk_oop_isKindOf(crank_talk_VMContext_t *context, crank_talk_oop_t value, crank_talk_oop_t behavior)
+{
+    crank_talk_oop_t valueClass = (crank_talk_oop_t)crank_talk_oop_getClass(context, value);
+    return value == behavior || sysmel_vm_Behavior_isDirectSubtype(valueClass, behavior);
+}
