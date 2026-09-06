@@ -42,6 +42,16 @@ void parser_runTests(void)
         AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)sequenceNode->expressions));
     }
 
+    // Assignment
+    {
+        crank_talk_oop_t ast = parseString(context, "a := 42");
+        Assert(crank_talk_isParseTreeAssignmentNode(context, ast));
+
+        crank_talk_ParseTreeAssignmentNode_t *assignment = (crank_talk_ParseTreeAssignmentNode_t*)ast;
+        Assert(crank_talk_isParseTreeIdentifierReferenceNode(context, (crank_talk_oop_t)assignment->store));
+        Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)assignment->value));
+    }    
+
     // Literal integer 42
     {
         crank_talk_oop_t ast = parseString(context, "42");

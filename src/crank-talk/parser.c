@@ -499,9 +499,40 @@ crank_talk_parseTerm(crank_talk_VMContext_t *context, crank_talk_ParserState_t *
 }
 
 static crank_talk_oop_t
-crank_talk_parseExpression(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+crank_talk_parseMessageCascade(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
 {
     return crank_talk_parseTerm(context, state);
+}
+
+static crank_talk_oop_t
+crank_talk_parseAssignmentExpression(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    size_t startPosition = state->position;
+    crank_talk_oop_t assignedStore = crank_talk_parseMessageCascade(context, state);
+    if(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindAssignment)
+    {
+        crank_talk_ParserState_advance(state);
+        crank_talk_oop_t assignedValue = crank_talk_parseAssignmentExpression(context, state);
+        
+        crank_talk_oop_t assignmentValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeAssignmentNode);
+        crank_talk_ParseTreeAssignmentNode_t *assignment = (crank_talk_ParseTreeAssignmentNode_t *)assignmentValue;
+        assignment->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startPosition);
+        assignment->store = (crank_talk_ParseTreeNode_t*)assignedStore;
+        assignment->value = (crank_talk_ParseTreeNode_t*)assignedValue;
+        return assignmentValue;
+    }
+    else
+    {
+        return assignedStore;
+    }
+
+    return crank_talk_parseMessageCascade(context, state);
+}
+
+static crank_talk_oop_t
+crank_talk_parseExpression(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    return crank_talk_parseAssignmentExpression(context, state);
 }
 
 static crank_talk_oop_t
