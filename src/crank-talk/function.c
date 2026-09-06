@@ -5,12 +5,13 @@
 #include <stdlib.h>
 
 CRANK_TALK_API crank_talk_CompiledFunction_t*
-crank_talk_CompiledFunction_createForPrimitive(crank_talk_VMContext_t *context, size_t argumentCount, crank_talk_CompiledFunctionNativeEntryPoint_t entryPoint)
+crank_talk_CompiledFunction_createForPrimitive(crank_talk_VMContext_t *context, crank_talk_oop_t name, size_t argumentCount, crank_talk_CompiledFunctionNativeEntryPoint_t entryPoint)
 {
     crank_talk_ExternalAddress_t *entryPointAddress = (crank_talk_ExternalAddress_t*)CrankAllocateValuesObjectWithClassName(context, ExternalAddress);
     entryPointAddress->address = entryPoint;
 
     crank_talk_CompiledFunction_t *primitiveFunction = (crank_talk_CompiledFunction_t*)CrankAllocateValuesObjectWithClassName(context, CompiledFunction);
+    primitiveFunction->name = name;
     primitiveFunction->argumentCount = crank_talk_oop_encodeSmallInteger(argumentCount);
     primitiveFunction->nativeEntryPoint = entryPointAddress;
     return primitiveFunction; 
@@ -36,7 +37,7 @@ crank_talk_CompiledFunction_apply(crank_talk_VMContext_t *context, crank_talk_Co
     if(function->nativeEntryPoint)
     {
         crank_talk_CompiledFunctionNativeEntryPoint_t entryPoint = (crank_talk_CompiledFunctionNativeEntryPoint_t)function->nativeEntryPoint->address;
-        crank_talk_oop_t result = entryPoint(context, closure, argumentCount, arguments);
+        crank_talk_oop_t result = entryPoint(context, (crank_talk_oop_t)closure, argumentCount, arguments);
         crank_talk_stackFrame_popRecord(&rootsRecord.super);
         return result;
     }

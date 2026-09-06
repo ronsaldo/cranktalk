@@ -1,5 +1,6 @@
 #include "crank-talk/behavior.h"
 #include "crank-talk/array.h"
+#include "crank-talk/dictionary.h"
 
 CRANK_TALK_API void
 crank_talk_Behavior_computeLayout(crank_talk_VMContext_t *context, crank_talk_oop_t behaviorValue)
@@ -41,7 +42,20 @@ crank_talk_Behavior_enumerateSlots(crank_talk_VMContext_t *context, crank_talk_o
 }
 
 CRANK_TALK_API crank_talk_oop_t
-crank_talk_Behavior_lookupSelector(crank_talk_oop_t behavior, crank_talk_oop_t selector)
+crank_talk_Behavior_lookupSelector(crank_talk_oop_t behaviorValue, crank_talk_oop_t selector)
 {
+    crank_talk_Behavior_t *behavior = (crank_talk_Behavior_t*)behaviorValue;
+    while(behavior)
+    {
+        if(behavior->methodDictionary)
+        {
+            crank_talk_oop_t foundMethod = crank_talk_MethodDictionary_atOrNil((crank_talk_oop_t)behavior->methodDictionary, selector);
+            if(!crank_talk_oop_isNil(foundMethod))
+                return foundMethod;
+        }
+
+        behavior = behavior->superclass;
+    }
+
     return crank_talk_oop_nil();
 }

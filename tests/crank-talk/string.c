@@ -33,6 +33,15 @@ void string_runTests(void)
         Assert(crank_talk_String_equalsCString(string, "Hello World!!!Wuff"));
     }
 
+    // Hello world as string
+    {
+        crank_talk_oop_t helloWorldValue = crank_talk_String_createWithCString(context, "Hello World");
+        crank_talk_oop_t helloWorldAsString = crank_talk_oop_asString(context, helloWorldValue);
+        Assert(crank_talk_String_equalsCString(helloWorldAsString, "Hello World"));
+
+        //crank_talk_oop_t helloWorldPrintString = crank_talk_oop_printString(context, helloWorldValue);
+        //Assert(crank_talk_String_equalsCString(helloWorldPrintString, "'Hello World'"));
+    }
 
     crank_talk_vm_destroyContext(context);
 }

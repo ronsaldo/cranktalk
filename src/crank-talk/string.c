@@ -1,5 +1,6 @@
 #include "crank-talk/string.h"
 #include "crank-talk/context.h"
+#include "crank-talk/message.h"
 #include "crank-talk/set.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -259,16 +260,29 @@ crank_talk_StringStream_asSymbol(crank_talk_VMContext_t *context, crank_talk_oop
     return crank_talk_Symbol_internWithString(context, symbolSize, stringStream->storage->elements);
 }
 
-/*
 CRANK_TALK_API crank_talk_oop_t
-crank_talk_Value_asString(crank_talk_VMContext_t *context, crank_talk_oop_t value)
+crank_talk_oop_asString(crank_talk_VMContext_t *context, crank_talk_oop_t value)
 {
     return crank_talk_send0(context, context->roots.asStringSymbol, value);
 }
 
 CRANK_TALK_API crank_talk_oop_t
-crank_talk_Value_printString(crank_talk_VMContext_t *context, crank_talk_oop_t value)
+crank_talk_oop_printString(crank_talk_VMContext_t *context, crank_talk_oop_t value)
 {
     return crank_talk_send0(context, context->roots.printStringSymbol, value);
 }
-*/
+
+static crank_talk_oop_t
+crank_talk_String_asString_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    return arguments[0];
+}
+
+void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context)
+{
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "asString", 1, crank_talk_String_asString_primitive);
+}

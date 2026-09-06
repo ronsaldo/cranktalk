@@ -144,7 +144,7 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
 
     typedef struct crank_talk_ExternalAddress_s crank_talk_ExternalAddress_t;
 
-typedef crank_talk_oop_t (*crank_talk_CompiledFunctionNativeEntryPoint_t)(crank_talk_VMContext_t *context, crank_talk_BlockClosure_t *closure, size_t argumentCount, crank_talk_oop_t *arguments);
+typedef crank_talk_oop_t (*crank_talk_CompiledFunctionNativeEntryPoint_t)(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments);
 
 struct crank_talk_ObjectHeader_s {
     crank_talk_ObjectHeader_t *nextObject;
@@ -393,6 +393,7 @@ struct crank_talk_Metaclass_s {
 
 struct crank_talk_CompiledFunction_s {
     crank_talk_Object_t super;
+    crank_talk_oop_t name;
     crank_talk_oop_t argumentCount;
     crank_talk_ExternalAddress_t *nativeEntryPoint;
     crank_talk_ByteArray_t *bytecode;

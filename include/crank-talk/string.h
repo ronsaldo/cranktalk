@@ -39,7 +39,7 @@ CRANK_TALK_API crank_talk_oop_t crank_talk_StringStream_asString(crank_talk_VMCo
 CRANK_TALK_API crank_talk_oop_t crank_talk_StringStream_asSymbol(crank_talk_VMContext_t *context, crank_talk_oop_t stream);
 
 // String messages
-CRANK_TALK_API crank_talk_oop_t crank_talk_Value_asString(crank_talk_VMContext_t *context, crank_talk_oop_t value);
-CRANK_TALK_API crank_talk_oop_t crank_talk_Value_printString(crank_talk_VMContext_t *context, crank_talk_oop_t value);
+CRANK_TALK_API crank_talk_oop_t crank_talk_oop_asString(crank_talk_VMContext_t *context, crank_talk_oop_t value);
+CRANK_TALK_API crank_talk_oop_t crank_talk_oop_printString(crank_talk_VMContext_t *context, crank_talk_oop_t value);
 
 #endif //CRANK_TALK_STRING_H

@@ -11,6 +11,8 @@
 
 #define CrankTalkSlotDef(clazz, fieldName) #fieldName, offsetof(crank_talk_ ## clazz ##_t, fieldName)
 
+void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context);
+
 static crank_talk_oop_t
 crank_talk_context_createAnonymousClassAndMetaclass(crank_talk_VMContext_t *context, crank_talk_oop_t superclass, size_t instanceSize, crank_talk_GCObjectDataType_t dataType)
 {
@@ -261,6 +263,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         NULL);
 
     crank_talk_context_setClassTypeMetadata(context, context->roots.CompiledFunctionClass, "CompiledFunction",
+        CrankTalkSlotDef(CompiledFunction, name),
         CrankTalkSlotDef(CompiledFunction, argumentCount),
         CrankTalkSlotDef(CompiledFunction, nativeEntryPoint),
         CrankTalkSlotDef(CompiledFunction, bytecode),
@@ -525,6 +528,7 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
 static void 
 crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
 {
+    crank_talk_registerStringPrimitives(context);
 }
 
 CRANK_TALK_API crank_talk_VMContext_t*
