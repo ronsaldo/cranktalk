@@ -177,6 +177,15 @@ void parser_runTests(void)
         Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)literal->symbol, "identifier"));
     }
 
+    // Parenthesis
+    {
+        crank_talk_oop_t ast = parseString(context, "(42)");
+        Assert(crank_talk_isParseTreeLiteralNode(context, ast));
 
+        crank_talk_ParseTreeLiteralNode_t *literal = (crank_talk_ParseTreeLiteralNode_t*)ast;
+        AssertEquals(42, crank_talk_oop_decodeSmallInteger(literal->value));
+    }
+
+    
     crank_talk_vm_destroyContext(context);
 }

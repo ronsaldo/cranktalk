@@ -15,6 +15,8 @@ typedef struct crank_talk_ParserState_s
     size_t tokenCount;
 } crank_talk_ParserState_t;
 
+static crank_talk_oop_t crank_talk_parseSequenceUntilEndOrDelimiter(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state, crank_talk_TokenKind_t delimiter);
+
 static bool
 crank_talk_ParserState_atEnd(crank_talk_ParserState_t *state)
 {
@@ -433,11 +435,26 @@ crank_talk_parseIdentifierReference(crank_talk_VMContext_t *context, crank_talk_
 }
 
 static crank_talk_oop_t
+crank_talk_parseParenthesis(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    assert(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindLeftParent);
+    crank_talk_ParserState_advance(state);
+
+    // Expression list
+    crank_talk_oop_t expression = crank_talk_parseSequenceUntilEndOrDelimiter(context, state, CrankTalkTokenKindRightParent);
+
+    // Close the parent
+    expression = crank_talk_ParserState_expectAddingErrorToNode(context, state, CrankTalkTokenKindRightParent, expression);
+    return expression;
+}
+
+static crank_talk_oop_t
 crank_talk_parseTerm(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
 {
     switch(crank_talk_ParserState_peekKind(state, 0))
     {
     case CrankTalkTokenKindIdentifier:  return crank_talk_parseIdentifierReference(context, state);
+    case CrankTalkTokenKindLeftParent:  return crank_talk_parseParenthesis(context, state);
     case CrankTalkTokenKindSelf:        return crank_talk_parseSelfReference(context, state);
     case CrankTalkTokenKindSuper:       return crank_talk_parseSuperReference(context, state);
     case CrankTalkTokenKindThisContext: return crank_talk_parseThisContextReference(context, state);
