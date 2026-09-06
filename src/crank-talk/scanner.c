@@ -397,7 +397,40 @@ crank_talk_ScannerState_scanNextToken(crank_talk_VMContext_t *context, crank_tal
     case '(':
         crank_talk_ScannerState_advance(state);
         return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindLeftParent, &initialState);
-    
+    case ')':
+        crank_talk_ScannerState_advance(state);
+        return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindRightParent, &initialState);
+
+    case '[':
+        crank_talk_ScannerState_advance(state);
+        return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindLeftBracket, &initialState);
+    case ']':
+        crank_talk_ScannerState_advance(state);
+        return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindRightBracket, &initialState);
+
+    case '{':
+        crank_talk_ScannerState_advance(state);
+        return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindLeftCurlyBracket, &initialState);
+    case '}':
+        crank_talk_ScannerState_advance(state);
+        return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindRightCurlyBracket, &initialState);
+
+    case ':':
+        crank_talk_ScannerState_advance(state);
+        if(crank_talk_ScannerState_peekAt(state, 0) == '=')
+        {
+            crank_talk_ScannerState_advance(state);
+            return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindAssignment, &initialState);
+        }
+
+        return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindColon, &initialState);
+    case ';':
+        crank_talk_ScannerState_advance(state);
+        return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindSemicolon, &initialState);
+    case '.':
+        crank_talk_ScannerState_advance(state);
+        return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindDot, &initialState);
+
     default:
         if(isOperatorCharacter(c))
         {
@@ -414,6 +447,12 @@ crank_talk_ScannerState_scanNextToken(crank_talk_VMContext_t *context, crank_tal
 
             switch (c)
             {
+            case '<':
+                return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindLessThan, &initialState);
+            case '>':
+                return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindGreaterThan, &initialState);
+            case '|':
+                return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindBar, &initialState);
             case '!':
                 if(crank_talk_ScannerState_peekAt(state, 0) == '[')
                 {

@@ -279,5 +279,82 @@ void scanner_runTests(void)
         AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
     }
 
+    // Punctuation
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "( )");
+        AssertEquals(3, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindLeftParent, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindRightParent, getTokenKind(tokens->elements[1]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[2]));
+    }
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "[ ]");
+        AssertEquals(3, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindLeftBracket, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindRightBracket, getTokenKind(tokens->elements[1]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[2]));
+    }
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "{ }");
+        AssertEquals(3, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindLeftCurlyBracket, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindRightCurlyBracket, getTokenKind(tokens->elements[1]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[2]));
+    }
+    {
+        crank_talk_oop_t tokensValue = scanString(context, ". ; : |");
+        AssertEquals(5, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindDot, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindSemicolon, getTokenKind(tokens->elements[1]));
+        AssertEquals(CrankTalkTokenKindColon, getTokenKind(tokens->elements[2]));
+        AssertEquals(CrankTalkTokenKindBar, getTokenKind(tokens->elements[3]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[4]));
+    }
+
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "< >");
+        AssertEquals(3, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindLessThan, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindGreaterThan, getTokenKind(tokens->elements[1]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[2]));
+    }
+
+    // Operator
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "+");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindOperator, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "-");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindOperator, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+
+    // Assignment
+    {
+        crank_talk_oop_t tokensValue = scanString(context, ":=");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindAssignment, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
     crank_talk_vm_destroyContext(context);
 }
