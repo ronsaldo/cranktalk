@@ -356,5 +356,20 @@ void scanner_runTests(void)
         AssertEquals(CrankTalkTokenKindAssignment, getTokenKind(tokens->elements[0]));
         AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
     }
+
+    // Nil
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "nil false true self super thisContext");
+        AssertEquals(7, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindNil, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindFalse, getTokenKind(tokens->elements[1]));
+        AssertEquals(CrankTalkTokenKindTrue, getTokenKind(tokens->elements[2]));
+        AssertEquals(CrankTalkTokenKindSelf, getTokenKind(tokens->elements[3]));
+        AssertEquals(CrankTalkTokenKindSuper, getTokenKind(tokens->elements[4]));
+        AssertEquals(CrankTalkTokenKindThisContext, getTokenKind(tokens->elements[5]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[6]));
+    }
     crank_talk_vm_destroyContext(context);
 }

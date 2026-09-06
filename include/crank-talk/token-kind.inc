@@ -1,6 +1,13 @@
 TokenKind(EndOfSource)
 TokenKind(Error)
 
+TokenKind(Nil)
+TokenKind(False)
+TokenKind(True)
+TokenKind(Self)
+TokenKind(Super)
+TokenKind(ThisContext)
+
 TokenKind(Character)
 TokenKind(Float)
 TokenKind(Identifier)

@@ -108,6 +108,14 @@ crank_talk_ScannerState_makeToken(crank_talk_VMContext_t *context, crank_talk_Sc
     return tokenValue;
 }
 
+static bool
+crank_talk_ScannerState_stringEquals(crank_talk_ScannerState_t* state, crank_talk_ScannerState_t* initialState, const char *string)
+{
+    const char* scannerString = initialState->text + initialState->position;
+    size_t scannerStringSize = state->position - initialState->position;
+    return memcmp(scannerString, string, scannerStringSize) == 0;
+}
+
 static crank_talk_oop_t
 crank_talk_ScannerState_makeTokenStartingFrom(crank_talk_VMContext_t *context, crank_talk_ScannerState_t* state, crank_talk_TokenKind_t kind, crank_talk_ScannerState_t* initialState)
 {
@@ -264,6 +272,18 @@ crank_talk_ScannerState_scanNextToken(crank_talk_VMContext_t *context, crank_tal
         }
         else
         {
+            if(crank_talk_ScannerState_stringEquals(state, &initialState, "nil"))
+                return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindNil, &initialState);
+            else if(crank_talk_ScannerState_stringEquals(state, &initialState, "false"))
+                return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindFalse, &initialState);
+            else if(crank_talk_ScannerState_stringEquals(state, &initialState, "true"))
+                return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindTrue, &initialState);
+            else if(crank_talk_ScannerState_stringEquals(state, &initialState, "self"))
+                return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindSelf, &initialState);
+            else if(crank_talk_ScannerState_stringEquals(state, &initialState, "super"))
+                return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindSuper, &initialState);
+            else if(crank_talk_ScannerState_stringEquals(state, &initialState, "thisContext"))
+                return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindThisContext, &initialState);
             return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindIdentifier, &initialState);
         }
     }
