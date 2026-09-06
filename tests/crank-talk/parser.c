@@ -105,6 +105,33 @@ void parser_runTests(void)
         Assert(crank_talk_String_equalsCString(literal->value, "'Hello World'"));
     }
 
+    // Literal symbol identifier
+    {
+        crank_talk_oop_t ast = parseString(context, "#symbol");
+        Assert(crank_talk_isParseTreeLiteralNode(context, ast));
+
+        crank_talk_ParseTreeLiteralNode_t *literal = (crank_talk_ParseTreeLiteralNode_t*)ast;
+        Assert(crank_talk_Symbol_equalsCString(literal->value, "symbol"));
+    }
+
+    // Literal symbol keyword
+    {
+        crank_talk_oop_t ast = parseString(context, "#keyword:");
+        Assert(crank_talk_isParseTreeLiteralNode(context, ast));
+
+        crank_talk_ParseTreeLiteralNode_t *literal = (crank_talk_ParseTreeLiteralNode_t*)ast;
+        Assert(crank_talk_Symbol_equalsCString(literal->value, "keyword:"));
+    }
+
+    // Literal symbol multi-keyword
+    {
+        crank_talk_oop_t ast = parseString(context, "#keyword:with:");
+        Assert(crank_talk_isParseTreeLiteralNode(context, ast));
+
+        crank_talk_ParseTreeLiteralNode_t *literal = (crank_talk_ParseTreeLiteralNode_t*)ast;
+        Assert(crank_talk_Symbol_equalsCString(literal->value, "keyword:with:"));
+    }
+
     // nil reference
     {
         crank_talk_oop_t ast = parseString(context, "nil");
