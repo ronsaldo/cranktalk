@@ -157,5 +157,71 @@ void scanner_runTests(void)
         AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
     }
 
+    // Symbol
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "#symbol");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindSymbol, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+
+    // KeywordSymbol
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "#keyword:");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindSymbol, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+
+    // Operator symbol
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "#<");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindSymbol, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "#|");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindSymbol, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "#+");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindSymbol, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+
+    // String symbol
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "#'Hello Symbol'");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindSymbol, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+
+    // Incomplete string symbol
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "#'Hello Symbol");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindError, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+
     crank_talk_vm_destroyContext(context);
 }

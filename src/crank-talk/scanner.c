@@ -183,7 +183,7 @@ static bool isOperatorCharacter(char c)
 }
 
 static crank_talk_oop_t
-crank_talk_SysmelScanner_skipWhite(crank_talk_VMContext_t *context, crank_talk_ScannerState_t *state)
+crank_talk_ScannerState_skipWhite(crank_talk_VMContext_t *context, crank_talk_ScannerState_t *state)
 {
     bool hasSeenComment = true;
     while (hasSeenComment)
@@ -214,11 +214,32 @@ crank_talk_SysmelScanner_skipWhite(crank_talk_VMContext_t *context, crank_talk_S
     return crank_talk_oop_nil();
 }
 
+static bool
+crank_talk_ScannerState_scanAdvanceKeyword(crank_talk_ScannerState_t *state)
+{
+    if(!isIdentifierStart(crank_talk_ScannerState_peekAt(state, 0)))
+        return false;
+    
+    crank_talk_ScannerState_t initialState = *state;
+    while(isIdentifierMiddle(crank_talk_ScannerState_peekAt(state, 0)))
+        crank_talk_ScannerState_advance(state);
+
+    if(crank_talk_ScannerState_peekAt(state, 0) == ':')
+    {
+        crank_talk_ScannerState_advance(state);
+        return true;
+    }
+    else
+    {
+        *state = initialState;
+        return false;
+    }
+}
 
 static crank_talk_oop_t
-crank_talk_SysmelScanner_scanNextToken(crank_talk_VMContext_t *context, crank_talk_ScannerState_t *state)
+crank_talk_ScannerState_scanNextToken(crank_talk_VMContext_t *context, crank_talk_ScannerState_t *state)
 {
-    crank_talk_oop_t whiteErrorToken = crank_talk_SysmelScanner_skipWhite(context, state);
+    crank_talk_oop_t whiteErrorToken = crank_talk_ScannerState_skipWhite(context, state);
     if(!crank_talk_oop_isNil(whiteErrorToken))
         return whiteErrorToken;
 
@@ -289,6 +310,61 @@ crank_talk_SysmelScanner_scanNextToken(crank_talk_VMContext_t *context, crank_ta
         return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindInteger, &initialState);
     }
 
+    if(c == '#')
+    {
+        int c1 = crank_talk_ScannerState_peekAt(state, 1);
+        if(isIdentifierStart(c1))
+        {
+            crank_talk_ScannerState_advanceCount(state, 2);
+            while(isIdentifierMiddle(crank_talk_ScannerState_peekAt(state, 0)))
+                crank_talk_ScannerState_advance(state);
+
+            if(crank_talk_ScannerState_peekAt(state, 0) == ':')
+            {
+                crank_talk_ScannerState_advance(state);
+                bool hasAdvanced = true;
+                while(hasAdvanced)
+                    hasAdvanced = crank_talk_ScannerState_scanAdvanceKeyword(state);
+            }
+
+            return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindSymbol, &initialState);
+        }
+        else if (isOperatorCharacter(c1))
+        {
+            crank_talk_ScannerState_advanceCount(state, 2);
+            while(isIdentifierMiddle(crank_talk_ScannerState_peekAt(state, 0)))
+                crank_talk_ScannerState_advance(state);
+
+            return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindSymbol, &initialState);
+        }
+        else if(c1 == '\'')
+        {
+            crank_talk_ScannerState_advanceCount(state, 2);
+            while(!crank_talk_ScannerState_atEnd(state) && crank_talk_ScannerState_peekAt(state, 0) != '\'')
+            {
+                if(crank_talk_ScannerState_peekAt(state, 0) == '\'' && crank_talk_ScannerState_peekAt(state, 1) == '\'')
+                    crank_talk_ScannerState_advanceCount(state, 2);
+                else
+                    crank_talk_ScannerState_advance(state);
+            }
+
+            // End of string
+            if(crank_talk_ScannerState_peekAt(state, 0) != '\'')
+                return crank_talk_ScannerState_makeErrorTokenStartingFrom(context, state, "Incomplete symbol string literal.", &initialState);
+            crank_talk_ScannerState_advance(state);
+            return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindSymbol, &initialState);
+        }
+        else if(c1 == '[')
+        {
+            crank_talk_ScannerState_advanceCount(state, 2);
+            return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindByteArrayStart, &initialState);
+        }
+        else if(c1 == '(')
+        {
+            crank_talk_ScannerState_advanceCount(state, 2);
+            return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindLiteralArrayStart, &initialState);
+        }
+    }
 
     // Unexpected character.
     crank_talk_ScannerState_advance(state);
@@ -312,7 +388,7 @@ crank_talk_CrankTalk_scanSourceCode(crank_talk_VMContext_t *context, crank_talk_
 
     for(;;)
     {
-        crank_talk_oop_t tokenValue = crank_talk_SysmelScanner_scanNextToken(context, &state);
+        crank_talk_oop_t tokenValue = crank_talk_ScannerState_scanNextToken(context, &state);
         crank_talk_OrderedCollection_add(context, orderedCollection, tokenValue);
 
         crank_talk_CrankTalkToken_t *token = (crank_talk_CrankTalkToken_t *)tokenValue;
