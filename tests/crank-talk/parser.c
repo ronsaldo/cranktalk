@@ -78,5 +78,14 @@ void parser_runTests(void)
         AssertEquals(42.5, crank_talk_oop_asFloat(literal->value));
     }
 
+    // Literal character
+    {
+        crank_talk_oop_t ast = parseString(context, "$A");
+        Assert(crank_talk_isParseTreeLiteralNode(context, ast));
+
+        crank_talk_ParseTreeLiteralNode_t *literal = (crank_talk_ParseTreeLiteralNode_t*)ast;
+        AssertEquals('A', crank_talk_oop_decodeCharacter(literal->value));
+    }
+
     crank_talk_vm_destroyContext(context);
 }
