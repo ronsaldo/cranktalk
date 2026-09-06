@@ -390,10 +390,12 @@ crank_talk_ScannerState_scanNextToken(crank_talk_VMContext_t *context, crank_tal
     if(c == '\'')
     {
         crank_talk_ScannerState_advance(state);
-        while(!crank_talk_ScannerState_atEnd(state) && crank_talk_ScannerState_peekAt(state, 0) != '\'')
+        while(!crank_talk_ScannerState_atEnd(state))
         {
             if(crank_talk_ScannerState_peekAt(state, 0) == '\'' && crank_talk_ScannerState_peekAt(state, 1) == '\'')
                 crank_talk_ScannerState_advanceCount(state, 2);
+            else if (crank_talk_ScannerState_peekAt(state, 0) == '\'')
+                break;
             else
                 crank_talk_ScannerState_advance(state);
         }

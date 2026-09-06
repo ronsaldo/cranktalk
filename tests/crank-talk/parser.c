@@ -87,6 +87,24 @@ void parser_runTests(void)
         AssertEquals('A', crank_talk_oop_decodeCharacter(literal->value));
     }
 
+    // Literal string
+    {
+        crank_talk_oop_t ast = parseString(context, "'Hello World'");
+        Assert(crank_talk_isParseTreeLiteralNode(context, ast));
+
+        crank_talk_ParseTreeLiteralNode_t *literal = (crank_talk_ParseTreeLiteralNode_t*)ast;
+        Assert(crank_talk_String_equalsCString(literal->value, "Hello World"));
+    }
+
+    // Literal string 2
+    {
+        crank_talk_oop_t ast = parseString(context, "'''Hello World'''");
+        Assert(crank_talk_isParseTreeLiteralNode(context, ast));
+
+        crank_talk_ParseTreeLiteralNode_t *literal = (crank_talk_ParseTreeLiteralNode_t*)ast;
+        Assert(crank_talk_String_equalsCString(literal->value, "'Hello World'"));
+    }
+
     // nil reference
     {
         crank_talk_oop_t ast = parseString(context, "nil");

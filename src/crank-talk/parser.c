@@ -282,6 +282,57 @@ crank_talk_parseTrueReference(crank_talk_VMContext_t *context, crank_talk_Parser
     return pseudoReferenceValue;
 }
 
+static char *
+crank_talk_parseString(size_t stringSize, const char *string, size_t *outSize)
+{
+    char *result = calloc(1, stringSize + 1);
+    char *dest = result;
+
+    for (size_t i = 0; i < stringSize; ++i)
+    {
+        char c = string[i];
+        if (c == '\'')
+        {
+            char c1 = string[++i];
+            if(c1 == '\'')
+            {
+                *dest++ = '\'';
+            }
+            else
+            {
+                break;
+            }
+        }
+        else
+        {
+            *dest++ = c;
+        }
+    }
+
+    if (outSize)
+        *outSize = dest - result;
+    return result;
+}
+
+static crank_talk_oop_t
+crank_talk_parseLiteralString(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_next(state);
+    assert(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindString);
+
+    crank_talk_StringSlice_t tokenString = crank_talk_SourcePosition_asStringSlice(token->sourcePosition);
+    size_t parsedStringSize = 0;
+    char *parsedString = crank_talk_parseString(tokenString.size - 2, tokenString.text + 1, &parsedStringSize);
+    crank_talk_oop_t stringValue = crank_talk_String_createWithString(context, parsedStringSize, parsedString);
+    free(parsedString);
+
+    crank_talk_oop_t literalNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+    crank_talk_ParseTreeLiteralNode_t *literalNode = (crank_talk_ParseTreeLiteralNode_t*)literalNodeValue;
+    literalNode->super.sourcePosition = token->sourcePosition;
+    literalNode->value = stringValue;
+    return literalNodeValue;
+}
+
 static crank_talk_oop_t
 crank_talk_parseLiteral(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
 {
@@ -290,7 +341,7 @@ crank_talk_parseLiteral(crank_talk_VMContext_t *context, crank_talk_ParserState_
     case CrankTalkTokenKindInteger:   return crank_talk_parseLiteralInteger(context, state);
     case CrankTalkTokenKindFloat:     return crank_talk_parseLiteralFloat(context, state);
     case CrankTalkTokenKindCharacter: return crank_talk_parseLiteralCharacter(context, state);
-    //case CrankTalkTokenKindString:  return crank_talk_parseLiteralString(context, state);
+    case CrankTalkTokenKindString:    return crank_talk_parseLiteralString(context, state);
     //case CrankTalkTokenKindSymbol:  return crank_talk_parseLiteralSymbol(context, state);
     case CrankTalkTokenKindNil:       return crank_talk_parseNilReference(context, state);
     case CrankTalkTokenKindFalse:     return crank_talk_parseFalseReference(context, state);
