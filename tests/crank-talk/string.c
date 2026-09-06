@@ -43,5 +43,34 @@ void string_runTests(void)
         Assert(crank_talk_String_equalsCString(helloWorldPrintString, "'Hello World'"));
     }
 
+    // Symbol as string
+    {
+        crank_talk_oop_t symbolValue = crank_talk_Symbol_internWithCString(context, "testSymbol");
+        crank_talk_oop_t symbolAsString = crank_talk_oop_asString(context, symbolValue);
+        Assert(crank_talk_Symbol_equalsCString(symbolAsString, "testSymbol"));
+
+        crank_talk_oop_t symbolPrintString = crank_talk_oop_printString(context, symbolValue);
+        Assert(crank_talk_Symbol_equalsCString(symbolPrintString, "#testSymbol"));
+    }
+
+    // Class as string
+    {
+        crank_talk_oop_t classAsString = crank_talk_oop_asString(context, context->roots.ObjectClass);
+        Assert(crank_talk_Symbol_equalsCString(classAsString, "Object"));
+    }
+
+    // Metaclass as string
+    {
+        crank_talk_oop_t classAsString = crank_talk_oop_asString(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.ObjectClass));
+        Assert(crank_talk_Symbol_equalsCString(classAsString, "Object class"));
+    }
+
+    // Object print string
+    {
+        crank_talk_oop_t objectValue = CrankAllocateValuesObjectWithClassName(context, Object);
+        crank_talk_oop_t objectAsString = crank_talk_oop_asString(context, objectValue);
+        Assert(crank_talk_Symbol_equalsCString(objectAsString, "a Object"));
+    }
+
     crank_talk_vm_destroyContext(context);
 }

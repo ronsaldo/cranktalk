@@ -294,6 +294,73 @@ crank_talk_Object_printString_primitive(crank_talk_VMContext_t *context, crank_t
 }
 
 static crank_talk_oop_t
+crank_talk_Object_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    crank_talk_StringStream_insertCString(context, stream, "a ");
+
+    crank_talk_oop_t receiverClass = (crank_talk_oop_t)crank_talk_oop_getClass(context, receiver);
+    crank_talk_StringStream_print(context, stream, receiverClass);
+
+    return receiver;
+}
+
+static crank_talk_oop_t
+crank_talk_Object_fullPrintOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    crank_talk_StringStream_print(context, stream, receiver);
+    return receiver;
+}
+
+static crank_talk_oop_t
+crank_talk_Class_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 1);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    crank_talk_Class_t *clazz = (crank_talk_Class_t*)receiver;
+    if(!clazz->name)
+        crank_talk_StringStream_insertCString(context, stream, "Anonymous Class");
+    else
+        crank_talk_StringStream_insertBytesObject(context, stream, (crank_talk_oop_t)clazz->name);
+    return receiver;
+}
+
+static crank_talk_oop_t
+crank_talk_Metaclass_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 1);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    crank_talk_Metaclass_t *metaclass = (crank_talk_Metaclass_t*)receiver;
+    if(!metaclass->thisClass)
+    {
+        crank_talk_StringStream_insertCString(context, stream, "Anonymous Metaclass");
+    }
+    else
+    {
+        crank_talk_StringStream_print(context, stream, (crank_talk_oop_t)metaclass->thisClass);
+        crank_talk_StringStream_insertCString(context, stream, " class");
+    }
+    return receiver;
+}
+
+static crank_talk_oop_t
 crank_talk_String_asString_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)context;
@@ -318,13 +385,46 @@ crank_talk_String_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_
     return receiver;
 }
 
+static crank_talk_oop_t
+crank_talk_Symbol_asString_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_oop_t receiver = arguments[0];
+    return crank_talk_String_createWithString(context, crank_talk_object_getSizeInBytes(receiver), (const char*)crank_talk_oop_getBytesData(receiver));
+}
+
+static crank_talk_oop_t
+crank_talk_Symbol_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 1);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    crank_talk_StringStream_insertCharacter(context, stream, '#');
+    crank_talk_StringStream_insertBytesObject(context, stream, receiver);
+    return receiver;
+}
+
 void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "asString", 1, crank_talk_Object_asString_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "printString", 1, crank_talk_Object_printString_primitive);
-    //crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "printOn:", crank_talk_SimpleFunctionType_createf(context, SysmelVMFunctionFlagsNone, SysmelCurrentTypePointer(VoidClass), SysmelCurrentTypePointer(ObjectClass), SysmelCurrentTypePointer(StringStreamClass), NULL), crank_talk_Object_printOn_primitive);
-    //crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "fullPrintOn:", crank_talk_SimpleFunctionType_createf(context, SysmelVMFunctionFlagsNone, SysmelCurrentTypePointer(VoidClass), SysmelCurrentTypePointer(ObjectClass), SysmelCurrentTypePointer(StringStreamClass), NULL), crank_talk_Object_fullPrintOn_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "printOn:", 2, crank_talk_Object_printOn_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "fullPrintOn:", 2, crank_talk_Object_fullPrintOn_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ClassClass, "printOn:", 2, crank_talk_Class_printOn_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.MetaclassClass, "printOn:", 2, crank_talk_Metaclass_printOn_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "asString", 1, crank_talk_String_asString_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "printOn:", 2, crank_talk_String_printOn_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "asString", 1, crank_talk_Symbol_asString_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "printOn:", 2, crank_talk_Symbol_printOn_primitive);
+
 }
