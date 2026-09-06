@@ -1,0 +1,16 @@
+#ifndef CRANK_TALK_DICTIONARY_H
+#define CRANK_TALK_DICTIONARY_H
+
+#include "object-model.h"
+
+CRANK_TALK_API crank_talk_oop_t crank_talk_IdentityDictionary_create(crank_talk_VMContext_t *context);
+CRANK_TALK_API void crank_talk_IdentityDictionary_atPut(crank_talk_VMContext_t *context, crank_talk_oop_t dictionaryValue, crank_talk_oop_t key, crank_talk_oop_t value);
+CRANK_TALK_API bool crank_talk_IdentityDictionary_includesKey(crank_talk_oop_t dictionaryValue, crank_talk_oop_t key);
+CRANK_TALK_API crank_talk_oop_t crank_talk_IdentityDictionary_at(crank_talk_oop_t dictionaryValue, crank_talk_oop_t key);
+
+CRANK_TALK_API crank_talk_oop_t crank_talk_MethodDictionary_create(crank_talk_VMContext_t *context);
+CRANK_TALK_API crank_talk_oop_t crank_talk_MethodDictionary_atOrNil(crank_talk_oop_t dict, crank_talk_oop_t key);
+CRANK_TALK_API void crank_talk_MethodDictionary_atPut(crank_talk_VMContext_t *context, crank_talk_oop_t dict, crank_talk_oop_t key, crank_talk_oop_t value);
+
+
+#endif //CRANK_TALK_DICTIONARY_H

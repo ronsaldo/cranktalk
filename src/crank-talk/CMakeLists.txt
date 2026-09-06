@@ -1,7 +1,9 @@
 set(CrankTalk_Sources
     array.c
+    association.c
     behavior.c
     context.c
+    dictionary.c
     dynarray.c
     errors.c
     gc.c
