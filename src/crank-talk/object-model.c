@@ -13,6 +13,12 @@ crank_talk_oop_numberAsFloat(crank_talk_oop_t oop)
 }
 
 CRANK_TALK_API crank_talk_oop_t
+crank_talk_oop_fromBoolean(crank_talk_VMContext_t *context, bool value)
+{
+    return value ? context->roots.trueValue : context->roots.falseValue;
+}
+
+CRANK_TALK_API crank_talk_oop_t
 crank_talk_oop_fromFloat(crank_talk_VMContext_t *context, double value)
 {
     if(crank_talk_oop_isFloatInSmallFloatRange(value))

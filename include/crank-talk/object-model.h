@@ -647,6 +647,7 @@ crank_talk_oop_asFloat(crank_talk_oop_t oop)
 
 CRANK_TALK_API double crank_talk_oop_numberAsFloat(crank_talk_oop_t oop);
 
+CRANK_TALK_API crank_talk_oop_t crank_talk_oop_fromBoolean(crank_talk_VMContext_t *context, bool value);
 CRANK_TALK_API crank_talk_oop_t crank_talk_oop_fromFloat(crank_talk_VMContext_t *context, double value);
 CRANK_TALK_API crank_talk_Behavior_t *crank_talk_oop_getClass(crank_talk_VMContext_t *context, crank_talk_oop_t value);
 

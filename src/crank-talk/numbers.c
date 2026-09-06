@@ -113,6 +113,96 @@ crank_talk_Float_divide_primitive(crank_talk_VMContext_t *context, crank_talk_oo
 }
 
 static crank_talk_oop_t
+crank_talk_Float_equals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    double value = crank_talk_oop_asFloat(self);
+    double operandValue = crank_talk_oop_numberAsFloat(operand);
+    return crank_talk_oop_fromFloat(context, crank_talk_oop_fromBoolean(context, value == operandValue));
+}
+
+static crank_talk_oop_t
+crank_talk_Float_notEquals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    double value = crank_talk_oop_asFloat(self);
+    double operandValue = crank_talk_oop_numberAsFloat(operand);
+    return crank_talk_oop_fromFloat(context, crank_talk_oop_fromBoolean(context, value != operandValue));
+}
+
+static crank_talk_oop_t
+crank_talk_Float_lessThan_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    double value = crank_talk_oop_asFloat(self);
+    double operandValue = crank_talk_oop_numberAsFloat(operand);
+    return crank_talk_oop_fromFloat(context, crank_talk_oop_fromBoolean(context, value < operandValue));
+}
+
+static crank_talk_oop_t
+crank_talk_Float_lessOrEquals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    double value = crank_talk_oop_asFloat(self);
+    double operandValue = crank_talk_oop_numberAsFloat(operand);
+    return crank_talk_oop_fromFloat(context, crank_talk_oop_fromBoolean(context, value <= operandValue));
+}
+
+static crank_talk_oop_t
+crank_talk_Float_greaterThan_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    double value = crank_talk_oop_asFloat(self);
+    double operandValue = crank_talk_oop_numberAsFloat(operand);
+    return crank_talk_oop_fromFloat(context, crank_talk_oop_fromBoolean(context, value > operandValue));
+}
+
+static crank_talk_oop_t
+crank_talk_Float_greaterOrEquals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    double value = crank_talk_oop_asFloat(self);
+    double operandValue = crank_talk_oop_numberAsFloat(operand);
+    return crank_talk_oop_fromFloat(context, crank_talk_oop_fromBoolean(context, value >= operandValue));
+}
+
+static crank_talk_oop_t
 crank_talk_Float_exp_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -194,6 +284,13 @@ crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "-", 2, crank_talk_Float_minus_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "*", 2, crank_talk_Float_times_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "/", 2, crank_talk_Float_divide_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "=",  2, crank_talk_Float_equals_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "~=", 2, crank_talk_Float_notEquals_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "<",  2, crank_talk_Float_lessThan_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "<=", 2, crank_talk_Float_lessOrEquals_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, ">",  2, crank_talk_Float_greaterThan_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, ">=", 2, crank_talk_Float_greaterOrEquals_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "exp", 1, crank_talk_Float_exp_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "ln",  1, crank_talk_Float_ln_primitive);
