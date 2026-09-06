@@ -84,6 +84,10 @@ struct crank_talk_VMContextRoots_s
 
     crank_talk_oop_t ExternalAddressClass;
 
+    // Boolean values
+    crank_talk_oop_t falseValue;
+    crank_talk_oop_t trueValue;
+
     // Interned symbols
     crank_talk_oop_t internedSymbolSet;
 

@@ -72,5 +72,23 @@ void string_runTests(void)
         Assert(crank_talk_Symbol_equalsCString(objectAsString, "a Object"));
     }
 
+    // Nil print string
+    {
+        crank_talk_oop_t objectAsString = crank_talk_oop_asString(context, crank_talk_oop_nil());
+        Assert(crank_talk_Symbol_equalsCString(objectAsString, "nil"));
+    }
+
+    // False print string
+    {
+        crank_talk_oop_t objectAsString = crank_talk_oop_asString(context, context->roots.falseValue);
+        Assert(crank_talk_Symbol_equalsCString(objectAsString, "false"));
+    }
+
+    // True print string
+    {
+        crank_talk_oop_t objectAsString = crank_talk_oop_asString(context, context->roots.trueValue);
+        Assert(crank_talk_Symbol_equalsCString(objectAsString, "true"));
+    }
+
     crank_talk_vm_destroyContext(context);
 }

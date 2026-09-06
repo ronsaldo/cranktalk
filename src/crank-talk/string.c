@@ -361,6 +361,45 @@ crank_talk_Metaclass_printOn_primitive(crank_talk_VMContext_t *context, crank_ta
 }
 
 static crank_talk_oop_t
+crank_talk_UndefinedObject_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 1);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    crank_talk_StringStream_insertCString(context, stream, "nil");
+    return receiver;
+}
+
+static crank_talk_oop_t
+crank_talk_False_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 1);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    crank_talk_StringStream_insertCString(context, stream, "false");
+    return receiver;
+}
+
+static crank_talk_oop_t
+crank_talk_True_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 1);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    crank_talk_StringStream_insertCString(context, stream, "true");
+    return receiver;
+}
+
+static crank_talk_oop_t
 crank_talk_String_asString_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)context;
@@ -420,6 +459,10 @@ void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ClassClass, "printOn:", 2, crank_talk_Class_printOn_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.MetaclassClass, "printOn:", 2, crank_talk_Metaclass_printOn_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.UndefinedObjectClass, "printOn:", 2, crank_talk_UndefinedObject_printOn_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FalseClass, "printOn:", 2, crank_talk_False_printOn_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.TrueClass, "printOn:", 2, crank_talk_True_printOn_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "asString", 1, crank_talk_String_asString_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "printOn:", 2, crank_talk_String_printOn_primitive);

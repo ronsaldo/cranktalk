@@ -232,6 +232,10 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     context->roots.ExternalAddressClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_ExternalAddress_t), CrankTalkGCObjectDataTypeBytes);
 
+    // Boolean values
+    context->roots.falseValue = CrankAllocateValuesObjectWithClassName(context, False);
+    context->roots.trueValue = CrankAllocateValuesObjectWithClassName(context, True);
+
     // Symbol set
     context->roots.internedSymbolSet = crank_talk_IdentitySet_create(context);
 
