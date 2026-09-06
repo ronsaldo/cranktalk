@@ -476,8 +476,50 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(ParseTreeBlockNode, body),
         NULL);
 
-    context->roots.ParseTreeLiteralNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeLiteralNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeLiteralNode_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.ParseTreeLiteralNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeLiteralNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeLiteralNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeLiteralNode, value),
+        NULL);
 
+    context->roots.ParseTreeCascadedMessageNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeCascadedMessageNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeCascadedMessageNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeCascadedMessageNode, selector),
+        CrankTalkSlotDef(ParseTreeCascadedMessageNode, arguments),
+        NULL);
+
+    context->roots.ParseTreeMessageCascadeNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeMessageCascadeNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeMessageCascadeNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeMessageCascadeNode, receiver),
+        CrankTalkSlotDef(ParseTreeMessageCascadeNode, cascadedMessages),
+        NULL);
+
+    context->roots.ParseTreeMessageSendNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeMessageSendNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeMessageSendNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeMessageSendNode, receiver),
+        CrankTalkSlotDef(ParseTreeMessageSendNode, selector),
+        CrankTalkSlotDef(ParseTreeMessageSendNode, arguments),
+        NULL);
+
+    context->roots.ParseTreeSequenceNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeSequenceNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeSequenceNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeSequenceNode, pragmas),
+        CrankTalkSlotDef(ParseTreeSequenceNode, localVariables),
+        CrankTalkSlotDef(ParseTreeSequenceNode, expressions),
+        NULL);
+
+    context->roots.ParseTreeArrayNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeArrayNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeArrayNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeArrayNode, elements),
+        NULL);
+
+    context->roots.ParseTreeReturnNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeReturnNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeReturnNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeReturnNode, expression),
+        NULL);
+
+    context->roots.ParseTreeAddMethodNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeAddMethodNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeAddMethodNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeAddMethodNode, owner),
+        CrankTalkSlotDef(ParseTreeAddMethodNode, method),
+        NULL);
+
+    context->roots.ParseTreeMethodDefinitionNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeMethodDefinitionNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeMethodDefinitionNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeMethodDefinitionNode, selector),
+        CrankTalkSlotDef(ParseTreeMethodDefinitionNode, arguments),
+        CrankTalkSlotDef(ParseTreeMethodDefinitionNode, body),
+        NULL);
 }
 
 static void 

@@ -20,12 +20,6 @@ typedef struct crank_talk_ParseTreePseudoVariableReferenceNode_s crank_talk_Pars
 typedef struct crank_talk_ParseTreeArgumentDefinitionNode_s crank_talk_ParseTreeArgumentDefinitionNode_t;
 typedef struct crank_talk_ParseTreeBlockNode_s crank_talk_ParseTreeBlockNode_t;
 typedef struct crank_talk_ParseTreeLiteralNode_s crank_talk_ParseTreeLiteralNode_t;
-    typedef struct crank_talk_ParseTreeLiteralCharacterNode_s crank_talk_ParseTreeLiteralCharacterNode_t;
-    typedef struct crank_talk_ParseTreeLiteralFloatNode_s crank_talk_ParseTreeLiteralFloatNode_t;
-    typedef struct crank_talk_ParseTreeLiteralIntegerNode_s crank_talk_ParseTreeLiteralIntegerNode_t;
-    typedef struct crank_talk_ParseTreeLiteralStringNode_s crank_talk_ParseTreeLiteralStringNode_t;
-    typedef struct crank_talk_ParseTreeLiteralSymbolNode_s crank_talk_ParseTreeLiteralSymbolNode_t;
-    typedef struct crank_talk_ParseTreeLiteralValueNode_s crank_talk_ParseTreeLiteralValueNode_t;
 typedef struct crank_talk_ParseTreeCascadedMessageNode_s crank_talk_ParseTreeCascadedMessageNode_t;
 typedef struct crank_talk_ParseTreeMessageCascadeNode_s crank_talk_ParseTreeMessageCascadeNode_t;
 typedef struct crank_talk_ParseTreeMessageSendNode_s crank_talk_ParseTreeMessageSendNode_t;
@@ -109,41 +103,6 @@ struct crank_talk_ParseTreeBlockNode_s
 };
 
 struct crank_talk_ParseTreeLiteralNode_s
-{
-    crank_talk_ParseTreeNode_t super;
-};
-
-struct crank_talk_ParseTreeLiteralCharacterNode_s
-{
-    crank_talk_ParseTreeNode_t super;
-    crank_talk_oop_t value;
-};
-
-struct crank_talk_ParseTreeLiteralFloatNode_s
-{
-    crank_talk_ParseTreeNode_t super;
-    crank_talk_oop_t value;
-};
-
-struct crank_talk_ParseTreeLiteralIntegerNode_s
-{
-    crank_talk_ParseTreeNode_t super;
-    crank_talk_oop_t value;
-};
-
-struct crank_talk_ParseTreeLiteralStringNode_s
-{
-    crank_talk_ParseTreeNode_t super;
-    crank_talk_oop_t value;
-};
-
-struct crank_talk_ParseTreeLiteralSymbolNode_s
-{
-    crank_talk_ParseTreeNode_t super;
-    crank_talk_oop_t value;
-};
-
-struct crank_talk_ParseTreeLiteralValueNode_s
 {
     crank_talk_ParseTreeNode_t super;
     crank_talk_oop_t value;
