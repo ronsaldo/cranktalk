@@ -144,6 +144,7 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
 
     typedef struct crank_talk_ExternalAddress_s crank_talk_ExternalAddress_t;
 
+typedef crank_talk_oop_t (*crank_talk_CompiledFunctionNativeEntryPoint_t)(crank_talk_VMContext_t *context, crank_talk_BlockClosure_t *closure, size_t argumentCount, crank_talk_oop_t *arguments);
 
 struct crank_talk_ObjectHeader_s {
     crank_talk_ObjectHeader_t *nextObject;

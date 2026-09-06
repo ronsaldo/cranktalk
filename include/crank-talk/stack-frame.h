@@ -28,6 +28,15 @@ typedef struct crank_talk_stackFrameGCRootsRecord_s
     crank_talk_oop_t *roots;
 } crank_talk_stackFrameGCRootsRecord_t;
 
+typedef struct crank_talk_stackFrameApplicationArgumentsRecord_s
+{
+    crank_talk_stackFrameRecord_t super;
+    crank_talk_oop_t functional;
+    crank_talk_oop_t blockClosure;
+    size_t argumentCount;
+    crank_talk_oop_t *arguments;
+} crank_talk_stackFrameApplicationArgumentsRecord_t;
+
 #define SYSMEL_VM_STACKFRAME_PUSH_GC_ROOTS(recordName, gcStackFrameRoots) \
     crank_talk_stackFrameGCRootsRecord_t recordName = {0}; \
     recordName.super.type = CrankTalkStackFrameRecordGCRoots; \
