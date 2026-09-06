@@ -39,3 +39,9 @@ crank_talk_Behavior_enumerateSlots(crank_talk_VMContext_t *context, crank_talk_o
         slot->index = crank_talk_oop_encodeSmallInteger(i);
     }
 }
+
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_Behavior_lookupSelector(crank_talk_oop_t behavior, crank_talk_oop_t selector)
+{
+    return crank_talk_oop_nil();
+}

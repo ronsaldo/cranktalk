@@ -9,6 +9,7 @@ set(CrankTalk_Sources
     function.c
     gc.c
     heap.c
+    message.c
     object-model.c
     ordered-collection.c
     parse-tree.c
