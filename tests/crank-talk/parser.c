@@ -87,5 +87,41 @@ void parser_runTests(void)
         AssertEquals('A', crank_talk_oop_decodeCharacter(literal->value));
     }
 
+    // nil reference
+    {
+        crank_talk_oop_t ast = parseString(context, "nil");
+        Assert(crank_talk_isParseTreeNilReferenceNode(context, ast));
+    }
+    
+    // false reference
+    {
+        crank_talk_oop_t ast = parseString(context, "false");
+        Assert(crank_talk_isParseTreeFalseReferenceNode(context, ast));
+    }
+
+    // true reference
+    {
+        crank_talk_oop_t ast = parseString(context, "true");
+        Assert(crank_talk_isParseTreeTrueReferenceNode(context, ast));
+    }
+
+    // self reference
+    {
+        crank_talk_oop_t ast = parseString(context, "self");
+        Assert(crank_talk_isParseTreeSelfReferenceNode(context, ast));
+    }
+
+    // super reference
+    {
+        crank_talk_oop_t ast = parseString(context, "super");
+        Assert(crank_talk_isParseTreeSuperReferenceNode(context, ast));
+    }
+
+    // thisContext reference
+    {
+        crank_talk_oop_t ast = parseString(context, "thisContext");
+        Assert(crank_talk_isParseTreeThisContextReferenceNode(context, ast));
+    }
+
     crank_talk_vm_destroyContext(context);
 }

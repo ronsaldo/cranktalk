@@ -247,6 +247,42 @@ crank_talk_parseLiteralCharacter(crank_talk_VMContext_t *context, crank_talk_Par
 }
 
 static crank_talk_oop_t
+crank_talk_parseNilReference(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_next(state);
+    assert(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindNil);
+
+    crank_talk_oop_t pseudoReferenceValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeNilReferenceNode);
+    crank_talk_ParseTreeNilReferenceNode_t *pseudoReference = (crank_talk_ParseTreeNilReferenceNode_t*)pseudoReferenceValue;
+    pseudoReference->super.super.sourcePosition = token->sourcePosition;
+    return pseudoReferenceValue;
+}
+
+static crank_talk_oop_t
+crank_talk_parseFalseReference(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_next(state);
+    assert(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindFalse);
+
+    crank_talk_oop_t pseudoReferenceValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeFalseReferenceNode);
+    crank_talk_ParseTreeFalseReferenceNode_t *pseudoReference = (crank_talk_ParseTreeFalseReferenceNode_t*)pseudoReferenceValue;
+    pseudoReference->super.super.sourcePosition = token->sourcePosition;
+    return pseudoReferenceValue;
+}
+
+static crank_talk_oop_t
+crank_talk_parseTrueReference(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_next(state);
+    assert(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindTrue);
+
+    crank_talk_oop_t pseudoReferenceValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeTrueReferenceNode);
+    crank_talk_ParseTreeTrueReferenceNode_t *pseudoReference = (crank_talk_ParseTreeTrueReferenceNode_t*)pseudoReferenceValue;
+    pseudoReference->super.super.sourcePosition = token->sourcePosition;
+    return pseudoReferenceValue;
+}
+
+static crank_talk_oop_t
 crank_talk_parseLiteral(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
 {
     switch(crank_talk_ParserState_peekKind(state, 0))
@@ -254,17 +290,69 @@ crank_talk_parseLiteral(crank_talk_VMContext_t *context, crank_talk_ParserState_
     case CrankTalkTokenKindInteger:   return crank_talk_parseLiteralInteger(context, state);
     case CrankTalkTokenKindFloat:     return crank_talk_parseLiteralFloat(context, state);
     case CrankTalkTokenKindCharacter: return crank_talk_parseLiteralCharacter(context, state);
-    //case CrankTalkTokenKindString:    return crank_talk_parseLiteralString(context, state);
-    //case CrankTalkTokenKindSymbol:    return crank_talk_parseLiteralSymbol(context, state);
+    //case CrankTalkTokenKindString:  return crank_talk_parseLiteralString(context, state);
+    //case CrankTalkTokenKindSymbol:  return crank_talk_parseLiteralSymbol(context, state);
+    case CrankTalkTokenKindNil:       return crank_talk_parseNilReference(context, state);
+    case CrankTalkTokenKindFalse:     return crank_talk_parseFalseReference(context, state);
+    case CrankTalkTokenKindTrue:      return crank_talk_parseTrueReference(context, state);
     default:
         return crank_talk_ParserState_advanceWithExpectedError(context, state, "Expected a literal.");
     }
 }
 
 static crank_talk_oop_t
+crank_talk_parseSelfReference(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_next(state);
+    assert(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindSelf);
+
+    crank_talk_oop_t pseudoReferenceValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeSelfReferenceNode);
+    crank_talk_ParseTreeSelfReferenceNode_t *pseudoReference = (crank_talk_ParseTreeSelfReferenceNode_t*)pseudoReferenceValue;
+    pseudoReference->super.super.sourcePosition = token->sourcePosition;
+    return pseudoReferenceValue;
+}
+
+static crank_talk_oop_t
+crank_talk_parseSuperReference(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_next(state);
+    assert(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindSuper);
+
+    crank_talk_oop_t pseudoReferenceValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeSuperReferenceNode);
+    crank_talk_ParseTreeSuperReferenceNode_t *pseudoReference = (crank_talk_ParseTreeSuperReferenceNode_t*)pseudoReferenceValue;
+    pseudoReference->super.super.sourcePosition = token->sourcePosition;
+    return pseudoReferenceValue;
+}
+
+static crank_talk_oop_t
+crank_talk_parseThisContextReference(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_next(state);
+    assert(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindThisContext);
+
+    crank_talk_oop_t pseudoReferenceValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeThisContextReferenceNode);
+    crank_talk_ParseTreeThisContextReferenceNode_t *pseudoReference = (crank_talk_ParseTreeThisContextReferenceNode_t*)pseudoReferenceValue;
+    pseudoReference->super.super.sourcePosition = token->sourcePosition;
+    return pseudoReferenceValue;
+}
+
+static crank_talk_oop_t
+crank_talk_parseTerm(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    switch(crank_talk_ParserState_peekKind(state, 0))
+    {
+    case CrankTalkTokenKindSelf:        return crank_talk_parseSelfReference(context, state);
+    case CrankTalkTokenKindSuper:       return crank_talk_parseSuperReference(context, state);
+    case CrankTalkTokenKindThisContext: return crank_talk_parseThisContextReference(context, state);
+    default:
+        return crank_talk_parseLiteral(context, state);
+    }
+}
+
+static crank_talk_oop_t
 crank_talk_parseExpression(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
 {
-    return crank_talk_parseLiteral(context, state);
+    return crank_talk_parseTerm(context, state);
 }
 
 static crank_talk_oop_t
