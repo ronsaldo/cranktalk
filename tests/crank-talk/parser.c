@@ -168,5 +168,15 @@ void parser_runTests(void)
         Assert(crank_talk_isParseTreeThisContextReferenceNode(context, ast));
     }
 
+    // Identifier reference
+    {
+        crank_talk_oop_t ast = parseString(context, "identifier");
+        Assert(crank_talk_isParseTreeIdentifierReferenceNode(context, ast));
+
+        crank_talk_ParseTreeIdentifierReferenceNode_t *literal = (crank_talk_ParseTreeIdentifierReferenceNode_t*)ast;
+        Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)literal->symbol, "identifier"));
+    }
+
+
     crank_talk_vm_destroyContext(context);
 }

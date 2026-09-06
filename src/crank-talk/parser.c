@@ -417,10 +417,27 @@ crank_talk_parseThisContextReference(crank_talk_VMContext_t *context, crank_talk
 }
 
 static crank_talk_oop_t
+crank_talk_parseIdentifierReference(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_next(state);
+    assert(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindIdentifier);
+
+    crank_talk_StringSlice_t tokenString = crank_talk_SourcePosition_asStringSlice(token->sourcePosition);
+    crank_talk_oop_t symbol = crank_talk_Symbol_internWithString(context, tokenString.size, tokenString.text);
+
+    crank_talk_oop_t identifierNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeIdentifierReferenceNode);
+    crank_talk_ParseTreeIdentifierReferenceNode_t *identifierNode = (crank_talk_ParseTreeIdentifierReferenceNode_t*)identifierNodeValue;
+    identifierNode->super.sourcePosition = token->sourcePosition;
+    identifierNode->symbol = (crank_talk_Symbol_t*)symbol;
+    return identifierNodeValue;
+}
+
+static crank_talk_oop_t
 crank_talk_parseTerm(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
 {
     switch(crank_talk_ParserState_peekKind(state, 0))
     {
+    case CrankTalkTokenKindIdentifier:  return crank_talk_parseIdentifierReference(context, state);
     case CrankTalkTokenKindSelf:        return crank_talk_parseSelfReference(context, state);
     case CrankTalkTokenKindSuper:       return crank_talk_parseSuperReference(context, state);
     case CrankTalkTokenKindThisContext: return crank_talk_parseThisContextReference(context, state);
