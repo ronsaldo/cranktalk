@@ -232,7 +232,7 @@ crank_talk_StringStream_insertBytesObject(crank_talk_VMContext_t *context, crank
     crank_talk_StringStream_insertString(context, stream, size, (const char*)crank_talk_oop_getBytesData(object));
 }
 
-/*CRANK_TALK_API void
+CRANK_TALK_API void
 crank_talk_StringStream_print(crank_talk_VMContext_t *context, crank_talk_oop_t stream, crank_talk_oop_t value)
 {
     crank_talk_send1(context, context->roots.printOnSymbol, value, stream);
@@ -242,7 +242,7 @@ CRANK_TALK_API void
 crank_talk_StringStream_fullPrint(crank_talk_VMContext_t *context, crank_talk_oop_t stream, crank_talk_oop_t value)
 {
     crank_talk_send1(context, context->roots.fullPrintOnSymbol, value, stream);
-}*/
+}
 
 CRANK_TALK_API crank_talk_oop_t
 crank_talk_StringStream_asString(crank_talk_VMContext_t *context, crank_talk_oop_t stream)
@@ -273,6 +273,27 @@ crank_talk_oop_printString(crank_talk_VMContext_t *context, crank_talk_oop_t val
 }
 
 static crank_talk_oop_t
+crank_talk_Object_asString_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    return crank_talk_send0(context, context->roots.printStringSymbol, arguments[0]);
+}
+
+static crank_talk_oop_t
+crank_talk_Object_printString_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = crank_talk_StringStream_create(context);
+    crank_talk_StringStream_print(context, stream, receiver);
+    return crank_talk_StringStream_asString(context, stream);
+}
+
+static crank_talk_oop_t
 crank_talk_String_asString_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)context;
@@ -282,7 +303,28 @@ crank_talk_String_asString_primitive(crank_talk_VMContext_t *context, crank_talk
     return arguments[0];
 }
 
+static crank_talk_oop_t
+crank_talk_String_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 1);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    crank_talk_StringStream_insertCharacter(context, stream, '\'');
+    crank_talk_StringStream_insertBytesObject(context, stream, receiver);
+    crank_talk_StringStream_insertCharacter(context, stream, '\'');
+    return receiver;
+}
+
 void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context)
 {
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "asString", 1, crank_talk_Object_asString_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "printString", 1, crank_talk_Object_printString_primitive);
+    //crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "printOn:", crank_talk_SimpleFunctionType_createf(context, SysmelVMFunctionFlagsNone, SysmelCurrentTypePointer(VoidClass), SysmelCurrentTypePointer(ObjectClass), SysmelCurrentTypePointer(StringStreamClass), NULL), crank_talk_Object_printOn_primitive);
+    //crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "fullPrintOn:", crank_talk_SimpleFunctionType_createf(context, SysmelVMFunctionFlagsNone, SysmelCurrentTypePointer(VoidClass), SysmelCurrentTypePointer(ObjectClass), SysmelCurrentTypePointer(StringStreamClass), NULL), crank_talk_Object_fullPrintOn_primitive);
+
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "asString", 1, crank_talk_String_asString_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "printOn:", 2, crank_talk_String_printOn_primitive);
 }

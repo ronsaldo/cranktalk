@@ -5,7 +5,7 @@
 #include <stddef.h>
 
 #define CRANK_TALK_STRING_FORMAT "%.*s"
-#define CRANK_TALK_STRING_FORMAT_ARG(x) (int)crank_talk_Value_getSizeInBytes(x), (const char*)crank_talk_Value_getBytesData(x)
+#define CRANK_TALK_STRING_FORMAT_ARG(x) (int)crank_talk_object_getSizeInBytes(x), (const char*)crank_talk_oop_getBytesData(x)
 
 CRANK_TALK_API size_t crank_talk_String_computeHashWithBytes(size_t size, const uint8_t *bytes);
 

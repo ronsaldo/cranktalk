@@ -12,9 +12,8 @@ crank_talk_error(const char *message)
     abort();
 }
 
-/*
-SYSMEL_VM_API void
-sysmel_vm_errorPrintf(sysmel_VMContext_t *context, const char *format, ...)
+CRANK_TALK_API void
+crank_talk_errorPrintf(crank_talk_VMContext_t *context, const char *format, ...)
 {
     (void)context;
     char buffer[256];
@@ -24,10 +23,10 @@ sysmel_vm_errorPrintf(sysmel_VMContext_t *context, const char *format, ...)
     vsnprintf(buffer, sizeof(buffer), format, valist);
     va_end(valist);
 
-    sysmel_vm_error(buffer);
+    crank_talk_error(buffer);
 }
 
-SYSMEL_VM_API void
+/*SYSMEL_VM_API void
 sysmel_vm_errorAtSourcePosition(sysmel_VMContext_t *context, sysmel_vm_Value_t abstractSourcePosition, const char *message)
 {
     if(sysmel_vm_Value_isKindOf(context, abstractSourcePosition, context->roots.SourcePositionClass))

@@ -70,7 +70,7 @@ crank_talk_send(crank_talk_VMContext_t *context, crank_talk_oop_t selector, size
 
         return crank_talk_send1(context, context->roots.doesNotUnderstandSymbol, receiver, messageValue);
         */
-        crank_talk_error("TODO: nil found method.");
+        crank_talk_errorPrintf(context, "Message not understood #" CRANK_TALK_STRING_FORMAT ".", CRANK_TALK_STRING_FORMAT_ARG(selector));
     }
 
     return crank_talk_apply(context, foundMethod, argumentCount, arguments);
