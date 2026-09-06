@@ -10,9 +10,8 @@ typedef struct crank_talk_StringSlice_s
 } crank_talk_StringSlice_t;
 
 CRANK_TALK_INLINE crank_talk_StringSlice_t
-crank_talk_SourcePosition_asStringSlice(crank_talk_oop_t sourcePositionValue)
+crank_talk_SourcePosition_asStringSlice(crank_talk_SourcePosition_t *sourcePosition)
 {
-    crank_talk_SourcePosition_t *sourcePosition = (crank_talk_SourcePosition_t*)sourcePositionValue;
     crank_talk_SourceCode_t *sourceCode = (crank_talk_SourceCode_t*)sourcePosition->sourceCode;
     const char *text = sourceCode->text->elements;
 

@@ -31,5 +31,52 @@ void parser_runTests(void)
         AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)sequenceNode->expressions));
     }
 
+    // Comment
+    {
+        crank_talk_oop_t ast = parseString(context, "\"Hello World\"");
+        Assert(crank_talk_isParseTreeSequenceNode(context, ast));
+
+        crank_talk_ParseTreeSequenceNode_t *sequenceNode = (crank_talk_ParseTreeSequenceNode_t*)ast;
+        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)sequenceNode->pragmas));
+        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)sequenceNode->localVariables));
+        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)sequenceNode->expressions));
+    }
+
+    // Literal integer 42
+    {
+        crank_talk_oop_t ast = parseString(context, "42");
+        Assert(crank_talk_isParseTreeLiteralNode(context, ast));
+
+        crank_talk_ParseTreeLiteralNode_t *literal = (crank_talk_ParseTreeLiteralNode_t*)ast;
+        AssertEquals(42, crank_talk_oop_decodeSmallInteger(literal->value));
+    }
+
+    // Literal integer 10
+    {
+        crank_talk_oop_t ast = parseString(context, "2r1010");
+        Assert(crank_talk_isParseTreeLiteralNode(context, ast));
+
+        crank_talk_ParseTreeLiteralNode_t *literal = (crank_talk_ParseTreeLiteralNode_t*)ast;
+        AssertEquals(10, crank_talk_oop_decodeSmallInteger(literal->value));
+    }
+
+    // Literal integer 49374
+    {
+        crank_talk_oop_t ast = parseString(context, "16rC0DE");
+        Assert(crank_talk_isParseTreeLiteralNode(context, ast));
+
+        crank_talk_ParseTreeLiteralNode_t *literal = (crank_talk_ParseTreeLiteralNode_t*)ast;
+        AssertEquals(49374, crank_talk_oop_decodeSmallInteger(literal->value));
+    }
+
+    // Literal float 42.5
+    {
+        crank_talk_oop_t ast = parseString(context, "42.5");
+        Assert(crank_talk_isParseTreeLiteralNode(context, ast));
+
+        crank_talk_ParseTreeLiteralNode_t *literal = (crank_talk_ParseTreeLiteralNode_t*)ast;
+        AssertEquals(42.5, crank_talk_oop_asFloat(literal->value));
+    }
+
     crank_talk_vm_destroyContext(context);
 }
