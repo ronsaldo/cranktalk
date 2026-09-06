@@ -8,7 +8,6 @@
 typedef struct crank_talk_ParseTreeNode_s crank_talk_ParseTreeNode_t;
 typedef struct crank_talk_ParseTreeParseErrorNode_s crank_talk_ParseTreeParseErrorNode_t;
 typedef struct crank_talk_ParseTreeAssignmentNode_s crank_talk_ParseTreeAssignmentNode_t;
-typedef struct crank_talk_ParseTreeBinaryExpressionSequenceNode_s crank_talk_ParseTreeBinaryExpressionSequenceNode_t;
 typedef struct crank_talk_ParseTreeIdentifierReferenceNode_s crank_talk_ParseTreeIdentifierReferenceNode_t;
 typedef struct crank_talk_ParseTreePseudoVariableReferenceNode_s crank_talk_ParseTreePseudoVariableReferenceNode_t;
     typedef struct crank_talk_ParseTreeNilReferenceNode_s crank_talk_ParseTreeNilReferenceNode_t;
@@ -53,12 +52,6 @@ struct crank_talk_ParseTreeAssignmentNode_s
     crank_talk_ParseTreeNode_t super;
     crank_talk_ParseTreeNode_t *store;
     crank_talk_ParseTreeNode_t *value;
-};
-
-struct crank_talk_ParseTreeBinaryExpressionSequenceNode_s
-{
-    crank_talk_ParseTreeNode_t super;
-    crank_talk_Array_t *operands;
 };
 
 struct crank_talk_ParseTreeIdentifierReferenceNode_s

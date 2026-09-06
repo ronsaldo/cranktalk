@@ -95,9 +95,9 @@ struct crank_talk_VMContextRoots_s
 
     // Front end classes
     crank_talk_oop_t ParseTreeNodeClass;
+    
     crank_talk_oop_t ParseTreeParseErrorNodeClass;
     crank_talk_oop_t ParseTreeAssignmentNodeClass;
-    crank_talk_oop_t ParseTreeBinaryExpressionSequenceNodeClass;
     crank_talk_oop_t ParseTreeIdentifierReferenceNodeClass;
     crank_talk_oop_t ParseTreePseudoVariableReferenceNodeClass;
     

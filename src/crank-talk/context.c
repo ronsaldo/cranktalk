@@ -441,6 +441,43 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
     context->roots.ParseTreeNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeNode", context->roots.ObjectClass, sizeof(crank_talk_ParseTreeNode_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(ParseTreeNode, sourcePosition),
         NULL);
+
+    context->roots.ParseTreeParseErrorNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeErrorNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeParseErrorNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeParseErrorNode, errorMessage),
+        NULL);
+    context->roots.ParseTreeAssignmentNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeAssignmentNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeAssignmentNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeAssignmentNode, store),
+        CrankTalkSlotDef(ParseTreeAssignmentNode, value),
+        NULL);
+    context->roots.ParseTreeIdentifierReferenceNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeIdentifierReferenceNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeIdentifierReferenceNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeIdentifierReferenceNode, symbol),
+        NULL);
+    context->roots.ParseTreePseudoVariableReferenceNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreePseudoVariableReferenceNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreePseudoVariableReferenceNode_t), CrankTalkGCObjectDataTypeOops,
+        NULL);
+
+    context->roots.ParseTreeNilReferenceNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeNilReferenceNode", context->roots.ParseTreePseudoVariableReferenceNodeClass, sizeof(crank_talk_ParseTreeNilReferenceNode_t), CrankTalkGCObjectDataTypeOops,
+        NULL);
+    context->roots.ParseTreeFalseReferenceNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeFalseReferenceNode", context->roots.ParseTreePseudoVariableReferenceNodeClass, sizeof(crank_talk_ParseTreeFalseReferenceNode_t), CrankTalkGCObjectDataTypeOops,
+        NULL);
+    context->roots.ParseTreeTrueReferenceNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeTrueReferenceNode", context->roots.ParseTreePseudoVariableReferenceNodeClass, sizeof(crank_talk_ParseTreeTrueReferenceNode_t), CrankTalkGCObjectDataTypeOops,
+        NULL);
+    context->roots.ParseTreeSelfReferenceNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeSelfReferenceNode", context->roots.ParseTreePseudoVariableReferenceNodeClass, sizeof(crank_talk_ParseTreeSelfReferenceNode_t), CrankTalkGCObjectDataTypeOops,
+        NULL);
+    context->roots.ParseTreeSuperReferenceNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeSuperReferenceNode", context->roots.ParseTreePseudoVariableReferenceNodeClass, sizeof(crank_talk_ParseTreeSuperReferenceNode_t), CrankTalkGCObjectDataTypeOops,
+        NULL);
+    context->roots.ParseTreeThisContextReferenceNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeThisContextReferenceNode", context->roots.ParseTreePseudoVariableReferenceNodeClass, sizeof(crank_talk_ParseTreeThisContextReferenceNode_t), CrankTalkGCObjectDataTypeOops,
+        NULL);
+
+    context->roots.ParseTreeArgumentDefinitionNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeArgumentDefinitionNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeArgumentDefinitionNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeArgumentDefinitionNode, name),
+        NULL);
+    context->roots.ParseTreeBlockNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeBlockNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeBlockNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeBlockNode, arguments),
+        CrankTalkSlotDef(ParseTreeBlockNode, body),
+        NULL);
+
+    context->roots.ParseTreeLiteralNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeLiteralNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeLiteralNode_t), CrankTalkGCObjectDataTypeOops, NULL);
+
 }
 
 static void 
