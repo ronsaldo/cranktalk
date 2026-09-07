@@ -367,5 +367,26 @@ void parser_runTests(void)
         AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)message->arguments));
     }
 
+    // Return node
+    {
+        crank_talk_oop_t ast = parseString(context, "^ self");
+        Assert(crank_talk_isParseTreeReturnNode(context, ast));
+
+        crank_talk_ParseTreeReturnNode_t *returnNode = (crank_talk_ParseTreeReturnNode_t*)ast;
+        Assert(crank_talk_isParseTreeSelfReferenceNode(context, (crank_talk_oop_t)returnNode->expression));
+    }
+
+    // Unary method
+    /*{
+        crank_talk_oop_t ast = parseString(context, "!{unary ^ self}");
+        Assert(crank_talk_isParseTreeMethodDefinitionNode(context, ast));
+
+        crank_talk_ParseTreeMethodDefinitionNode_t *methodNode = (crank_talk_ParseTreeMethodDefinitionNode_t*)ast;
+        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)methodNode->arguments));
+
+        Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)methodNode->selector, "unary"));
+        Assert(crank_talk_isParseTreeReturnNode(context, (crank_talk_oop_t)methodNode->body));
+    }*/
+
     crank_talk_vm_destroyContext(context);
 }

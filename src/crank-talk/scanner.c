@@ -180,7 +180,7 @@ isIdentifierMiddle(char c)
 
 static bool isOperatorCharacter(char c)
 {
-    const char *operatorSet = "+-/\\*~<>=@,%|&?!";
+    const char *operatorSet = "+-/\\*~<>=@,%|&?!^";
     for(const char *position = operatorSet; *position; ++position)
     {
         if(*position == c)
@@ -475,6 +475,8 @@ crank_talk_ScannerState_scanNextToken(crank_talk_VMContext_t *context, crank_tal
                 return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindGreaterThan, &initialState);
             case '|':
                 return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindBar, &initialState);
+            case '^':
+                return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindCaret, &initialState);
             case '!':
                 if(crank_talk_ScannerState_peekAt(state, 0) == '[')
                 {

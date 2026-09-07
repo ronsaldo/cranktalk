@@ -622,6 +622,7 @@ isBinaryExpressionOperator(crank_talk_TokenKind_t kind)
     case CrankTalkTokenKindLessThan:
     case CrankTalkTokenKindGreaterThan:
     case CrankTalkTokenKindBar:
+    case CrankTalkTokenKindCaret:
         return true;
     default:
         return false;
@@ -843,9 +844,27 @@ crank_talk_parseAssignmentExpression(crank_talk_VMContext_t *context, crank_talk
 }
 
 static crank_talk_oop_t
+crank_talk_parseReturnExpression(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    size_t startPosition = state->position;
+    if(crank_talk_ParserState_peekKind(state, 0) != CrankTalkTokenKindCaret)
+        return crank_talk_parseAssignmentExpression(context, state);
+    
+    crank_talk_ParserState_advance(state);
+    
+    crank_talk_oop_t resultValue = crank_talk_parseAssignmentExpression(context, state);
+
+    crank_talk_oop_t returnNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeReturnNode);
+    crank_talk_ParseTreeReturnNode_t *returnNode = (crank_talk_ParseTreeReturnNode_t *)returnNodeValue;
+    returnNode->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startPosition);
+    returnNode->expression = (crank_talk_ParseTreeNode_t*)resultValue;
+    return returnNodeValue;
+}
+
+static crank_talk_oop_t
 crank_talk_parseExpression(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
 {
-    return crank_talk_parseAssignmentExpression(context, state);
+    return crank_talk_parseReturnExpression(context, state);
 }
 
 static crank_talk_oop_t
