@@ -1,6 +1,7 @@
 #include "crank-talk/context.h"
 #include "crank-talk/array.h"
 #include "crank-talk/behavior.h"
+#include "crank-talk/dictionary.h"
 #include "crank-talk/gc.h"
 #include "crank-talk/ordered-collection.h"
 #include "crank-talk/parse-tree.h"
@@ -52,8 +53,7 @@ crank_talk_context_setClassTypeMetadataVList(crank_talk_VMContext_t *context, cr
     {
         crank_talk_oop_t nameSymbol = crank_talk_Symbol_internWithCString(context, name);
         clazz->name = (crank_talk_Symbol_t*)nameSymbol;
-        // TODO: create the system environment
-        //crank_talk_Namespace_setSymbolBinding(context, context->roots.globalNamespace, nameSymbol, classValue);
+        crank_talk_SystemEnvironment_atPut(context, context->roots.systemEnvironment, nameSymbol, classValue);
     }
 
     crank_talk_oop_t slots = crank_talk_OrderedCollection_create(context);
@@ -194,8 +194,10 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.TombstoneClass       = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass,  sizeof(crank_talk_Tombstone_t),       CrankTalkGCObjectDataTypeOops);
 
     // Variables and slots
-    context->roots.VariableClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass,   sizeof(crank_talk_Variable_t), CrankTalkGCObjectDataTypeOops);
-    context->roots.SlotClass     = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.VariableClass, sizeof(crank_talk_Slot_t),     CrankTalkGCObjectDataTypeOops);
+    context->roots.VariableClass        = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass,          sizeof(crank_talk_Variable_t),        CrankTalkGCObjectDataTypeOops);
+    context->roots.LiteralVariableClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.VariableClass,        sizeof(crank_talk_LiteralVariable_t), CrankTalkGCObjectDataTypeOops);
+    context->roots.GlobalVariableClass  = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.LiteralVariableClass, sizeof(crank_talk_GlobalVariable_t),  CrankTalkGCObjectDataTypeOops);
+    context->roots.SlotClass            = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.VariableClass,        sizeof(crank_talk_Slot_t),            CrankTalkGCObjectDataTypeOops);
 
     // Association
     context->roots.LookupKeyClass   = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_LookupKey_t),      CrankTalkGCObjectDataTypeOops);
@@ -211,11 +213,12 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.CrankTalkTokenClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_CrankTalkToken_t), CrankTalkGCObjectDataTypeOops);
 
     // Hashed collections
-    context->roots.CollectionClass          = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass,           sizeof(crank_talk_Collection_t),          CrankTalkGCObjectDataTypeOops);
-    context->roots.HashedCollectionClass    = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.CollectionClass,       sizeof(crank_talk_HashedCollection_t),    CrankTalkGCObjectDataTypeOops);
-    context->roots.DictionaryClass          = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.HashedCollectionClass, sizeof(crank_talk_Dictionary_t),          CrankTalkGCObjectDataTypeOops);
-    context->roots.IdentityDictionaryClass  = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.DictionaryClass,       sizeof(crank_talk_IdentityDictionary_t),  CrankTalkGCObjectDataTypeOops);
-    context->roots.MethodDictionaryClass    = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.DictionaryClass,       sizeof(crank_talk_MethodDictionary_t),    CrankTalkGCObjectDataTypeOops);
+    context->roots.CollectionClass          = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass,            sizeof(crank_talk_Collection_t),         CrankTalkGCObjectDataTypeOops);
+    context->roots.HashedCollectionClass    = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.CollectionClass,        sizeof(crank_talk_HashedCollection_t),   CrankTalkGCObjectDataTypeOops);
+    context->roots.DictionaryClass          = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.HashedCollectionClass,  sizeof(crank_talk_Dictionary_t),         CrankTalkGCObjectDataTypeOops);
+    context->roots.IdentityDictionaryClass  = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.DictionaryClass,        sizeof(crank_talk_IdentityDictionary_t), CrankTalkGCObjectDataTypeOops);
+    context->roots.SystemEnvironmentClass   = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.IdentityDictionaryClass, sizeof(crank_talk_SystemEnvironment_t), CrankTalkGCObjectDataTypeOops);
+    context->roots.MethodDictionaryClass    = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.DictionaryClass,         sizeof(crank_talk_MethodDictionary_t),  CrankTalkGCObjectDataTypeOops);
 
     context->roots.SetClass         = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.HashedCollectionClass, sizeof(crank_talk_Set_t),         CrankTalkGCObjectDataTypeOops);
     context->roots.IdentitySetClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.SetClass,              sizeof(crank_talk_IdentitySet_t), CrankTalkGCObjectDataTypeOops);
@@ -233,6 +236,9 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.StringStreamClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_StringStream_t), CrankTalkGCObjectDataTypeOops);
 
     context->roots.ExternalAddressClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_ExternalAddress_t), CrankTalkGCObjectDataTypeBytes);
+
+    // System environment
+    context->roots.systemEnvironment = crank_talk_SystemEnvironment_create(context);
 
     // Boolean values
     context->roots.falseValue = CrankAllocateValuesObjectWithClassName(context, False);
@@ -313,6 +319,11 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_context_setClassTypeMetadata(context, context->roots.VariableClass, "Variable",
         CrankTalkSlotDef(Variable, name),
         NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.LiteralVariableClass, "LiteralVariable",
+        CrankTalkSlotDef(LiteralVariable, value),
+        NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.GlobalVariableClass, "GlobalVariable", NULL);
+
     crank_talk_context_setClassTypeMetadata(context, context->roots.SlotClass, "Slot",
         CrankTalkSlotDef(Slot, index),
         NULL);
@@ -354,6 +365,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.DictionaryClass, "Dictionary", NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.IdentityDictionaryClass, "IdentityDictionary", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.SystemEnvironmentClass, "SystemEnvironment", NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.MethodDictionaryClass, "MethodDictionary", NULL);
 
     crank_talk_context_setClassTypeMetadata(context, context->roots.SetClass, "Set", NULL);
@@ -411,6 +423,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_context_createClassTables(context, context->roots.TombstoneClass);
 
     crank_talk_context_createClassTables(context, context->roots.VariableClass);
+    crank_talk_context_createClassTables(context, context->roots.LiteralVariableClass);
+    crank_talk_context_createClassTables(context, context->roots.GlobalVariableClass);
     crank_talk_context_createClassTables(context, context->roots.SlotClass);
 
     crank_talk_context_createClassTables(context, context->roots.LookupKeyClass);
@@ -427,6 +441,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_context_createClassTables(context, context->roots.HashedCollectionClass);
     crank_talk_context_createClassTables(context, context->roots.DictionaryClass);
     crank_talk_context_createClassTables(context, context->roots.IdentityDictionaryClass);
+    crank_talk_context_createClassTables(context, context->roots.SystemEnvironmentClass);
     crank_talk_context_createClassTables(context, context->roots.MethodDictionaryClass);
 
     crank_talk_context_createClassTables(context, context->roots.SetClass);

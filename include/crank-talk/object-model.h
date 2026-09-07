@@ -109,7 +109,9 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
 
     typedef struct crank_talk_Tombstone_s crank_talk_Tombstone_t;
 
-       typedef struct crank_talk_Variable_s crank_talk_Variable_t;
+    typedef struct crank_talk_Variable_s crank_talk_Variable_t;
+        typedef struct crank_talk_LiteralVariable_s crank_talk_LiteralVariable_t;
+            typedef struct crank_talk_GlobalVariable_s crank_talk_GlobalVariable_t;
         typedef struct crank_talk_Slot_s crank_talk_Slot_t;
 
     typedef struct crank_talk_LookupKey_s crank_talk_LookupKey_t;
@@ -126,6 +128,7 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
         typedef struct crank_talk_HashedCollection_s crank_talk_HashedCollection_t;
             typedef struct crank_talk_Dictionary_s crank_talk_Dictionary_t;
                 typedef struct crank_talk_IdentityDictionary_s crank_talk_IdentityDictionary_t;
+                    typedef struct crank_talk_SystemEnvironment_s crank_talk_SystemEnvironment_t;
                 typedef struct crank_talk_MethodDictionary_s crank_talk_MethodDictionary_t;
         
             typedef struct crank_talk_Set_s crank_talk_Set_t;
@@ -490,6 +493,15 @@ struct crank_talk_Variable_s {
     crank_talk_Symbol_t *name;
 };
 
+struct crank_talk_LiteralVariable_s {
+    crank_talk_Variable_t super;
+    crank_talk_oop_t value;
+};
+
+struct crank_talk_GlobalVariable_s {
+    crank_talk_LiteralVariable_t super;
+};
+            
 struct crank_talk_Slot_s {
     crank_talk_Variable_t super;
     crank_talk_oop_t index;
@@ -566,6 +578,11 @@ struct crank_talk_Dictionary_s
 struct crank_talk_IdentityDictionary_s
 {
     crank_talk_Dictionary_t super;
+};
+
+struct crank_talk_SystemEnvironment_s
+{
+    crank_talk_IdentityDictionary_t super;
 };
 
 struct crank_talk_MethodDictionary_s

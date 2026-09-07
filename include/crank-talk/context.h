@@ -51,6 +51,8 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t TombstoneClass;
 
     crank_talk_oop_t VariableClass;
+    crank_talk_oop_t LiteralVariableClass;
+    crank_talk_oop_t GlobalVariableClass;
     crank_talk_oop_t SlotClass;
 
     crank_talk_oop_t LookupKeyClass;
@@ -67,6 +69,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t HashedCollectionClass;
     crank_talk_oop_t DictionaryClass;
     crank_talk_oop_t IdentityDictionaryClass;
+    crank_talk_oop_t SystemEnvironmentClass;
     crank_talk_oop_t MethodDictionaryClass;
 
     crank_talk_oop_t SetClass;
@@ -84,6 +87,9 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t StringStreamClass;
 
     crank_talk_oop_t ExternalAddressClass;
+
+    // System environment
+    crank_talk_oop_t systemEnvironment;
 
     // Boolean values
     crank_talk_oop_t falseValue;
