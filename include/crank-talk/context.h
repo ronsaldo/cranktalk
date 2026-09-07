@@ -97,6 +97,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t printStringSymbol;
     crank_talk_oop_t printOnSymbol;
     crank_talk_oop_t fullPrintOnSymbol;
+    crank_talk_oop_t traverseAndCollectErrorsIntoSymbol;
 
     // Front end classes
     crank_talk_oop_t ParseTreeNodeClass;

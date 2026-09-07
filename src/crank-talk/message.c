@@ -1,5 +1,6 @@
 #include "crank-talk/message.h"
 #include "crank-talk/behavior.h"
+#include "crank-talk/context.h"
 #include "crank-talk/dictionary.h"
 #include "crank-talk/errors.h"
 #include "crank-talk/function.h"
@@ -70,6 +71,19 @@ crank_talk_send(crank_talk_VMContext_t *context, crank_talk_oop_t selector, size
 
         return crank_talk_send1(context, context->roots.doesNotUnderstandSymbol, receiver, messageValue);
         */
+        if(crank_talk_oop_isKindOf(context, receiverClass, context->roots.ClassClass))
+        {
+            crank_talk_Class_t *clazz = (crank_talk_Class_t *)receiverClass;
+            if(clazz->name)
+            {
+                crank_talk_errorPrintf(context, "Message not understood #" CRANK_TALK_STRING_FORMAT " by " CRANK_TALK_STRING_FORMAT,
+                    CRANK_TALK_STRING_FORMAT_ARG(selector),
+                    CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)clazz->name)
+                );
+            }
+    }
+
+
         crank_talk_errorPrintf(context, "Message not understood #" CRANK_TALK_STRING_FORMAT ".", CRANK_TALK_STRING_FORMAT_ARG(selector));
     }
 

@@ -68,8 +68,8 @@ CRANK_TALK_API crank_talk_oop_t crank_talk_OrderedCollection_at(crank_talk_VMCon
     (void)context;
     crank_talk_OrderedCollection_t *collection = (crank_talk_OrderedCollection_t*)orderedCollectionValue;
     size_t size = crank_talk_oop_decodeSmallInteger(collection->size);
-    if(index >= size)
+    if(index < 1 || index > size)
         crank_talk_error("Ordered collection index is out of bounds.");
     
-    return collection->storage->elements[index];
+    return collection->storage->elements[index - 1];
 }

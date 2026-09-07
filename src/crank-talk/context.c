@@ -12,6 +12,7 @@
 #define CrankTalkSlotDef(clazz, fieldName) #fieldName, offsetof(crank_talk_ ## clazz ##_t, fieldName)
 
 void crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerParseTreePrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context);
 
 static crank_talk_oop_t
@@ -246,6 +247,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.printStringSymbol       = crank_talk_Symbol_internWithCString(context, "printString");
     context->roots.printOnSymbol           = crank_talk_Symbol_internWithCString(context, "printOn:");
     context->roots.fullPrintOnSymbol       = crank_talk_Symbol_internWithCString(context, "fullPrintOn:");
+    
+    context->roots.traverseAndCollectErrorsIntoSymbol = crank_talk_Symbol_internWithCString(context, "traverseAndCollectErrorsInto:");
 
     // Field definitions
     crank_talk_context_setClassTypeMetadata(context, context->roots.ProtoObjectClass, "ProtoObject", NULL);
@@ -543,6 +546,7 @@ static void
 crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_registerNumbersPrimitives(context);
+    crank_talk_registerParseTreePrimitives(context);
     crank_talk_registerStringPrimitives(context);
 }
 

@@ -207,4 +207,9 @@ CRANK_TALK_API bool crank_talk_isParseTreeMethodDefinitionNode(crank_talk_VMCont
 CRANK_TALK_API bool crank_talk_isParseTreePragmaNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
 CRANK_TALK_API bool crank_talk_isParseTreeVariableDefinitionNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
 
+CRANK_TALK_API void crank_talk_ParseTree_traverseAndCollectErrorsInto(crank_talk_VMContext_t *context, crank_talk_ParseTreeNode_t *node, crank_talk_oop_t errorList);
+CRANK_TALK_API void crank_talk_ParseTree_traverseListAndCollectErrorsInto(crank_talk_VMContext_t *context, crank_talk_Array_t *list, crank_talk_oop_t errorList);
+CRANK_TALK_API bool crank_talk_ParseTree_checkAndPrintErrors(crank_talk_VMContext_t *context, crank_talk_ParseTreeNode_t *node);
+
+
 #endif //CRANK_TALK_PARSE_TREE_H

@@ -6,6 +6,7 @@ set(CrankTalk_Sources
     dictionary.c
     dynarray.c
     errors.c
+    eval.c
     function.c
     gc.c
     heap.c
