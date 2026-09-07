@@ -50,7 +50,43 @@ void parser_runTests(void)
         crank_talk_ParseTreeAssignmentNode_t *assignment = (crank_talk_ParseTreeAssignmentNode_t*)ast;
         Assert(crank_talk_isParseTreeIdentifierReferenceNode(context, (crank_talk_oop_t)assignment->store));
         Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)assignment->value));
-    }    
+    }
+
+    // Empty block
+    {
+        crank_talk_oop_t ast = parseString(context, "[]");
+        Assert(crank_talk_isParseTreeBlockNode(context, ast));
+        
+        crank_talk_ParseTreeBlockNode_t *blockNode = (crank_talk_ParseTreeBlockNode_t*)ast;
+        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)blockNode->arguments));
+        Assert(crank_talk_isParseTreeSequenceNode(context, (crank_talk_oop_t)blockNode->body));
+    }
+    
+    // Block body
+    {
+        crank_talk_oop_t ast = parseString(context, "[42]");
+        Assert(crank_talk_isParseTreeBlockNode(context, ast));
+        
+        crank_talk_ParseTreeBlockNode_t *blockNode = (crank_talk_ParseTreeBlockNode_t*)ast;
+        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)blockNode->arguments));
+        Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)blockNode->body));
+    }
+
+    // Block single argument
+    {
+        crank_talk_oop_t ast = parseString(context, "[:a | a]");
+        Assert(crank_talk_isParseTreeBlockNode(context, ast));
+        
+        crank_talk_ParseTreeBlockNode_t *blockNode = (crank_talk_ParseTreeBlockNode_t*)ast;
+        AssertEquals(1, crank_talk_object_getSizeInSlots((crank_talk_oop_t)blockNode->arguments));
+
+        Assert(crank_talk_isParseTreeIdentifierReferenceNode(context, (crank_talk_oop_t)blockNode->body));
+    }
+
+    // Incomplete block
+    {
+        parseString(context, "[:a | a");
+    }
 
     // Literal integer 42
     {

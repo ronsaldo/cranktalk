@@ -24,18 +24,6 @@ crank_talk_ParserState_atEnd(crank_talk_ParserState_t *state)
     return state->position >= state->tokenCount;
 }
 
-static size_t
-crank_talk_ParserState_memento(crank_talk_ParserState_t *state)
-{
-    return state->position;
-}
-
-static void
-crank_talk_ParserState_restore(crank_talk_ParserState_t *state, size_t memento)
-{
-    state->position = memento;
-}
-
 static crank_talk_TokenKind_t
 crank_talk_ParserState_peekKind(crank_talk_ParserState_t *state, size_t offset)
 {
@@ -481,6 +469,79 @@ crank_talk_parseArray(crank_talk_VMContext_t *context, crank_talk_ParserState_t 
     return arrayValue;
 }
 
+static crank_talk_oop_t
+crank_talk_parseBlockArgument(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    size_t startingPosition = state->position;
+    assert(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindColon);
+    crank_talk_ParserState_advance(state);
+
+    crank_talk_oop_t optionalName = crank_talk_oop_nil();
+    if(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindIdentifier)
+    {
+        crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_next(state);
+        
+        crank_talk_StringSlice_t tokenString = crank_talk_SourcePosition_asStringSlice(token->sourcePosition);
+        optionalName = crank_talk_Symbol_internWithString(context, tokenString.size, tokenString.text);
+    }
+
+    crank_talk_oop_t argumentValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeArgumentDefinitionNode);
+    crank_talk_ParseTreeArgumentDefinitionNode_t *argument = (crank_talk_ParseTreeArgumentDefinitionNode_t *)argumentValue;
+    argument->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startingPosition);
+    argument->name = (crank_talk_Symbol_t*)optionalName;
+    return argumentValue;
+}
+
+static crank_talk_oop_t
+crank_talk_parseBlock(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    size_t startingPosition = state->position;
+    assert(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindLeftBracket);
+    crank_talk_ParserState_advance(state);
+
+    // Arguments
+    crank_talk_oop_t argumentDefinitions = crank_talk_OrderedCollection_create(context);
+    while(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindColon)
+    {
+        crank_talk_oop_t argumentDefinition = crank_talk_parseBlockArgument(context, state);
+        crank_talk_OrderedCollection_add(context, argumentDefinitions, argumentDefinition);
+    }
+
+    // Parse the bar
+    if(crank_talk_OrderedCollection_getSize(argumentDefinitions) > 0 && crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindBar)
+        crank_talk_ParserState_advance(state);
+
+    // Expression list
+    crank_talk_oop_t body = crank_talk_parseSequenceUntilEndOrDelimiter(context, state, CrankTalkTokenKindRightBracket);
+
+    if(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindRightBracket)
+    {
+        crank_talk_ParserState_advance(state);
+    }
+    else
+    {
+        crank_talk_oop_t errorNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeParseErrorNode);
+        crank_talk_ParseTreeParseErrorNode_t *errorNode = (crank_talk_ParseTreeParseErrorNode_t *)errorNodeValue;
+        errorNode->super.sourcePosition = crank_talk_ParserState_currentSourcePosition(state);
+        errorNode->errorMessage = crank_talk_String_createWithCString(context, "Expected a right bracket.");
+
+        crank_talk_oop_t errorSequenceValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeSequenceNode);
+        crank_talk_ParseTreeSequenceNode_t *errorSequence = (crank_talk_ParseTreeSequenceNode_t*)errorSequenceValue;
+        errorSequence->super.sourcePosition = errorNode->super.sourcePosition;
+        errorSequence->pragmas = (crank_talk_Array_t*)crank_talk_Array_create(context, 0);
+        errorSequence->localVariables = (crank_talk_Array_t*)crank_talk_Array_create(context, 0);
+        errorSequence->expressions = (crank_talk_Array_t*)crank_talk_Array_WithWith(context, body, errorNodeValue);
+
+        body = errorSequenceValue;
+    }
+    
+    crank_talk_oop_t blockValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeBlockNode);
+    crank_talk_ParseTreeBlockNode_t *block = (crank_talk_ParseTreeBlockNode_t *)blockValue;
+    block->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startingPosition);
+    block->arguments = (crank_talk_Array_t*)crank_talk_OrderedCollection_asArray(context, argumentDefinitions);
+    block->body = (crank_talk_ParseTreeNode_t*)body;
+    return blockValue;
+}
 
 static crank_talk_oop_t
 crank_talk_parseTerm(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
@@ -490,6 +551,7 @@ crank_talk_parseTerm(crank_talk_VMContext_t *context, crank_talk_ParserState_t *
     case CrankTalkTokenKindIdentifier:       return crank_talk_parseIdentifierReference(context, state);
     case CrankTalkTokenKindLeftParent:       return crank_talk_parseParenthesis(context, state);
     case CrankTalkTokenKindLeftCurlyBracket: return crank_talk_parseArray(context, state);
+    case CrankTalkTokenKindLeftBracket:      return crank_talk_parseBlock(context, state);
     case CrankTalkTokenKindSelf:             return crank_talk_parseSelfReference(context, state);
     case CrankTalkTokenKindSuper:            return crank_talk_parseSuperReference(context, state);
     case CrankTalkTokenKindThisContext:      return crank_talk_parseThisContextReference(context, state);
