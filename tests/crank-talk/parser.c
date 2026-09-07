@@ -426,5 +426,42 @@ void parser_runTests(void)
         Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)methodNode->selector, "myYourself"));
     }
 
+    // Pragmas
+    {
+        crank_talk_oop_t ast = parseString(context, "<testPragma>");
+        Assert(crank_talk_isParseTreeSequenceNode(context, ast));
+
+        crank_talk_ParseTreeSequenceNode_t *sequenceNode = (crank_talk_ParseTreeSequenceNode_t*)ast;
+        AssertEquals(1, crank_talk_object_getSizeInSlots((crank_talk_oop_t)sequenceNode->pragmas));
+
+        Assert(crank_talk_isParseTreePragmaNode(context, sequenceNode->pragmas->elements[0]));
+        crank_talk_ParseTreePragmaNode_t *pragmaNode = (crank_talk_ParseTreePragmaNode_t*)sequenceNode->pragmas->elements[0];
+        Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)pragmaNode->selector, "testPragma"));
+        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)pragmaNode->arguments));
+    }
+
+    // Pragmas
+    {
+        crank_talk_oop_t ast = parseString(context, "<test: 1 with: 42>"); 
+        Assert(crank_talk_isParseTreeSequenceNode(context, ast));
+
+        crank_talk_ParseTreeSequenceNode_t *sequenceNode = (crank_talk_ParseTreeSequenceNode_t*)ast;
+        AssertEquals(1, crank_talk_object_getSizeInSlots((crank_talk_oop_t)sequenceNode->pragmas));
+
+        Assert(crank_talk_isParseTreePragmaNode(context, sequenceNode->pragmas->elements[0]));
+        crank_talk_ParseTreePragmaNode_t *pragmaNode = (crank_talk_ParseTreePragmaNode_t*)sequenceNode->pragmas->elements[0];
+        Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)pragmaNode->selector, "test:with:"));
+        AssertEquals(2, crank_talk_object_getSizeInSlots((crank_talk_oop_t)pragmaNode->arguments));
+    }
+
+    /*// Local variables
+    {
+        crank_talk_oop_t ast = parseString(context, "| testLocal |");
+        Assert(crank_talk_isParseTreeSequenceNode(context, ast));
+
+        crank_talk_ParseTreeSequenceNode_t *sequenceNode = (crank_talk_ParseTreeSequenceNode_t*)ast;
+        AssertEquals(1, crank_talk_object_getSizeInSlots((crank_talk_oop_t)sequenceNode->localVariables));
+    }*/
+
     crank_talk_vm_destroyContext(context);
 }

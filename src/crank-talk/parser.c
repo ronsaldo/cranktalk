@@ -1006,19 +1006,82 @@ crank_talk_parseExpressionListUntilEndOrDelimiter(crank_talk_VMContext_t *contex
 }
 
 static crank_talk_oop_t
+crank_talk_parsePragma(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    size_t startingPosition = state->position;
+    assert(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindLessThan);
+    crank_talk_ParserState_advance(state);
+
+    // Create the pragma
+    crank_talk_oop_t pragmaValue = CrankAllocateValuesObjectWithClassName(context, ParseTreePragmaNode);
+    crank_talk_ParseTreePragmaNode_t *pragma = (crank_talk_ParseTreePragmaNode_t*)pragmaValue;
+
+    // Parse the pragma
+    crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_peek(state, 0);
+    if(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindIdentifier)
+    {
+        crank_talk_ParserState_advance(state);
+        crank_talk_StringSlice_t tokenString = crank_talk_SourcePosition_asStringSlice(token->sourcePosition);
+        pragma->selector = (crank_talk_Symbol_t*)crank_talk_Symbol_internWithString(context, tokenString.size, tokenString.text);
+        pragma->arguments = (crank_talk_Array_t*)crank_talk_Array_create(context, 0);
+    }
+    else if(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindKeyword)
+    {
+        crank_talk_oop_t symbolBuilder = crank_talk_StringStream_create(context);
+        crank_talk_oop_t arguments = crank_talk_OrderedCollection_create(context);
+
+        while (crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindKeyword)
+        {
+            crank_talk_CrankTalkToken_t *keywordToken = crank_talk_ParserState_next(state);
+            crank_talk_StringSlice_t keywordTokenString = crank_talk_SourcePosition_asStringSlice(keywordToken->sourcePosition);
+            crank_talk_StringStream_insertString(context, symbolBuilder, keywordTokenString.size, keywordTokenString.text);
+
+            crank_talk_oop_t argument = crank_talk_parseUnaryPostfixExpression(context, state);
+            crank_talk_OrderedCollection_add(context, arguments, argument);        
+        }
+
+        pragma->selector = (crank_talk_Symbol_t*)crank_talk_StringStream_asSymbol(context, symbolBuilder);
+        pragma->arguments = (crank_talk_Array_t*)crank_talk_OrderedCollection_asArray(context, arguments);
+    }
+    else
+    {
+        crank_talk_oop_t errorNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeParseErrorNode);
+        crank_talk_ParseTreeParseErrorNode_t *errorNode = (crank_talk_ParseTreeParseErrorNode_t *)errorNodeValue;
+        errorNode->super.sourcePosition = crank_talk_ParserState_currentSourcePosition(state);
+        errorNode->errorMessage = crank_talk_String_createWithCString(context, "Expected a pragma message.");
+        return errorNodeValue;
+    }
+
+
+    // Finish the pragma parsing.
+    crank_talk_oop_t pragmaWithError = crank_talk_ParserState_expectAddingErrorToNode(context, state, CrankTalkTokenKindGreaterThan, pragmaValue);
+    pragma->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startingPosition);
+    return pragmaWithError;
+}
+
+static crank_talk_oop_t
 crank_talk_parseSequenceUntilEndOrDelimiter(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state, crank_talk_TokenKind_t delimiter)
 {
     size_t initialPosition = state->position;
-    // TODO: Parse the pragmas and the local variables.
+
+    // Parse the pragmas.
+    crank_talk_oop_t pragmaList = crank_talk_OrderedCollection_create(context);
+    while(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindLessThan)
+    {
+        crank_talk_oop_t pragma = crank_talk_parsePragma(context, state);
+        crank_talk_OrderedCollection_add(context, pragmaList, pragma);
+    }
+
+    // TODO: Parse the local variables.
     
     crank_talk_oop_t expressions = crank_talk_parseExpressionListUntilEndOrDelimiter(context, state, delimiter);
-    if(crank_talk_object_getSizeInSlots(expressions) == 1)
+    if(crank_talk_OrderedCollection_getSize(pragmaList) == 0 && crank_talk_object_getSizeInSlots(expressions) == 1)
         return crank_talk_oop_getSlotsData(expressions)[0];
 
     crank_talk_oop_t sequenceValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeSequenceNode);
     crank_talk_ParseTreeSequenceNode_t *sequence = (crank_talk_ParseTreeSequenceNode_t *)sequenceValue;
     sequence->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, initialPosition);
-    sequence->pragmas = (crank_talk_Array_t*)crank_talk_Array_create(context, 0);
+    sequence->pragmas = (crank_talk_Array_t*)crank_talk_OrderedCollection_asArray(context, pragmaList);
     sequence->localVariables = (crank_talk_Array_t*)crank_talk_Array_create(context, 0);
     sequence->expressions = (crank_talk_Array_t*)expressions;
     return sequenceValue;
