@@ -271,5 +271,65 @@ void parser_runTests(void)
         Assert(crank_talk_isParseTreeLiteralNode(context, arguments->elements[1]));
     }
 
+    // Cascade message send
+    {
+        crank_talk_oop_t ast = parseString(context, "a; with:5; yourself");
+        Assert(crank_talk_isParseTreeMessageCascadeNode(context, ast));
+
+        crank_talk_ParseTreeMessageCascadeNode_t *cascadeNode = (crank_talk_ParseTreeMessageCascadeNode_t*)ast;
+        Assert(crank_talk_isParseTreeIdentifierReferenceNode(context, (crank_talk_oop_t)cascadeNode->receiver));
+        AssertEquals(2, crank_talk_object_getSizeInSlots((crank_talk_oop_t)cascadeNode->cascadedMessages));
+
+        crank_talk_Array_t *messages = cascadeNode->cascadedMessages;
+
+        Assert(crank_talk_isParseTreeCascadedMessageNode(context, messages->elements[0]));
+        crank_talk_ParseTreeCascadedMessageNode_t *message = (crank_talk_ParseTreeCascadedMessageNode_t *)messages->elements[0];
+        Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)message->selector));
+        Assert(crank_talk_Symbol_equalsCString(((crank_talk_ParseTreeLiteralNode_t*)message->selector)->value, "with:"));
+        AssertEquals(1, crank_talk_object_getSizeInSlots((crank_talk_oop_t)message->arguments));
+
+        Assert(crank_talk_isParseTreeCascadedMessageNode(context, messages->elements[1]));
+        message = (crank_talk_ParseTreeCascadedMessageNode_t *)messages->elements[1];
+        Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)message->selector));
+        Assert(crank_talk_Symbol_equalsCString(((crank_talk_ParseTreeLiteralNode_t*)message->selector)->value, "yourself"));
+        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)message->arguments));
+    }
+
+    // Cascade message send 3
+    {
+        crank_talk_oop_t ast = parseString(context, "a with: 42; - 3; with: 5 with: 5; yourself");
+        Assert(crank_talk_isParseTreeMessageCascadeNode(context, ast));
+
+        crank_talk_ParseTreeMessageCascadeNode_t *cascadeNode = (crank_talk_ParseTreeMessageCascadeNode_t*)ast;
+        Assert(crank_talk_isParseTreeIdentifierReferenceNode(context, (crank_talk_oop_t)cascadeNode->receiver));
+        AssertEquals(4, crank_talk_object_getSizeInSlots((crank_talk_oop_t)cascadeNode->cascadedMessages));
+
+        crank_talk_Array_t *messages = cascadeNode->cascadedMessages;
+
+        Assert(crank_talk_isParseTreeCascadedMessageNode(context, messages->elements[0]));
+        crank_talk_ParseTreeCascadedMessageNode_t *message = (crank_talk_ParseTreeCascadedMessageNode_t *)messages->elements[0];
+        Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)message->selector));
+        Assert(crank_talk_Symbol_equalsCString(((crank_talk_ParseTreeLiteralNode_t*)message->selector)->value, "with:"));
+        AssertEquals(1, crank_talk_object_getSizeInSlots((crank_talk_oop_t)message->arguments));
+        
+        Assert(crank_talk_isParseTreeCascadedMessageNode(context, messages->elements[1]));
+        message = (crank_talk_ParseTreeCascadedMessageNode_t *)messages->elements[1];
+        Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)message->selector));
+        Assert(crank_talk_Symbol_equalsCString(((crank_talk_ParseTreeLiteralNode_t*)message->selector)->value, "-"));
+        AssertEquals(1, crank_talk_object_getSizeInSlots((crank_talk_oop_t)message->arguments));
+
+        Assert(crank_talk_isParseTreeCascadedMessageNode(context, messages->elements[2]));
+        message = (crank_talk_ParseTreeCascadedMessageNode_t *)messages->elements[2];
+        Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)message->selector));
+        Assert(crank_talk_Symbol_equalsCString(((crank_talk_ParseTreeLiteralNode_t*)message->selector)->value, "with:with:"));
+        AssertEquals(2, crank_talk_object_getSizeInSlots((crank_talk_oop_t)message->arguments));
+
+        Assert(crank_talk_isParseTreeCascadedMessageNode(context, messages->elements[3]));
+        message = (crank_talk_ParseTreeCascadedMessageNode_t *)messages->elements[3];
+        Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)message->selector));
+        Assert(crank_talk_Symbol_equalsCString(((crank_talk_ParseTreeLiteralNode_t*)message->selector)->value, "yourself"));
+        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)message->arguments));
+    }
+
     crank_talk_vm_destroyContext(context);
 }

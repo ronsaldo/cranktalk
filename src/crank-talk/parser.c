@@ -635,9 +635,124 @@ crank_talk_parseKeywordMessageSend(crank_talk_VMContext_t *context, crank_talk_P
 }
 
 static crank_talk_oop_t
+crank_talk_parseCascadedMessage(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    size_t startPosition = state->position;
+    crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_peek(state, 0);
+    if(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindIdentifier)
+    {
+        crank_talk_ParserState_advance(state);
+        crank_talk_StringSlice_t tokenString = crank_talk_SourcePosition_asStringSlice(token->sourcePosition);
+
+        crank_talk_oop_t selectorValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+        crank_talk_ParseTreeLiteralNode_t *selector = (crank_talk_ParseTreeLiteralNode_t*)selectorValue;
+        selector->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startPosition);
+        selector->value = crank_talk_Symbol_internWithString(context, tokenString.size, tokenString.text);
+
+        crank_talk_oop_t cascadedMessageValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeCascadedMessageNode);
+        crank_talk_ParseTreeCascadedMessageNode_t *cascadedMessage = (crank_talk_ParseTreeCascadedMessageNode_t *)cascadedMessageValue;
+        cascadedMessage->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startPosition);
+        cascadedMessage->selector = (crank_talk_ParseTreeNode_t*)selectorValue;
+        cascadedMessage->arguments = (crank_talk_Array_t*)crank_talk_Array_create(context, 0);
+        return cascadedMessageValue;
+    }
+    else if(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindKeyword)
+    {
+        crank_talk_oop_t symbolBuilder = crank_talk_StringStream_create(context);
+        crank_talk_oop_t arguments = crank_talk_OrderedCollection_create(context);
+
+        while (crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindKeyword)
+        {
+            crank_talk_CrankTalkToken_t *keywordToken = crank_talk_ParserState_next(state);
+            crank_talk_StringSlice_t keywordTokenString = crank_talk_SourcePosition_asStringSlice(keywordToken->sourcePosition);
+            crank_talk_StringStream_insertString(context, symbolBuilder, keywordTokenString.size, keywordTokenString.text);
+
+            crank_talk_oop_t argument = crank_talk_parseBinaryExpressionSequence(context, state);
+            crank_talk_OrderedCollection_add(context, arguments, argument);        
+        }
+        
+        crank_talk_oop_t selectorValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+        crank_talk_ParseTreeLiteralNode_t * selector = (crank_talk_ParseTreeLiteralNode_t *)selectorValue;
+        selector->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startPosition);
+        selector->value = crank_talk_StringStream_asSymbol(context, symbolBuilder);
+
+        crank_talk_oop_t cascadedMessageValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeCascadedMessageNode);
+        crank_talk_ParseTreeCascadedMessageNode_t *cascadedMessage = (crank_talk_ParseTreeCascadedMessageNode_t *)cascadedMessageValue;
+        cascadedMessage->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startPosition);
+        cascadedMessage->selector = (crank_talk_ParseTreeNode_t*)selectorValue;
+        cascadedMessage->arguments = (crank_talk_Array_t*)crank_talk_OrderedCollection_asArray(context, arguments);
+        return cascadedMessageValue;
+    }
+    else if(isBinaryExpressionOperator(crank_talk_oop_decodeSmallInteger(token->kind)))
+    {
+        crank_talk_ParserState_advance(state);
+        crank_talk_StringSlice_t tokenString = crank_talk_SourcePosition_asStringSlice(token->sourcePosition);
+
+        crank_talk_oop_t selectorValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+        crank_talk_ParseTreeLiteralNode_t *selector = (crank_talk_ParseTreeLiteralNode_t *)selectorValue;
+        selector->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startPosition);
+        selector->value = crank_talk_Symbol_internWithString(context, tokenString.size, tokenString.text);
+
+        crank_talk_oop_t argument = crank_talk_parseBinaryExpressionSequence(context, state);
+
+        crank_talk_oop_t cascadedMessageValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeCascadedMessageNode);
+        crank_talk_ParseTreeCascadedMessageNode_t *cascadedMessage = (crank_talk_ParseTreeCascadedMessageNode_t *)cascadedMessageValue;
+        cascadedMessage->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startPosition);
+        cascadedMessage->selector = (crank_talk_ParseTreeNode_t*)selectorValue;
+        cascadedMessage->arguments = (crank_talk_Array_t*)crank_talk_Array_With(context, argument);
+        return cascadedMessageValue;
+    }
+    else
+    {
+        crank_talk_oop_t errorNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeParseErrorNode);
+        crank_talk_ParseTreeParseErrorNode_t *errorNode = (crank_talk_ParseTreeParseErrorNode_t *)errorNodeValue;
+        errorNode->super.sourcePosition = crank_talk_ParserState_currentSourcePosition(state);
+        errorNode->errorMessage = crank_talk_String_createWithCString(context, "Expected a cascaded message send.");
+        return errorNodeValue;
+    }
+}
+
+
+static crank_talk_oop_t
 crank_talk_parseMessageCascade(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
 {
-    return crank_talk_parseKeywordMessageSend(context, state);
+    size_t startPosition = state->position;
+    crank_talk_oop_t firstMessageOrReceiver = crank_talk_parseKeywordMessageSend(context, state);
+    if(crank_talk_ParserState_peekKind(state, 0) != CrankTalkTokenKindSemicolon)
+        return firstMessageOrReceiver;
+
+    crank_talk_oop_t cascadeReceiver = firstMessageOrReceiver;
+    crank_talk_oop_t firstMessage = crank_talk_oop_nil();
+
+    if(crank_talk_isParseTreeMessageSendNode(context, firstMessageOrReceiver))
+    {
+        crank_talk_ParseTreeMessageSendNode_t *firstMessageSend = (crank_talk_ParseTreeMessageSendNode_t*)firstMessageOrReceiver;
+        cascadeReceiver = (crank_talk_oop_t)firstMessageSend->receiver;
+
+        firstMessage = CrankAllocateValuesObjectWithClassName(context, ParseTreeCascadedMessageNode);
+        crank_talk_ParseTreeCascadedMessageNode_t *firstCascadedMessage = (crank_talk_ParseTreeCascadedMessageNode_t*)firstMessage;
+        firstCascadedMessage->super.sourcePosition = firstMessageSend->super.sourcePosition;
+        firstCascadedMessage->selector = firstMessageSend->selector;
+        firstCascadedMessage->arguments = firstMessageSend->arguments;
+    }
+
+    crank_talk_oop_t cascadedMessages = crank_talk_OrderedCollection_create(context);
+    if(!crank_talk_oop_isNil(firstMessage))
+        crank_talk_OrderedCollection_add(context, cascadedMessages, firstMessage);
+
+    while(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindSemicolon)
+    {
+        crank_talk_ParserState_advance(state);
+        crank_talk_oop_t cascadedMessage = crank_talk_parseCascadedMessage(context, state);
+        crank_talk_OrderedCollection_add(context, cascadedMessages, cascadedMessage);
+    }
+    
+    crank_talk_oop_t cascadeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeMessageCascadeNode);
+    crank_talk_ParseTreeMessageCascadeNode_t *cascade = (crank_talk_ParseTreeMessageCascadeNode_t *)cascadeValue;
+    cascade->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startPosition);
+    cascade->receiver = (crank_talk_ParseTreeNode_t*)cascadeReceiver;
+    cascade->cascadedMessages = (crank_talk_Array_t*)crank_talk_OrderedCollection_asArray(context, cascadedMessages);
+    return cascadeValue;
 }
 
 static crank_talk_oop_t
