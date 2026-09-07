@@ -377,8 +377,8 @@ void parser_runTests(void)
     }
 
     // Unary method
-    /*{
-        crank_talk_oop_t ast = parseString(context, "!{unary ^ self}");
+    {
+        crank_talk_oop_t ast = parseString(context, "![unary ^ self]");
         Assert(crank_talk_isParseTreeMethodDefinitionNode(context, ast));
 
         crank_talk_ParseTreeMethodDefinitionNode_t *methodNode = (crank_talk_ParseTreeMethodDefinitionNode_t*)ast;
@@ -386,7 +386,31 @@ void parser_runTests(void)
 
         Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)methodNode->selector, "unary"));
         Assert(crank_talk_isParseTreeReturnNode(context, (crank_talk_oop_t)methodNode->body));
-    }*/
+    }
+
+    // Binary method
+    {
+        crank_talk_oop_t ast = parseString(context, "![+ operand ^ self]");
+        Assert(crank_talk_isParseTreeMethodDefinitionNode(context, ast));
+
+        crank_talk_ParseTreeMethodDefinitionNode_t *methodNode = (crank_talk_ParseTreeMethodDefinitionNode_t*)ast;
+        AssertEquals(1, crank_talk_object_getSizeInSlots((crank_talk_oop_t)methodNode->arguments));
+
+        Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)methodNode->selector, "+"));
+        Assert(crank_talk_isParseTreeReturnNode(context, (crank_talk_oop_t)methodNode->body));
+    }
+
+    // Keyword method
+    {
+        crank_talk_oop_t ast = parseString(context, "![test: first with: second ^ self]");
+        Assert(crank_talk_isParseTreeMethodDefinitionNode(context, ast));
+
+        crank_talk_ParseTreeMethodDefinitionNode_t *methodNode = (crank_talk_ParseTreeMethodDefinitionNode_t*)ast;
+        AssertEquals(2, crank_talk_object_getSizeInSlots((crank_talk_oop_t)methodNode->arguments));
+
+        Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)methodNode->selector, "test:with:"));
+        Assert(crank_talk_isParseTreeReturnNode(context, (crank_talk_oop_t)methodNode->body));
+    }
 
     crank_talk_vm_destroyContext(context);
 }
