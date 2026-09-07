@@ -698,7 +698,13 @@ crank_talk_parseUnaryPostfixExpression(crank_talk_VMContext_t *context, crank_ta
         } break;
         case CrankTalkTokenKindMethodStart:
         {
-            abort();
+            crank_talk_oop_t method = crank_talk_parseMethod(context, state);
+            crank_talk_oop_t addMethodValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeAddMethodNode);
+            crank_talk_ParseTreeAddMethodNode_t *addMethod = (crank_talk_ParseTreeAddMethodNode_t*)addMethodValue;
+            addMethod->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startPosition);
+            addMethod->owner = (crank_talk_ParseTreeNode_t*)receiver;
+            addMethod->method = (crank_talk_ParseTreeNode_t*)method;
+            receiver = addMethodValue;
         } break;
         }
 

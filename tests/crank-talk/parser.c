@@ -412,5 +412,19 @@ void parser_runTests(void)
         Assert(crank_talk_isParseTreeReturnNode(context, (crank_talk_oop_t)methodNode->body));
     }
 
+    // Add method
+    {
+        crank_talk_oop_t ast = parseString(context, "Object ![myYourself ^ self]");
+        Assert(crank_talk_isParseTreeAddMethodNode(context, ast));
+
+        crank_talk_ParseTreeAddMethodNode_t *addMethod = (crank_talk_ParseTreeAddMethodNode_t *)ast;
+
+        Assert(crank_talk_isParseTreeMethodDefinitionNode(context, (crank_talk_oop_t)addMethod->method));
+
+        crank_talk_ParseTreeMethodDefinitionNode_t *methodNode = (crank_talk_ParseTreeMethodDefinitionNode_t*)addMethod->method;
+        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)methodNode->arguments));
+        Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)methodNode->selector, "myYourself"));
+    }
+
     crank_talk_vm_destroyContext(context);
 }
