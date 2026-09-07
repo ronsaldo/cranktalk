@@ -454,14 +454,26 @@ void parser_runTests(void)
         AssertEquals(2, crank_talk_object_getSizeInSlots((crank_talk_oop_t)pragmaNode->arguments));
     }
 
-    /*// Local variables
+    // Local variables
     {
-        crank_talk_oop_t ast = parseString(context, "| testLocal |");
+        crank_talk_oop_t ast = parseString(context, "| local1 local2 |");
         Assert(crank_talk_isParseTreeSequenceNode(context, ast));
 
         crank_talk_ParseTreeSequenceNode_t *sequenceNode = (crank_talk_ParseTreeSequenceNode_t*)ast;
-        AssertEquals(1, crank_talk_object_getSizeInSlots((crank_talk_oop_t)sequenceNode->localVariables));
-    }*/
+        AssertEquals(2, crank_talk_object_getSizeInSlots((crank_talk_oop_t)sequenceNode->localVariables));
+
+        crank_talk_oop_t local1Value = sequenceNode->localVariables->elements[0];
+        Assert(crank_talk_isParseTreeVariableDefinitionNode(context, local1Value));
+
+        crank_talk_ParseTreeVariableDefinitionNode_t *local1 = (crank_talk_ParseTreeVariableDefinitionNode_t *)local1Value;
+        Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)local1->name, "local1"));
+
+        crank_talk_oop_t local2Value = sequenceNode->localVariables->elements[1];
+        Assert(crank_talk_isParseTreeVariableDefinitionNode(context, local2Value));
+
+        crank_talk_ParseTreeVariableDefinitionNode_t *local2 = (crank_talk_ParseTreeVariableDefinitionNode_t *)local2Value;
+        Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)local2->name, "local2"));
+    }
 
     crank_talk_vm_destroyContext(context);
 }

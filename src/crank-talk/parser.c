@@ -1060,6 +1060,47 @@ crank_talk_parsePragma(crank_talk_VMContext_t *context, crank_talk_ParserState_t
 }
 
 static crank_talk_oop_t
+crank_talk_parseLocalVariables(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    assert(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindBar);
+    crank_talk_ParserState_advance(state);
+
+    crank_talk_oop_t localVariables = crank_talk_OrderedCollection_create(context);
+
+    while(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindIdentifier)
+    {
+        crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_next(state);
+        assert(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindIdentifier);
+
+        crank_talk_StringSlice_t tokenString = crank_talk_SourcePosition_asStringSlice(token->sourcePosition);
+        crank_talk_oop_t symbol = crank_talk_Symbol_internWithString(context, tokenString.size, tokenString.text);
+
+        crank_talk_oop_t variableDefinitionValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeVariableDefinitionNode);
+        crank_talk_ParseTreeVariableDefinitionNode_t *variableDefinition = (crank_talk_ParseTreeVariableDefinitionNode_t *)variableDefinitionValue;
+        variableDefinition->super.sourcePosition = token->sourcePosition;
+        variableDefinition->name = (crank_talk_Symbol_t*)symbol;
+
+        crank_talk_OrderedCollection_add(context, localVariables, variableDefinitionValue);
+    }
+
+    if(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindBar)
+    {
+        crank_talk_ParserState_advance(state);
+    }
+    else
+    {
+        crank_talk_oop_t errorNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeParseErrorNode);
+        crank_talk_ParseTreeParseErrorNode_t *errorNode = (crank_talk_ParseTreeParseErrorNode_t *)errorNodeValue;
+        errorNode->super.sourcePosition = crank_talk_ParserState_currentSourcePosition(state);
+        errorNode->errorMessage = crank_talk_String_createWithCString(context, "Expected a bar (|).");
+
+        crank_talk_OrderedCollection_add(context, localVariables, errorNodeValue);
+    }
+
+    return crank_talk_OrderedCollection_asArray(context, localVariables);
+}
+
+static crank_talk_oop_t
 crank_talk_parseSequenceUntilEndOrDelimiter(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state, crank_talk_TokenKind_t delimiter)
 {
     size_t initialPosition = state->position;
@@ -1072,17 +1113,24 @@ crank_talk_parseSequenceUntilEndOrDelimiter(crank_talk_VMContext_t *context, cra
         crank_talk_OrderedCollection_add(context, pragmaList, pragma);
     }
 
+    // Parse the local variables
+    crank_talk_oop_t locals = crank_talk_Array_create(context, 0);
+    if(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindBar)
+        locals = crank_talk_parseLocalVariables(context, state);
+
     // TODO: Parse the local variables.
     
     crank_talk_oop_t expressions = crank_talk_parseExpressionListUntilEndOrDelimiter(context, state, delimiter);
-    if(crank_talk_OrderedCollection_getSize(pragmaList) == 0 && crank_talk_object_getSizeInSlots(expressions) == 1)
+    if(crank_talk_OrderedCollection_getSize(pragmaList) == 0 &&
+        crank_talk_object_getSizeInSlots(locals) == 0 &&
+        crank_talk_object_getSizeInSlots(expressions) == 1)
         return crank_talk_oop_getSlotsData(expressions)[0];
 
     crank_talk_oop_t sequenceValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeSequenceNode);
     crank_talk_ParseTreeSequenceNode_t *sequence = (crank_talk_ParseTreeSequenceNode_t *)sequenceValue;
     sequence->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, initialPosition);
     sequence->pragmas = (crank_talk_Array_t*)crank_talk_OrderedCollection_asArray(context, pragmaList);
-    sequence->localVariables = (crank_talk_Array_t*)crank_talk_Array_create(context, 0);
+    sequence->localVariables = (crank_talk_Array_t*)locals;
     sequence->expressions = (crank_talk_Array_t*)expressions;
     return sequenceValue;
 }
