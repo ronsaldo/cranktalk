@@ -1,7 +1,7 @@
 #define _XOPEN_SOURCE 500 // For realpath
 
 #include "crank-talk/eval.h"
-//#include "crank-talk/analysis-evaluation.h"
+#include "crank-talk/analysis-evaluation.h"
 #include "crank-talk/context.h"
 #include "crank-talk/errors.h"
 #include "crank-talk/parser.h"
@@ -20,10 +20,9 @@ crank_talk_analyzeAndEvaluateSourceCode(crank_talk_VMContext_t *context, crank_t
     crank_talk_oop_t ast = crank_talk_parseScannedTokens(context, tokensValue);
     if(!crank_talk_ParseTree_checkAndPrintErrors(context, (crank_talk_ParseTreeNode_t*)ast))
         crank_talk_error("AST has parse errors.");
-//
-    //crank_talk_oop_t evaluationContext = crank_talk_createTopLevelAnalysisAndEvaluationContext(context, sourceCodeValue);
-    //return crank_talk_ParseTreeAnalyzeAndEvaluateDecayedNode(context, ast, evaluationContext);
-    abort();
+
+    crank_talk_oop_t evaluationContext = crank_talk_createTopLevelAnalysisAndEvaluationContext(context, sourceCodeValue);
+    return crank_talk_ParseTreeAnalyzeAndEvaluate(context, ast, evaluationContext);
 }
 
 CRANK_TALK_API crank_talk_oop_t

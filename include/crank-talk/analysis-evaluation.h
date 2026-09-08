@@ -1,0 +1,20 @@
+#ifndef CRANK_TALK_ANALYSIS_EVALUATION_H
+#define CRANK_TALK_ANALYSIS_EVALUATION_H
+
+#include "object-model.h"
+
+typedef struct crank_talk_AnalysisAndEvaluationContext_s crank_talk_AnalysisAndEvaluationContext_t;
+
+struct crank_talk_AnalysisAndEvaluationContext_s
+{
+    crank_talk_Object_t super;
+    crank_talk_oop_t lexicalEnvironment;
+};
+
+CRANK_TALK_API crank_talk_oop_t crank_talk_createTopLevelEvaluationEnvironment(crank_talk_VMContext_t *context, crank_talk_oop_t sourceCode);
+CRANK_TALK_API crank_talk_oop_t crank_talk_createAnalysisAndEvaluationContext(crank_talk_VMContext_t *context, crank_talk_oop_t lexicalEnvironment);
+CRANK_TALK_API crank_talk_oop_t crank_talk_createTopLevelAnalysisAndEvaluationContext(crank_talk_VMContext_t *context, crank_talk_oop_t sourceCode);
+
+CRANK_TALK_API crank_talk_oop_t crank_talk_ParseTreeAnalyzeAndEvaluate(crank_talk_VMContext_t *context, crank_talk_oop_t parseTreeNode, crank_talk_oop_t evaluationContext);
+
+#endif //CRANK_TALK_ANALYSIS_EVALUATION_H

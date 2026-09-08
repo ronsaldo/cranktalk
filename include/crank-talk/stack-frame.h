@@ -37,14 +37,14 @@ typedef struct crank_talk_stackFrameApplicationArgumentsRecord_s
     crank_talk_oop_t *arguments;
 } crank_talk_stackFrameApplicationArgumentsRecord_t;
 
-#define SYSMEL_VM_STACKFRAME_PUSH_GC_ROOTS(recordName, gcStackFrameRoots) \
+#define CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(recordName, gcStackFrameRoots) \
     crank_talk_stackFrameGCRootsRecord_t recordName = {0}; \
     recordName.super.type = CrankTalkStackFrameRecordGCRoots; \
-    recordName.rootCount = sizeof(gcStackFrameRoots) / sizeof(crank_talk_Value_t); \
-    recordName.roots = (crank_talk_Value_t*)(&gcStackFrameRoots); \
+    recordName.rootCount = sizeof(gcStackFrameRoots) / sizeof(crank_talk_oop_t); \
+    recordName.roots = (crank_talk_oop_t*)(&gcStackFrameRoots); \
     crank_talk_stackFrame_pushRecord(&recordName.super)
 
-#define SYSMEL_VM_STACKFRAME_POP_GC_ROOTS(recordName) \
+#define CRANK_TALK_STACKFRAME_POP_GC_ROOTS(recordName) \
     crank_talk_stackFrame_popRecord(&recordName.super)
 
 CRANK_TALK_API crank_talk_stackFrameRecord_t *crank_talk_stackFrame_getActiveRecord(void);

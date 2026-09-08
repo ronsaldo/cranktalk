@@ -53,6 +53,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t VariableClass;
     crank_talk_oop_t LiteralVariableClass;
     crank_talk_oop_t GlobalVariableClass;
+    crank_talk_oop_t LocalVariableClass;
     crank_talk_oop_t SlotClass;
 
     crank_talk_oop_t LookupKeyClass;
@@ -104,6 +105,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t printOnSymbol;
     crank_talk_oop_t fullPrintOnSymbol;
     crank_talk_oop_t traverseAndCollectErrorsIntoSymbol;
+    crank_talk_oop_t analyzeAndEvaluateWithSymbol;
 
     // Front end classes
     crank_talk_oop_t ParseTreeNodeClass;
@@ -141,6 +143,9 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t SystemEnvironmentEnvironmentClass;
     crank_talk_oop_t LexicalEnvironmentClass;
     crank_talk_oop_t FunctionAnalysisEnvironmentClass;
+
+    // Passes
+    crank_talk_oop_t AnalysisAndEvaluationContextClass;
 };
 
 struct crank_talk_VMContext_s

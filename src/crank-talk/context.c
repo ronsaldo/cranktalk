@@ -1,4 +1,5 @@
 #include "crank-talk/context.h"
+#include "crank-talk/analysis-evaluation.h"
 #include "crank-talk/array.h"
 #include "crank-talk/behavior.h"
 #include "crank-talk/dictionary.h"
@@ -13,6 +14,7 @@
 
 #define CrankTalkSlotDef(clazz, fieldName) #fieldName, offsetof(crank_talk_ ## clazz ##_t, fieldName)
 
+void crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerParseTreePrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context);
@@ -198,6 +200,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.VariableClass        = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass,          sizeof(crank_talk_Variable_t),        CrankTalkGCObjectDataTypeOops);
     context->roots.LiteralVariableClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.VariableClass,        sizeof(crank_talk_LiteralVariable_t), CrankTalkGCObjectDataTypeOops);
     context->roots.GlobalVariableClass  = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.LiteralVariableClass, sizeof(crank_talk_GlobalVariable_t),  CrankTalkGCObjectDataTypeOops);
+    context->roots.LocalVariableClass   = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.LiteralVariableClass, sizeof(crank_talk_LocalVariable_t),   CrankTalkGCObjectDataTypeOops);
     context->roots.SlotClass            = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.VariableClass,        sizeof(crank_talk_Slot_t),            CrankTalkGCObjectDataTypeOops);
 
     // Association
@@ -256,6 +259,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.fullPrintOnSymbol       = crank_talk_Symbol_internWithCString(context, "fullPrintOn:");
     
     context->roots.traverseAndCollectErrorsIntoSymbol = crank_talk_Symbol_internWithCString(context, "traverseAndCollectErrorsInto:");
+    context->roots.analyzeAndEvaluateWithSymbol = crank_talk_Symbol_internWithCString(context, "analyzeAndEvaluateWith:");
 
     // Field definitions
     crank_talk_context_setClassTypeMetadata(context, context->roots.ProtoObjectClass, "ProtoObject", NULL);
@@ -324,6 +328,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(LiteralVariable, value),
         NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.GlobalVariableClass, "GlobalVariable", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.LocalVariableClass, "LocalVariable", NULL);
 
     crank_talk_context_setClassTypeMetadata(context, context->roots.SlotClass, "Slot",
         CrankTalkSlotDef(Slot, index),
@@ -426,6 +431,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_context_createClassTables(context, context->roots.VariableClass);
     crank_talk_context_createClassTables(context, context->roots.LiteralVariableClass);
     crank_talk_context_createClassTables(context, context->roots.GlobalVariableClass);
+    crank_talk_context_createClassTables(context, context->roots.LocalVariableClass);
     crank_talk_context_createClassTables(context, context->roots.SlotClass);
 
     crank_talk_context_createClassTables(context, context->roots.LookupKeyClass);
@@ -569,11 +575,18 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(LexicalEnvironment, parent),
         CrankTalkSlotDef(LexicalEnvironment, symbolTable),
         NULL);
+
+    // Passes
+    context->roots.AnalysisAndEvaluationContextClass = crank_talk_context_createClassAndMetaclass(context, "AnalysisAndEvaluationContext", context->roots.ObjectClass, sizeof(crank_talk_AnalysisAndEvaluationContext_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(AnalysisAndEvaluationContext, lexicalEnvironment),
+        NULL);
+    
 }
 
 static void 
 crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
 {
+    crank_talk_registerAnalysisAndEvaluationPrimitives(context);
     crank_talk_registerNumbersPrimitives(context);
     crank_talk_registerParseTreePrimitives(context);
     crank_talk_registerStringPrimitives(context);

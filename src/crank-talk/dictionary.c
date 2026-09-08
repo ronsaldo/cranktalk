@@ -109,6 +109,46 @@ void crank_talk_IdentityDictionary_atPut(crank_talk_VMContext_t *context, crank_
     }
 }
 
+CRANK_TALK_API
+void crank_talk_IdentityDictionary_localAtPut(crank_talk_VMContext_t *context, crank_talk_oop_t dictionaryValue, crank_talk_oop_t key, crank_talk_oop_t value)
+{
+    if(!crank_talk_oop_isKindOf(context, key, context->roots.SymbolClass))
+        crank_talk_error("Symbol table expects the keys to be symbols.");
+
+    crank_talk_IdentityDictionary_t *dictionary = (crank_talk_IdentityDictionary_t*)dictionaryValue;
+    intptr_t elementIndex = crank_talk_IdentityDictionary_scanFor(dictionary, key);
+    if(elementIndex < 0)
+    {
+        crank_talk_IdentityDictionary_increaseCapacity(context, dictionary);
+        elementIndex = crank_talk_IdentityDictionary_scanFor(dictionary, key);
+        if(elementIndex < 0)
+            crank_talk_error("Identity dictionary is out of memory.");
+    }
+
+    crank_talk_oop_t *storageValues = dictionary->super.super.storage->elements;
+    crank_talk_oop_t oldValue = storageValues[elementIndex];
+    if(!crank_talk_oop_isNil(oldValue))
+    {
+        crank_talk_Association_t *oldAssociation = (crank_talk_Association_t *)oldValue;
+        oldAssociation->value = value;
+    }
+    else
+    {
+        crank_talk_oop_t newLocalVariableValue = CrankAllocateValuesObjectWithClassName(context, LocalVariable);
+        crank_talk_LocalVariable_t *newLocalVariable = (crank_talk_LocalVariable_t *)newLocalVariableValue;
+        newLocalVariable->super.super.name = (crank_talk_Symbol_t*)key;
+        newLocalVariable->super.value = value;
+        storageValues[elementIndex] = newLocalVariableValue;
+
+        size_t capacity = crank_talk_object_getSizeInSlots((crank_talk_oop_t)dictionary->super.super.storage);
+        size_t newSize = crank_talk_oop_decodeSmallInteger(dictionary->super.super.size) + 1;
+        dictionary->super.super.size = crank_talk_oop_encodeSmallInteger(newSize);
+        size_t capacityThreshold = capacity*4/5;
+        if(newSize >= capacityThreshold)
+            crank_talk_IdentityDictionary_increaseCapacity(context, dictionary);
+    }
+}
+
 CRANK_TALK_API bool
 crank_talk_IdentityDictionary_includesKey(crank_talk_oop_t dictionaryValue, crank_talk_oop_t key)
 {

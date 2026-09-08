@@ -1,4 +1,5 @@
 set(CrankTalk_Sources
+    analysis-evaluation.c
     array.c
     association.c
     behavior.c
