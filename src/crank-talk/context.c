@@ -2,6 +2,7 @@
 #include "crank-talk/array.h"
 #include "crank-talk/behavior.h"
 #include "crank-talk/dictionary.h"
+#include "crank-talk/environment.h"
 #include "crank-talk/gc.h"
 #include "crank-talk/ordered-collection.h"
 #include "crank-talk/parse-tree.h"
@@ -464,6 +465,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 static void 
 crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
 {
+    // Parse tree
     context->roots.ParseTreeNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeNode", context->roots.ObjectClass, sizeof(crank_talk_ParseTreeNode_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(ParseTreeNode, sourcePosition),
         NULL);
@@ -554,6 +556,18 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
 
     context->roots.ParseTreeVariableDefinitionNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeVariableDefinitionNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeMethodDefinitionNode_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(ParseTreeVariableDefinitionNode, name),
+        NULL);
+
+    // Environment
+    context->roots.AbstractEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "AbstractEnvironment", context->roots.ObjectClass, sizeof(crank_talk_AbstractEnvironment_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.EmptyEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "EmptyEnvironment", context->roots.AbstractEnvironmentClass, sizeof(crank_talk_AbstractEnvironment_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.SystemEnvironmentEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "SystemEnvironmentEnvironment", context->roots.AbstractEnvironmentClass, sizeof(crank_talk_AbstractEnvironment_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(SystemEnvironmentEnvironment, parent),
+        CrankTalkSlotDef(SystemEnvironmentEnvironment, systemEnvironment),
+        NULL);
+    context->roots.LexicalEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "LexicalEnvironment", context->roots.AbstractEnvironmentClass, sizeof(crank_talk_AbstractEnvironment_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(LexicalEnvironment, parent),
+        CrankTalkSlotDef(LexicalEnvironment, symbolTable),
         NULL);
 }
 

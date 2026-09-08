@@ -135,7 +135,12 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t ParseTreePragmaNodeClass;
     crank_talk_oop_t ParseTreeVariableDefinitionNodeClass;
 
-
+    // Environment
+    crank_talk_oop_t AbstractEnvironmentClass;
+    crank_talk_oop_t EmptyEnvironmentClass;
+    crank_talk_oop_t SystemEnvironmentEnvironmentClass;
+    crank_talk_oop_t LexicalEnvironmentClass;
+    crank_talk_oop_t FunctionAnalysisEnvironmentClass;
 };
 
 struct crank_talk_VMContext_s

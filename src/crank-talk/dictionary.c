@@ -122,6 +122,16 @@ crank_talk_IdentityDictionary_includesKey(crank_talk_oop_t dictionaryValue, cran
 }
 
 CRANK_TALK_API crank_talk_oop_t
+crank_talk_IdentityDictionary_associationAtOrNil(crank_talk_oop_t dictionaryValue, crank_talk_oop_t key)
+{
+    crank_talk_IdentityDictionary_t *dictionary = (crank_talk_IdentityDictionary_t*)dictionaryValue;
+    intptr_t elementIndex = crank_talk_IdentityDictionary_scanFor(dictionary, key);
+    if(elementIndex < 0)
+        return crank_talk_oop_nil();
+    return dictionary->super.super.storage->elements[elementIndex];
+}
+
+CRANK_TALK_API crank_talk_oop_t
 crank_talk_IdentityDictionary_at(crank_talk_oop_t dictionaryValue, crank_talk_oop_t key)
 {
     crank_talk_IdentityDictionary_t *dictionary = (crank_talk_IdentityDictionary_t*)dictionaryValue;

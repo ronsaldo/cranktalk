@@ -5,6 +5,7 @@ set(CrankTalk_Sources
     context.c
     dictionary.c
     dynarray.c
+    environment.c
     errors.c
     eval.c
     function.c
