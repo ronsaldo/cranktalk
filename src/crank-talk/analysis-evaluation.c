@@ -53,6 +53,17 @@ crank_talk_ParseTreeAnalyzeAndEvaluate(crank_talk_VMContext_t *context, crank_ta
 }
 
 static crank_talk_oop_t
+crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_ParseTreeLiteralNode_t *node = (crank_talk_ParseTreeLiteralNode_t*)self;
+    return node->value;
+}
+
+static crank_talk_oop_t
 crank_talk_ParseTreeSequenceNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -82,5 +93,6 @@ crank_talk_ParseTreeSequenceNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *
 void
 crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context)
 {
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSequenceNode_analyzeAndEvaluateWith);
 }
