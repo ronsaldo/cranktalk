@@ -43,5 +43,23 @@ void analysisAndEvaluation_runTests(void)
         Assert(crank_talk_Symbol_equalsCString(value, "testSymbol"));
     }
 
+    // nil reference
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "nil");
+        Assert(crank_talk_oop_isNil(value));
+    }
+
+    // false refrence
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "false");
+        AssertEquals(context->roots.falseValue, value);
+    }
+
+    // true refrence
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "true");
+        AssertEquals(context->roots.trueValue, value);
+    }
+
     crank_talk_vm_destroyContext(context);
 }

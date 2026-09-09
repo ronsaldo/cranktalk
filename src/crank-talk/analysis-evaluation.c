@@ -64,6 +64,37 @@ crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *c
 }
 
 static crank_talk_oop_t
+crank_talk_ParseTreeNilReference_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)arguments;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    return crank_talk_oop_nil();
+}
+
+static crank_talk_oop_t
+crank_talk_ParseTreeFalseReference_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)arguments;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    return context->roots.falseValue;
+}
+
+static crank_talk_oop_t
+crank_talk_ParseTreeTrueReference_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)arguments;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    return context->roots.trueValue;
+}
+
+static crank_talk_oop_t
 crank_talk_ParseTreeSequenceNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -94,5 +125,8 @@ void
 crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeNilReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeFalseReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeTrueReference_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSequenceNode_analyzeAndEvaluateWith);
 }
