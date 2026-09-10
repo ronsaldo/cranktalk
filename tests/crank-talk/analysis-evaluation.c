@@ -49,13 +49,13 @@ void analysisAndEvaluation_runTests(void)
         Assert(crank_talk_oop_isNil(value));
     }
 
-    // false refrence
+    // false reference
     {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "false");
         AssertEquals(context->roots.falseValue, value);
     }
 
-    // true refrence
+    // true reference
     {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "true");
         AssertEquals(context->roots.trueValue, value);
