@@ -187,6 +187,60 @@ crank_talk_ParseTreeSequenceNodeWithLocals_analyzeAndEvaluateWith(crank_talk_VMC
 }
 
 static crank_talk_oop_t
+crank_talk_ParseTreeCascadedMessageNode_asMessageSendWithReceiver(crank_talk_VMContext_t *context, crank_talk_ParseTreeCascadedMessageNode_t *cascadedMessage, crank_talk_oop_t receiver)
+{
+    crank_talk_oop_t messageSendNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeMessageSendNode);
+    crank_talk_ParseTreeMessageSendNode_t *messageSendNode = (crank_talk_ParseTreeMessageSendNode_t *)messageSendNodeValue;
+    messageSendNode->super.sourcePosition = cascadedMessage->super.sourcePosition;
+    messageSendNode->receiver = (crank_talk_ParseTreeNode_t*)receiver;
+    messageSendNode->selector = cascadedMessage->selector;
+    messageSendNode->arguments = cascadedMessage->arguments;
+    return messageSendNodeValue;
+}
+
+static crank_talk_oop_t
+crank_talk_ParseTreeMessageCascadeNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t evaluationContext = arguments[1];
+
+    crank_talk_ParseTreeMessageCascadeNode_t *node = (crank_talk_ParseTreeMessageCascadeNode_t*)self;
+   
+    struct {
+        crank_talk_oop_t receiverValue;
+        crank_talk_oop_t receiverNode;
+        crank_talk_oop_t result;
+    } gcFrame = {0};
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    gcFrame.receiverValue = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->receiver, evaluationContext);
+    gcFrame.result = gcFrame.receiverValue;
+
+    // Create the receiver literal node value.
+    gcFrame.receiverNode = CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+    crank_talk_ParseTreeLiteralNode_t *receiverNode = (crank_talk_ParseTreeLiteralNode_t *)gcFrame.receiverNode;
+    receiverNode->super.sourcePosition = node->receiver->sourcePosition;
+    receiverNode->value = gcFrame.receiverValue;
+
+    // Expand and evaluate the cascaded messages.
+    size_t cascadeMessageCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->cascadedMessages);
+    for(size_t i = 0; i < cascadeMessageCount; ++i)
+    {
+        crank_talk_oop_t cascadedMessageValue = node->cascadedMessages->elements[i];
+        crank_talk_ParseTreeCascadedMessageNode_t *cascadedMessage = (crank_talk_ParseTreeCascadedMessageNode_t*)cascadedMessageValue;
+        
+        crank_talk_oop_t expandedCascadedMessage = crank_talk_ParseTreeCascadedMessageNode_asMessageSendWithReceiver(context, cascadedMessage, gcFrame.receiverNode);
+        gcFrame.result = crank_talk_ParseTreeAnalyzeAndEvaluate(context, expandedCascadedMessage, evaluationContext);
+    }    
+
+    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+    return gcFrame.result;
+}
+
+static crank_talk_oop_t
 crank_talk_ParseTreeMessageSendNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -302,6 +356,7 @@ crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* conte
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeNilReference_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeFalseReference_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeTrueReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageCascadeNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeMessageCascadeNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeMessageSendNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSequenceNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeArrayNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeArrayNode_analyzeAndEvaluateWith);

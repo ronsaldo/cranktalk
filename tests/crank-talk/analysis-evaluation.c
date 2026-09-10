@@ -105,5 +105,11 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(-42, crank_talk_oop_decodeSmallInteger(value));
     }
 
+    // Message send cascade
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "1 negated; yourself");
+        AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
+    }
+
     crank_talk_vm_destroyContext(context);
 }
