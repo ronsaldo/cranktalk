@@ -145,6 +145,24 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t LexicalEnvironmentClass;
     crank_talk_oop_t FunctionAnalysisEnvironmentClass;
 
+    // HIR
+    crank_talk_oop_t HIRValueClass;
+    crank_talk_oop_t HIRConstantValueClass;
+    crank_talk_oop_t HIRConstantLiteralValueClass;
+    crank_talk_oop_t HIRConstantControlFlowEscapeValueClass;
+
+    crank_talk_oop_t HIRFunctionClass;
+    crank_talk_oop_t HIRFunctionLocalClass;
+    crank_talk_oop_t HIRArgumentClass;
+    crank_talk_oop_t HIRCaptureClass;
+    crank_talk_oop_t HIRBasicBlockClass;
+    crank_talk_oop_t HIRInstructionClass;
+    crank_talk_oop_t HIRBranchInstructionClass;
+    crank_talk_oop_t HIRReturnInstructionClass;
+    crank_talk_oop_t HIRUnreachableInstructionClass;
+
+    crank_talk_oop_t HIRBuilderClass;
+
     // Passes
     crank_talk_oop_t AnalysisAndEvaluationContextClass;
 };

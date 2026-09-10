@@ -5,6 +5,7 @@
 #include "crank-talk/dictionary.h"
 #include "crank-talk/environment.h"
 #include "crank-talk/gc.h"
+#include "crank-talk/hir.h"
 #include "crank-talk/ordered-collection.h"
 #include "crank-talk/parse-tree.h"
 #include "crank-talk/set.h"
@@ -582,6 +583,63 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
     context->roots.LexicalEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "LexicalEnvironment", context->roots.AbstractEnvironmentClass, sizeof(crank_talk_AbstractEnvironment_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(LexicalEnvironment, parent),
         CrankTalkSlotDef(LexicalEnvironment, symbolTable),
+        NULL);
+
+    // HIR
+    context->roots.HIRValueClass = crank_talk_context_createClassAndMetaclass(context, "HIRValue", context->roots.ObjectClass, sizeof(crank_talk_HIRValue_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRValue, sourcePosition),
+        NULL);
+    context->roots.HIRConstantValueClass = crank_talk_context_createClassAndMetaclass(context, "HIRConstantValue", context->roots.HIRValueClass, sizeof(crank_talk_HIRValue_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.HIRConstantLiteralValueClass = crank_talk_context_createClassAndMetaclass(context, "HIRConstantLiteralValue", context->roots.HIRConstantValueClass, sizeof(crank_talk_HIRConstantLiteralValue_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRConstantLiteralValue, value),
+        NULL);
+    context->roots.HIRConstantControlFlowEscapeValueClass = crank_talk_context_createClassAndMetaclass(context, "HIRConstantControlFlowEscapeValue", context->roots.HIRConstantValueClass, sizeof(crank_talk_HIRConstantControlFlowEscapeValue_t), CrankTalkGCObjectDataTypeOops, NULL);
+
+    context->roots.HIRFunctionClass = crank_talk_context_createClassAndMetaclass(context, "HIRFunction", context->roots.HIRConstantValueClass, sizeof(crank_talk_HIRFunction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRFunction, name),
+        CrankTalkSlotDef(HIRFunction, arguments),
+        CrankTalkSlotDef(HIRFunction, captures),
+        CrankTalkSlotDef(HIRFunction, firstBasicBlock),
+        CrankTalkSlotDef(HIRFunction, lastBasicBlock),
+        CrankTalkSlotDef(HIRFunction, enumeratedLocalValues),
+        NULL);
+
+    context->roots.HIRFunctionLocalClass = crank_talk_context_createClassAndMetaclass(context, "HIRFunctionLocal", context->roots.HIRValueClass, sizeof(crank_talk_HIRFunctionLocal_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRFunctionLocal, name),
+        CrankTalkSlotDef(HIRFunctionLocal, index),
+
+        CrankTalkSlotDef(HIRFunctionLocal, bytecodeVectorIndex),
+        NULL);
+    context->roots.HIRArgumentClass = crank_talk_context_createClassAndMetaclass(context, "HIRArgument", context->roots.HIRFunctionLocalClass, sizeof(crank_talk_HIRArgument_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.HIRCaptureClass = crank_talk_context_createClassAndMetaclass(context, "HIRCapture", context->roots.HIRFunctionLocalClass, sizeof(crank_talk_HIRCapture_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.HIRBasicBlockClass = crank_talk_context_createClassAndMetaclass(context, "HIRBasicBlock", context->roots.HIRFunctionLocalClass, sizeof(crank_talk_HIRBasicBlock_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRBasicBlock, nextBlock),
+        CrankTalkSlotDef(HIRBasicBlock, previousBlock),
+
+        CrankTalkSlotDef(HIRBasicBlock, firstInstruction),
+        CrankTalkSlotDef(HIRBasicBlock, lastInstruction),
+
+        CrankTalkSlotDef(HIRBasicBlock, bytecodeLabel),
+        NULL);
+
+    context->roots.HIRInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRInstruction", context->roots.HIRFunctionLocalClass, sizeof(crank_talk_HIRInstruction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRInstruction, nextInstruction),
+        CrankTalkSlotDef(HIRInstruction, previousInstruction),
+        NULL);
+
+    context->roots.HIRBranchInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRBranchInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRBranchInstruction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRBranchInstruction, destination),
+        NULL);
+    context->roots.HIRReturnInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRReturnInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRReturnInstruction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRReturnInstruction, resultValue),
+        NULL);
+    context->roots.HIRUnreachableInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRUnreachableInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRUnreachableInstruction_t), CrankTalkGCObjectDataTypeOops, NULL);
+
+    context->roots.HIRBuilderClass = crank_talk_context_createClassAndMetaclass(context, "HIRBuilder", context->roots.ObjectClass, sizeof(crank_talk_HIRBuilder_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRBuilder, hirFunction),
+        CrankTalkSlotDef(HIRBuilder, basicBlock),
+        CrankTalkSlotDef(HIRBuilder, allocaBuilder),
+        CrankTalkSlotDef(HIRBuilder, lexicalEnvironment),
         NULL);
 
     // Passes

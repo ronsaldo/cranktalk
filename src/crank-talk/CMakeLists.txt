@@ -12,6 +12,7 @@ set(CrankTalk_Sources
     function.c
     gc.c
     heap.c
+    hir.c
     message.c
     numbers.c
     object-model.c
