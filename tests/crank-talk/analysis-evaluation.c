@@ -84,6 +84,20 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(2, crank_talk_oop_decodeSmallInteger(value));
     }
 
+    // Empty array
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "{}");
+        AssertEquals(0, crank_talk_object_getSizeInSlots(value));
+    }
+    // Array with two elements
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "{1 . 2}");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(value));
+        
+        crank_talk_oop_t *elements = crank_talk_oop_getSlotsData(value);
+        AssertEquals(1, crank_talk_oop_decodeSmallInteger(elements[0]));
+        AssertEquals(2, crank_talk_oop_decodeSmallInteger(elements[1]));
+    }
     
     crank_talk_vm_destroyContext(context);
 }
