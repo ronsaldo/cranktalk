@@ -55,7 +55,35 @@ crank_talk_ParseTreeAnalyzeAndEvaluate(crank_talk_VMContext_t *context, crank_ta
 }
 
 static crank_talk_oop_t
-crank_talk_IdentifierReferenceNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+crank_talk_ParseTreeAssignmentNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t evaluationContextValue = arguments[1];
+
+    crank_talk_ParseTreeAssignmentNode_t *node = (crank_talk_ParseTreeAssignmentNode_t*)self;
+    crank_talk_AnalysisAndEvaluationContext_t *evaluationContext = (crank_talk_AnalysisAndEvaluationContext_t*)evaluationContextValue;
+   
+    if(!crank_talk_oop_isKindOf(context, (crank_talk_oop_t)node->store, (crank_talk_oop_t)context->roots.ParseTreeIdentifierReferenceNodeClass))
+        crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->store->sourcePosition, "Expected an identifier with the variable name to assign.");
+
+    crank_talk_ParseTreeIdentifierReferenceNode_t *storeIdentifer = (crank_talk_ParseTreeIdentifierReferenceNode_t*)node->store;
+    crank_talk_oop_t foundBinding = crank_talk_Environment_lookupSymbolRecursively(context, evaluationContext->lexicalEnvironment, (crank_talk_oop_t)storeIdentifer->symbol);
+    if(crank_talk_oop_isNil(foundBinding))
+        crank_talk_errorPrintfAtSourcePosition(context, (crank_talk_oop_t)node->super.sourcePosition, "Binding not found for symbol #" CRANK_TALK_STRING_FORMAT, CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)storeIdentifer->symbol));
+
+    crank_talk_oop_t valueToStore = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->value, evaluationContextValue);
+
+    //// TODO: Use a message here.
+    assert(crank_talk_oop_isKindOf(context, foundBinding, context->roots.LiteralVariableClass));
+    ((crank_talk_LiteralVariable_t*)foundBinding)->value = valueToStore;
+    return valueToStore;
+}
+
+static crank_talk_oop_t
+crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
     (void)argumentCount;
@@ -205,7 +233,8 @@ crank_talk_ParseTreeVariableDefinitionNode_analyzeAndEvaluateWith(crank_talk_VMC
 void
 crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_IdentifierReferenceNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeAssignmentNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeAssignmentNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeNilReference_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeFalseReference_analyzeAndEvaluateWith);

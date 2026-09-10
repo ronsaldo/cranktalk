@@ -72,5 +72,18 @@ void analysisAndEvaluation_runTests(void)
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "| local | local");
         AssertEquals(crank_talk_oop_nil(), value);
     }
+
+    // Local variable assignment
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "| local | local := 2");
+        AssertEquals(2, crank_talk_oop_decodeSmallInteger(value));
+    }
+    // Local variable assignment
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "| local | local := 2. local");
+        AssertEquals(2, crank_talk_oop_decodeSmallInteger(value));
+    }
+
+    
     crank_talk_vm_destroyContext(context);
 }
