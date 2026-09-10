@@ -1,5 +1,6 @@
 #include "crank-talk/object-model.h"
 #include "crank-talk/context.h"
+#include "crank-talk/message.h"
 #include <stdlib.h>
 
 CRANK_TALK_API double
@@ -75,4 +76,40 @@ crank_talk_oop_isKindOf(crank_talk_VMContext_t *context, crank_talk_oop_t value,
 {
     crank_talk_oop_t valueClass = (crank_talk_oop_t)crank_talk_oop_getClass(context, value);
     return value == behavior || sysmel_vm_Behavior_isDirectSubtype(valueClass, behavior);
+}
+
+static crank_talk_oop_t
+crank_talk_ProtoObject_class_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    return (crank_talk_oop_t)crank_talk_oop_getClass(context, arguments[0]);
+}
+
+static crank_talk_oop_t
+crank_talk_Object_species_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    return (crank_talk_oop_t)crank_talk_oop_getClass(context, arguments[0]);
+}
+
+static crank_talk_oop_t
+crank_talk_Object_yourself_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    return arguments[0];
+}
+
+void
+crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context)
+{
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "class", 1, crank_talk_ProtoObject_class_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "species", 1, crank_talk_Object_species_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "yourself", 1, crank_talk_Object_yourself_primitive);
 }
