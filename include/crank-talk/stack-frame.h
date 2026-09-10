@@ -3,7 +3,7 @@
 
 #include "object-model.h"
 
-#define CRANK_TAL_MAX_CALL_ARGUMENT_COUNT 16
+#define CRANK_TALK_MAX_CALL_ARGUMENT_COUNT 16
 
 typedef void (crank_talk_GCRootIterationFunction_t) (void *userdata, crank_talk_oop_t *root);
 
