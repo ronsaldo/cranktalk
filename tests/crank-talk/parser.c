@@ -278,6 +278,17 @@ void parser_runTests(void)
         AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)sendNode->arguments));
     }
 
+    // Unary message send2
+    {
+        crank_talk_oop_t ast = parseString(context, "42 negated");
+        Assert(crank_talk_isParseTreeMessageSendNode(context, ast));
+
+        crank_talk_ParseTreeMessageSendNode_t *sendNode = (crank_talk_ParseTreeMessageSendNode_t*)ast;
+        Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)sendNode->receiver));
+        Assert(crank_talk_isParseTreeLiteralNode(context, (crank_talk_oop_t)sendNode->selector));
+        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)sendNode->arguments));
+    }
+
     // Keyword message send
     {
         crank_talk_oop_t ast = parseString(context, "a perform: #yourself");

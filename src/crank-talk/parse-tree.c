@@ -209,7 +209,7 @@ crank_talk_ParseTreeAssignmentNode_traverseAndCollectErrorsInto(crank_talk_VMCon
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
-    crank_talk_ParseTreeAssignmentNode_t *node = (crank_talk_ParseTreeAssignmentNode_t*)arguments;
+    crank_talk_ParseTreeAssignmentNode_t *node = (crank_talk_ParseTreeAssignmentNode_t*)arguments[0];
     crank_talk_oop_t errorList = arguments[1];
 
     crank_talk_ParseTree_traverseAndCollectErrorsInto(context, node->store, errorList);
@@ -254,7 +254,7 @@ crank_talk_ParseTreeBlockNode_traverseAndCollectErrorsInto(crank_talk_VMContext_
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
-    crank_talk_ParseTreeBlockNode_t *node = (crank_talk_ParseTreeBlockNode_t*)arguments;
+    crank_talk_ParseTreeBlockNode_t *node = (crank_talk_ParseTreeBlockNode_t*)arguments[0];
     crank_talk_oop_t errorList = arguments[1];
 
     crank_talk_ParseTree_traverseListAndCollectErrorsInto(context, node->arguments, errorList);
@@ -279,7 +279,7 @@ crank_talk_ParseTreeCascadedMessageNode_traverseAndCollectErrorsInto(crank_talk_
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
-    crank_talk_ParseTreeCascadedMessageNode_t *node = (crank_talk_ParseTreeCascadedMessageNode_t*)arguments;
+    crank_talk_ParseTreeCascadedMessageNode_t *node = (crank_talk_ParseTreeCascadedMessageNode_t*)arguments[0];
     crank_talk_oop_t errorList = arguments[1];
 
     crank_talk_ParseTree_traverseAndCollectErrorsInto(context, node->selector, errorList);
@@ -294,7 +294,7 @@ crank_talk_ParseTreeMessageCascadeNode_traverseAndCollectErrorsInto(crank_talk_V
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
-    crank_talk_ParseTreeMessageCascadeNode_t *node = (crank_talk_ParseTreeMessageCascadeNode_t*)arguments;
+    crank_talk_ParseTreeMessageCascadeNode_t *node = (crank_talk_ParseTreeMessageCascadeNode_t*)arguments[0];
     crank_talk_oop_t errorList = arguments[1];
 
     crank_talk_ParseTree_traverseAndCollectErrorsInto(context, node->receiver, errorList);
@@ -309,7 +309,7 @@ crank_talk_ParseTreeMessageSendNode_traverseAndCollectErrorsInto(crank_talk_VMCo
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
-    crank_talk_ParseTreeMessageSendNode_t *node = (crank_talk_ParseTreeMessageSendNode_t*)arguments;
+    crank_talk_ParseTreeMessageSendNode_t *node = (crank_talk_ParseTreeMessageSendNode_t*)arguments[0];
     crank_talk_oop_t errorList = arguments[1];
 
     crank_talk_ParseTree_traverseAndCollectErrorsInto(context, node->receiver, errorList);
@@ -325,7 +325,7 @@ crank_talk_ParseTreeSequenceNode_traverseAndCollectErrorsInto(crank_talk_VMConte
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
-    crank_talk_ParseTreeSequenceNode_t *node = (crank_talk_ParseTreeSequenceNode_t*)arguments;
+    crank_talk_ParseTreeSequenceNode_t *node = (crank_talk_ParseTreeSequenceNode_t*)arguments[0];
     crank_talk_oop_t errorList = arguments[1];
 
     crank_talk_ParseTree_traverseListAndCollectErrorsInto(context, node->pragmas, errorList);
@@ -341,7 +341,7 @@ crank_talk_ParseTreeArrayNode_traverseAndCollectErrorsInto(crank_talk_VMContext_
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
-    crank_talk_ParseTreeArrayNode_t *node = (crank_talk_ParseTreeArrayNode_t*)arguments;
+    crank_talk_ParseTreeArrayNode_t *node = (crank_talk_ParseTreeArrayNode_t*)arguments[0];
     crank_talk_oop_t errorList = arguments[1];
 
     crank_talk_ParseTree_traverseListAndCollectErrorsInto(context, node->elements, errorList);
@@ -355,7 +355,7 @@ crank_talk_ParseTreeReturnNode_traverseAndCollectErrorsInto(crank_talk_VMContext
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
-    crank_talk_ParseTreeReturnNode_t *node = (crank_talk_ParseTreeReturnNode_t*)arguments;
+    crank_talk_ParseTreeReturnNode_t *node = (crank_talk_ParseTreeReturnNode_t*)arguments[0];
     crank_talk_oop_t errorList = arguments[1];
 
     crank_talk_ParseTree_traverseAndCollectErrorsInto(context, node->expression, errorList);
@@ -369,7 +369,7 @@ crank_talk_ParseTreeAddMethodNode_traverseAndCollectErrorsInto(crank_talk_VMCont
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
-    crank_talk_ParseTreeAddMethodNode_t *node = (crank_talk_ParseTreeAddMethodNode_t*)arguments;
+    crank_talk_ParseTreeAddMethodNode_t *node = (crank_talk_ParseTreeAddMethodNode_t*)arguments[0];
     crank_talk_oop_t errorList = arguments[1];
 
     crank_talk_ParseTree_traverseAndCollectErrorsInto(context, node->owner, errorList);
@@ -384,7 +384,7 @@ crank_talk_ParseTreeMethodDefinitionNode_traverseAndCollectErrorsInto(crank_talk
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
-    crank_talk_ParseTreeMethodDefinitionNode_t *node = (crank_talk_ParseTreeMethodDefinitionNode_t*)arguments;
+    crank_talk_ParseTreeMethodDefinitionNode_t *node = (crank_talk_ParseTreeMethodDefinitionNode_t*)arguments[0];
     crank_talk_oop_t errorList = arguments[1];
 
     crank_talk_ParseTree_traverseListAndCollectErrorsInto(context, node->arguments, errorList);
@@ -399,7 +399,7 @@ crank_talk_ParseTreePragmaNode_traverseAndCollectErrorsInto(crank_talk_VMContext
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
-    crank_talk_ParseTreePragmaNode_t *node = (crank_talk_ParseTreePragmaNode_t*)arguments;
+    crank_talk_ParseTreePragmaNode_t *node = (crank_talk_ParseTreePragmaNode_t*)arguments[0];
     crank_talk_oop_t errorList = arguments[1];
 
     crank_talk_ParseTree_traverseListAndCollectErrorsInto(context, node->arguments, errorList);

@@ -272,6 +272,19 @@ crank_talk_SmallInteger_printOn_primitive(crank_talk_VMContext_t *context, crank
     return self;
 }
 
+static crank_talk_oop_t
+crank_talk_SmallInteger_negated_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+
+    double value = crank_talk_oop_decodeSmallInteger(self);
+    return crank_talk_oop_encodeSmallInteger(-value);
+}
+
 void
 crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context)
 {
@@ -298,4 +311,6 @@ crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "sin", 1, crank_talk_Float_sin_primitive);
     
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "printOn:", 2, crank_talk_SmallInteger_printOn_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "negated", 1, crank_talk_SmallInteger_negated_primitive);
 }

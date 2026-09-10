@@ -98,6 +98,12 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(1, crank_talk_oop_decodeSmallInteger(elements[0]));
         AssertEquals(2, crank_talk_oop_decodeSmallInteger(elements[1]));
     }
-    
+
+    // Unary message
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "42 negated");
+        AssertEquals(-42, crank_talk_oop_decodeSmallInteger(value));
+    }
+
     crank_talk_vm_destroyContext(context);
 }
