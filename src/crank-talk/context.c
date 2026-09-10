@@ -15,6 +15,7 @@
 #define CrankTalkSlotDef(clazz, fieldName) #fieldName, offsetof(crank_talk_ ## clazz ##_t, fieldName)
 
 void crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerEnvironmentPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerParseTreePrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context);
@@ -260,6 +261,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     
     context->roots.traverseAndCollectErrorsIntoSymbol = crank_talk_Symbol_internWithCString(context, "traverseAndCollectErrorsInto:");
     context->roots.analyzeAndEvaluateWithSymbol = crank_talk_Symbol_internWithCString(context, "analyzeAndEvaluateWith:");
+
+    context->roots.lookupSymbolRecursively = crank_talk_Symbol_internWithCString(context, "lookupSymbolRecursively:");
 
     // Field definitions
     crank_talk_context_setClassTypeMetadata(context, context->roots.ProtoObjectClass, "ProtoObject", NULL);
@@ -587,6 +590,7 @@ static void
 crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_registerAnalysisAndEvaluationPrimitives(context);
+    crank_talk_registerEnvironmentPrimitives(context);
     crank_talk_registerNumbersPrimitives(context);
     crank_talk_registerParseTreePrimitives(context);
     crank_talk_registerStringPrimitives(context);

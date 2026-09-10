@@ -1,5 +1,6 @@
 #include "crank-talk/errors.h"
 #include "crank-talk/context.h"
+#include "crank-talk/source-position.h"
 #include "crank-talk/string.h"
 #include <stdarg.h>
 #include <stdio.h>
@@ -26,18 +27,18 @@ crank_talk_errorPrintf(crank_talk_VMContext_t *context, const char *format, ...)
     crank_talk_error(buffer);
 }
 
-/*SYSMEL_VM_API void
-sysmel_vm_errorAtSourcePosition(sysmel_VMContext_t *context, sysmel_vm_Value_t abstractSourcePosition, const char *message)
+CRANK_TALK_API void
+crank_talk_errorAtSourcePosition(crank_talk_VMContext_t *context, crank_talk_oop_t abstractSourcePosition, const char *message)
 {
-    if(sysmel_vm_Value_isKindOf(context, abstractSourcePosition, context->roots.SourcePositionClass))
+    if(crank_talk_oop_isKindOf(context, abstractSourcePosition, context->roots.SourcePositionClass))
     {
-        sysmel_vm_SourcePosition_t *sourcePosition = (sysmel_vm_SourcePosition_t*)abstractSourcePosition.value.gc;
-        sysmel_vm_SourceCode_t *sourceCode = (sysmel_vm_SourceCode_t *)sourcePosition->sourceCode.value.gc;
-        fprintf(stderr, SYSMEL_VM_STRING_FORMAT "/" SYSMEL_VM_STRING_FORMAT ":%d.%d-%d.%d: ",
-            SYSMEL_VM_STRING_FORMAT_ARG(sourceCode->directory),
-            SYSMEL_VM_STRING_FORMAT_ARG(sourceCode->name),
-            (int)sysmel_vm_Value_getSize(sourcePosition->startLine), (int)sysmel_vm_Value_getSize(sourcePosition->startColumn),
-            (int)sysmel_vm_Value_getSize(sourcePosition->endLine), (int)sysmel_vm_Value_getSize(sourcePosition->endColumn));
+        crank_talk_SourcePosition_t *sourcePosition = (crank_talk_SourcePosition_t*)abstractSourcePosition;
+        crank_talk_SourceCode_t *sourceCode = (crank_talk_SourceCode_t *)sourcePosition->sourceCode;
+        fprintf(stderr, CRANK_TALK_STRING_FORMAT "/" CRANK_TALK_STRING_FORMAT ":%d.%d-%d.%d: ",
+            CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)sourceCode->directory),
+            CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)sourceCode->name),
+            (int)crank_talk_oop_decodeSmallInteger(sourcePosition->startLine), (int)crank_talk_oop_decodeSmallInteger(sourcePosition->startColumn),
+            (int)crank_talk_oop_decodeSmallInteger(sourcePosition->endLine), (int)crank_talk_oop_decodeSmallInteger(sourcePosition->endColumn));
 
     }
 
@@ -45,8 +46,8 @@ sysmel_vm_errorAtSourcePosition(sysmel_VMContext_t *context, sysmel_vm_Value_t a
     abort();
 }
 
-SYSMEL_VM_API void
-sysmel_vm_errorPrintfAtSourcePosition(sysmel_VMContext_t *context, sysmel_vm_Value_t sourcePosition, const char *format, ...)
+CRANK_TALK_API void
+crank_talk_errorPrintfAtSourcePosition(crank_talk_VMContext_t *context, crank_talk_oop_t sourcePosition, const char *format, ...)
 {
     char buffer[256];
 
@@ -55,7 +56,5 @@ sysmel_vm_errorPrintfAtSourcePosition(sysmel_VMContext_t *context, sysmel_vm_Val
     vsnprintf(buffer, sizeof(buffer), format, valist);
     va_end(valist);
 
-    sysmel_vm_errorAtSourcePosition(context, sourcePosition, buffer);
+    crank_talk_errorAtSourcePosition(context, sourcePosition, buffer);
 }
-
-*/

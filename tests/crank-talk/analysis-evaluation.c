@@ -61,5 +61,11 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(context->roots.trueValue, value);
     }
 
+    // Object reference
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "Object");
+        AssertEquals(context->roots.ObjectClass, value);
+    }
+
     crank_talk_vm_destroyContext(context);
 }

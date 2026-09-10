@@ -1,10 +1,12 @@
 #include "crank-talk/analysis-evaluation.h"
 #include "crank-talk/context.h"
 #include "crank-talk/environment.h"
+#include "crank-talk/errors.h"
 #include "crank-talk/message.h"
 #include "crank-talk/parse-tree.h"
 #include "crank-talk/stack-frame.h"
 #include "crank-talk/string.h"
+#include <stdlib.h>
 
 CRANK_TALK_API crank_talk_oop_t
 crank_talk_createTopLevelEvaluationEnvironment(crank_talk_VMContext_t *context, crank_talk_oop_t sourceCodeValue)
@@ -50,6 +52,26 @@ CRANK_TALK_API crank_talk_oop_t
 crank_talk_ParseTreeAnalyzeAndEvaluate(crank_talk_VMContext_t *context, crank_talk_oop_t parseTreeNode, crank_talk_oop_t evaluationContext)
 {
     return crank_talk_send1(context, context->roots.analyzeAndEvaluateWithSymbol, parseTreeNode, evaluationContext);
+}
+
+static crank_talk_oop_t
+crank_talk_IdentifierReferenceNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t evaluationContextValue = arguments[1];
+
+    crank_talk_ParseTreeIdentifierReferenceNode_t *node = (crank_talk_ParseTreeIdentifierReferenceNode_t*)self;
+    crank_talk_AnalysisAndEvaluationContext_t *evaluationContext = (crank_talk_AnalysisAndEvaluationContext_t*)evaluationContextValue;
+    crank_talk_oop_t foundBinding = crank_talk_Environment_lookupSymbolRecursively(context, evaluationContext->lexicalEnvironment, (crank_talk_oop_t)node->symbol);
+    if(crank_talk_oop_isNil(foundBinding))
+        crank_talk_errorPrintfAtSourcePosition(context, (crank_talk_oop_t)node->super.sourcePosition, "Binding not found for symbol #" CRANK_TALK_STRING_FORMAT, CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)node->symbol));
+
+    // TODO: Use a message here.
+    assert(crank_talk_oop_isKindOf(context, foundBinding, context->roots.LiteralVariableClass));
+    return ((crank_talk_LiteralVariable_t*)foundBinding)->value;
 }
 
 static crank_talk_oop_t
@@ -124,6 +146,7 @@ crank_talk_ParseTreeSequenceNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *
 void
 crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context)
 {
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_IdentifierReferenceNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeNilReference_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeFalseReference_analyzeAndEvaluateWith);
