@@ -3,6 +3,7 @@
 #include "crank-talk/errors.h"
 #include "crank-talk/stack-frame.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 CRANK_TALK_API crank_talk_CompiledFunction_t*
 crank_talk_CompiledFunction_createForPrimitive(crank_talk_VMContext_t *context, crank_talk_oop_t name, size_t argumentCount, crank_talk_CompiledFunctionNativeEntryPoint_t entryPoint)
@@ -62,4 +63,46 @@ crank_talk_apply(crank_talk_VMContext_t *context, crank_talk_oop_t function, siz
 
     crank_talk_error("TODO: non functional application.");
     abort();
+}
+
+CRANK_TALK_API void
+sysmel_vm_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction)
+{
+    if(!crank_talk_oop_isNil(compiledFunction->hirFunction))
+        return;
+
+    
+}
+
+CRANK_TALK_API void
+crank_talk_CompiledFunction_ensureAnalysis(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction)
+{
+    if(!crank_talk_oop_isNil(compiledFunction->hirFunction))
+        return;
+
+    sysmel_vm_CompiledFunction_ensureHIRAnalysis(context, compiledFunction);
+}
+
+static void
+crank_talk_CompiledFunction_dumpToConsole(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction)
+{
+    crank_talk_CompiledFunction_ensureAnalysis(context, compiledFunction);
+    printf("Compiled function: TODO dump HIR function\n");
+}
+
+static void
+crank_talk_BlockClosure_dumpToConsole(crank_talk_VMContext_t *context, crank_talk_BlockClosure_t *blockClosure)
+{
+    crank_talk_CompiledFunction_dumpToConsole(context, blockClosure->function);
+}
+
+CRANK_TALK_API void
+crank_talk_Functional_dumpToConsole(crank_talk_VMContext_t *context, crank_talk_oop_t functional)
+{
+    if(crank_talk_oop_isKindOf(context, functional, context->roots.CompiledFunctionClass))
+        crank_talk_CompiledFunction_dumpToConsole(context, (crank_talk_CompiledFunction_t*)functional);
+    else if(crank_talk_oop_isKindOf(context, functional, context->roots.BlockClosureClass))
+        crank_talk_BlockClosure_dumpToConsole(context, (crank_talk_BlockClosure_t*)functional);
+    else
+        crank_talk_error("Expected a functinal for dumping.");
 }

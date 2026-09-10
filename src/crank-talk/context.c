@@ -291,6 +291,10 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(CompiledFunction, nativeEntryPoint),
         CrankTalkSlotDef(CompiledFunction, bytecode),
         CrankTalkSlotDef(CompiledFunction, literalVector),
+        CrankTalkSlotDef(CompiledFunction, definitionEnvironment),
+        CrankTalkSlotDef(CompiledFunction, definitionArguments),
+        CrankTalkSlotDef(CompiledFunction, definitionBody),
+        CrankTalkSlotDef(CompiledFunction, hirFunction),
         NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.BlockClosureClass, "BlockClosure",
         CrankTalkSlotDef(BlockClosure, function),

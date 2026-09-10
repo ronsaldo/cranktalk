@@ -6,4 +6,7 @@
 CRANK_TALK_API crank_talk_CompiledFunction_t *crank_talk_CompiledFunction_createForPrimitive(crank_talk_VMContext_t *context, crank_talk_oop_t name, size_t argumentCount, crank_talk_CompiledFunctionNativeEntryPoint_t entryPoint);
 CRANK_TALK_API crank_talk_oop_t crank_talk_apply(crank_talk_VMContext_t *context, crank_talk_oop_t function, size_t argumentCount, crank_talk_oop_t *arguments);
 
+CRANK_TALK_API void crank_talk_CompiledFunction_ensureAnalysis(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction);
+CRANK_TALK_API void crank_talk_Functional_dumpToConsole(crank_talk_VMContext_t *context, crank_talk_oop_t functional);
+
 #endif //CRANK_TALK_FUNCTION_H

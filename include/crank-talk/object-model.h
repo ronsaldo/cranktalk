@@ -402,6 +402,12 @@ struct crank_talk_CompiledFunction_s {
     crank_talk_ExternalAddress_t *nativeEntryPoint;
     crank_talk_ByteArray_t *bytecode;
     crank_talk_Array_t *literalVector;
+
+    crank_talk_oop_t definitionEnvironment;
+    crank_talk_Array_t *definitionArguments;
+    crank_talk_oop_t definitionBody;
+
+    crank_talk_oop_t hirFunction;
 };
 
 struct crank_talk_BlockClosure_s {

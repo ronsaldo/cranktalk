@@ -1,6 +1,7 @@
 #include "assertions.h"
 #include "crank-talk/context.h"
 #include "crank-talk/eval.h"
+#include "crank-talk/function.h"
 #include "crank-talk/string.h"
 
 void analysisAndEvaluation_runTests(void)
@@ -110,6 +111,19 @@ void analysisAndEvaluation_runTests(void)
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "1 negated; yourself");
         AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
     }
+
+    // Block
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[1]");
+        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
+        crank_talk_Functional_dumpToConsole(context, value);
+    }
+
+    // ifTrue:ifFalse
+    //{
+    //    crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "true ifTrue: [1] ifFalse: [2]");
+    //    AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
+    //}
 
     crank_talk_vm_destroyContext(context);
 }
