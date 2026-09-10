@@ -67,5 +67,10 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(context->roots.ObjectClass, value);
     }
 
+    // Local variable definition
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "| local | local");
+        AssertEquals(crank_talk_oop_nil(), value);
+    }
     crank_talk_vm_destroyContext(context);
 }

@@ -117,6 +117,47 @@ crank_talk_ParseTreeTrueReference_analyzeAndEvaluateWith(crank_talk_VMContext_t 
 }
 
 static crank_talk_oop_t
+crank_talk_ParseTreeSequenceNodeWithLocals_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t evaluationContextValue = arguments[1];
+
+    crank_talk_ParseTreeSequenceNode_t *node = (crank_talk_ParseTreeSequenceNode_t*)self;
+    crank_talk_AnalysisAndEvaluationContext_t *evaluationContext = (crank_talk_AnalysisAndEvaluationContext_t*)evaluationContextValue;
+
+    struct {
+        crank_talk_oop_t oldLexicalEnvironment;
+        crank_talk_oop_t result;
+    } gcFrame = {
+        .oldLexicalEnvironment = evaluationContext->lexicalEnvironment,
+        .result = crank_talk_oop_nil()
+    };
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    gcFrame.oldLexicalEnvironment = evaluationContext->lexicalEnvironment;
+    evaluationContext->lexicalEnvironment = crank_talk_LexicalEnvironment_create(context, evaluationContext->lexicalEnvironment);
+
+    // Define the local variables.
+    size_t localVariableCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->localVariables);
+    crank_talk_oop_t *locals = crank_talk_oop_getSlotsData((crank_talk_oop_t)node->localVariables);
+    for(size_t i = 0; i < localVariableCount; ++i)
+        crank_talk_ParseTreeAnalyzeAndEvaluate(context, locals[i], evaluationContextValue);
+
+    // Evaluate the expressions.
+    size_t expressionCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->expressions);
+    crank_talk_oop_t *expressions = crank_talk_oop_getSlotsData((crank_talk_oop_t)node->expressions);
+    for(size_t i = 0; i < expressionCount; ++i)
+        gcFrame.result = crank_talk_ParseTreeAnalyzeAndEvaluate(context, expressions[i], evaluationContextValue);
+
+    evaluationContext->lexicalEnvironment = gcFrame.oldLexicalEnvironment;
+    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+    return gcFrame.result;
+}
+
+static crank_talk_oop_t
 crank_talk_ParseTreeSequenceNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -126,6 +167,8 @@ crank_talk_ParseTreeSequenceNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *
     crank_talk_oop_t evaluationContext = arguments[1];
 
     crank_talk_ParseTreeSequenceNode_t *node = (crank_talk_ParseTreeSequenceNode_t*)self;
+    if(crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->localVariables) != 0)
+        return crank_talk_ParseTreeSequenceNodeWithLocals_analyzeAndEvaluateWith(context, closure, argumentCount, arguments);
    
     struct {
         crank_talk_oop_t result;
@@ -143,6 +186,22 @@ crank_talk_ParseTreeSequenceNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *
     return gcFrame.result;
 }
 
+static crank_talk_oop_t
+crank_talk_ParseTreeVariableDefinitionNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t evaluationContextValue = arguments[1];
+
+    crank_talk_ParseTreeVariableDefinitionNode_t *node = (crank_talk_ParseTreeVariableDefinitionNode_t*)self;
+    crank_talk_AnalysisAndEvaluationContext_t *evaluationContext = (crank_talk_AnalysisAndEvaluationContext_t*)evaluationContextValue;
+
+    crank_talk_LexicalEnvironment_setNewSymbolBinding(context, evaluationContext->lexicalEnvironment, (crank_talk_oop_t)node->name, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
+    return crank_talk_oop_nil();
+}
+
 void
 crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context)
 {
@@ -152,4 +211,5 @@ crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* conte
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeFalseReference_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeTrueReference_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSequenceNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeVariableDefinitionNode_analyzeAndEvaluateWith);
 }
