@@ -1,10 +1,30 @@
 #include "crank-talk/hir.h"
 #include "crank-talk/context.h"
+#include "crank-talk/message.h"
 #include "crank-talk/ordered-collection.h"
 #include "crank-talk/stack-frame.h"
 #include "crank-talk/string.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_HIRConstantLiteralValue_create(crank_talk_VMContext_t *context, crank_talk_oop_t value, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_oop_t constantLiteralValue = CrankAllocateValuesObjectWithClassName(context, HIRConstantLiteralValue);
+    crank_talk_HIRConstantLiteralValue_t *literalValue = (crank_talk_HIRConstantLiteralValue_t*)constantLiteralValue;
+    literalValue->super.super.sourcePosition = sourcePosition;
+    literalValue->value = value;
+    return constantLiteralValue;
+}
+
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_HIRConstantControlFlowEscapeValue_create(crank_talk_VMContext_t *context, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_oop_t controlFlowEscape = CrankAllocateValuesObjectWithClassName(context, HIRConstantControlFlowEscapeValue);
+    crank_talk_HIRConstantControlFlowEscapeValue_t *literalValue = (crank_talk_HIRConstantControlFlowEscapeValue_t*)controlFlowEscape;
+    literalValue->super.super.sourcePosition = sourcePosition;
+    return controlFlowEscape;
+}
 
 CRANK_TALK_API void
 crank_talk_HIRFunction_ensureEnumeratedLocalValues(crank_talk_VMContext_t *context, crank_talk_HIRFunction_t *function)
@@ -229,7 +249,7 @@ crank_talk_HIRBuilder_isLastTerminator(crank_talk_VMContext_t *context, crank_ta
     if(!builder->basicBlock->lastInstruction)
         return false;
 
-    abort();
+    return crank_talk_oop_asBoolean(context, crank_talk_send0(context, context->roots.isTerminatorSymbol, (crank_talk_oop_t)builder->basicBlock->lastInstruction));
 }
 
 CRANK_TALK_API crank_talk_oop_t
@@ -265,8 +285,142 @@ crank_talk_HIRBuilder_unreachable(crank_talk_VMContext_t *context, crank_talk_HI
     return instructionValue;
 }
 
+static crank_talk_oop_t
+crank_talk_HIRConstantLiteralValue_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+
+    crank_talk_HIRConstantLiteralValue_t *constantLiteral = (crank_talk_HIRConstantLiteralValue_t*)receiver;
+
+    crank_talk_StringStream_insertCString(context, stream, "constantLiteral ");
+    crank_talk_StringStream_print(context, stream, constantLiteral->value);
+
+    return receiver;
+}
+
+static crank_talk_oop_t
+crank_talk_HIRFunctionLocal_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+
+    crank_talk_HIRFunctionLocal_t *functionLocal = (crank_talk_HIRFunctionLocal_t*)receiver;
+
+    crank_talk_StringStream_insertCString(context, stream, "$");
+    crank_talk_StringStream_print(context, stream, functionLocal->index);
+    if(functionLocal->name)
+    {
+        crank_talk_StringStream_insertCString(context, stream, "|");
+        crank_talk_StringStream_insertBytesObject(context, stream, functionLocal->name);
+    }
+
+
+    return receiver;
+}
+
+static crank_talk_oop_t
+crank_talk_HIRBranchInstruction_fullPrintOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    
+    crank_talk_HIRBranchInstruction_t *instruction = (crank_talk_HIRBranchInstruction_t*)receiver;
+
+    crank_talk_StringStream_insertCString(context, stream, "destination ");
+    crank_talk_StringStream_print(context, stream, (crank_talk_oop_t)instruction->destination);
+
+    return receiver;
+}
+
+static crank_talk_oop_t
+crank_talk_HIRReturnInstruction_fullPrintOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    
+    crank_talk_HIRReturnInstruction_t *instruction = (crank_talk_HIRReturnInstruction_t*)receiver;
+
+    crank_talk_StringStream_insertCString(context, stream, "return ");
+    crank_talk_StringStream_print(context, stream, (crank_talk_oop_t)instruction->resultValue);
+
+    return receiver;
+}
+
+static crank_talk_oop_t
+crank_talk_HIRUnreachableInstruction_fullPrintOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    
+    crank_talk_StringStream_insertCString(context, stream, "unreachable");
+
+    return receiver;
+}
+
+static crank_talk_oop_t
+crank_talk_HIRInstruction_isTerminator(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    (void)arguments;
+    return crank_talk_oop_fromBoolean(context, false);
+}
+
+static crank_talk_oop_t
+crank_talk_HIRBranchInstruction_isTerminator(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    (void)arguments;
+    return crank_talk_oop_fromBoolean(context, true);
+}
+
+static crank_talk_oop_t
+crank_talk_HIRReturnInstruction_isTerminator(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    (void)arguments;
+    return crank_talk_oop_fromBoolean(context, true);
+}
+
+static crank_talk_oop_t
+crank_talk_HIRUnreachableInstruction_isTerminator(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    (void)arguments;
+    return crank_talk_oop_fromBoolean(context, true);
+}
 
 void
 crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
 {
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRConstantLiteralValueClass, "printOn:", 2, crank_talk_HIRConstantLiteralValue_printOn_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRFunctionLocalClass, "printOn:", 2, crank_talk_HIRFunctionLocal_printOn_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "fullPrintOn:", 2, crank_talk_HIRBranchInstruction_fullPrintOn_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRReturnInstructionClass, "fullPrintOn:", 2, crank_talk_HIRReturnInstruction_fullPrintOn_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRUnreachableInstructionClass, "fullPrintOn:", 2, crank_talk_HIRUnreachableInstruction_fullPrintOn_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRInstructionClass, "isTerminator", 1, crank_talk_HIRInstruction_isTerminator);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "isTerminator", 1, crank_talk_HIRBranchInstruction_isTerminator);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRReturnInstructionClass, "isTerminator", 1, crank_talk_HIRReturnInstruction_isTerminator);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRUnreachableInstructionClass, "isTerminator", 1, crank_talk_HIRUnreachableInstruction_isTerminator);
 }

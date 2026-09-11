@@ -117,6 +117,9 @@ struct crank_talk_HIRBuilder_s
     crank_talk_oop_t lexicalEnvironment;
 };
 
+CRANK_TALK_API crank_talk_oop_t crank_talk_HIRConstantLiteralValue_create(crank_talk_VMContext_t *context, crank_talk_oop_t value, crank_talk_oop_t sourcePosition);
+CRANK_TALK_API crank_talk_oop_t crank_talk_HIRConstantControlFlowEscapeValue_create(crank_talk_VMContext_t *context, crank_talk_oop_t sourcePosition);
+
 CRANK_TALK_API void crank_talk_HIRFunction_ensureEnumeratedLocalValues(crank_talk_VMContext_t *context, crank_talk_HIRFunction_t *functionValue);
 CRANK_TALK_API void crank_talk_HIRFunction_dumpToStream(crank_talk_VMContext_t *context, crank_talk_HIRFunction_t *functionValue, crank_talk_oop_t stringStream);
 CRANK_TALK_API void crank_talk_HIRFunction_dumpToConsole(crank_talk_VMContext_t *context, crank_talk_HIRFunction_t *functionValue);

@@ -105,6 +105,7 @@ crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *con
     gcFrame.compiledFunctionValue = CrankAllocateValuesObjectWithClassName(context, CompiledFunction);
     crank_talk_CompiledFunction_t *compiledFunction = (crank_talk_CompiledFunction_t*)gcFrame.compiledFunctionValue;
     compiledFunction->argumentCount = crank_talk_oop_encodeSmallInteger(crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments));
+    compiledFunction->isBlock = crank_talk_oop_fromBoolean(context, true);
     compiledFunction->definitionEnvironment = evaluationContext->lexicalEnvironment;
     compiledFunction->definitionArguments = (crank_talk_Array_t*)node->arguments;
     compiledFunction->definitionBody = (crank_talk_oop_t)node->body;

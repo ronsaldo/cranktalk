@@ -1,5 +1,7 @@
 #include "crank-talk/function.h"
+#include "crank-talk/analysis-build.h"
 #include "crank-talk/context.h"
+#include "crank-talk/environment.h"
 #include "crank-talk/errors.h"
 #include "crank-talk/hir.h"
 #include "crank-talk/parse-tree.h"
@@ -87,9 +89,14 @@ sysmel_vm_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, cr
         crank_talk_HIRBasicBlock_t *entryBlock;
         crank_talk_HIRBuilder_t *builder;
         crank_talk_oop_t lexicalEnvironment;
+        crank_talk_oop_t analysisAndBuildContext;
+        crank_talk_HIRValue_t * result;
     } gcFrame = {0};
 
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    // Create the function analysis environment.
+    gcFrame.lexicalEnvironment = sysmel_vm_FunctionAnalysisEnvironment_create(context, compiledFunction->definitionEnvironment);
 
     // Alloca builder
     gcFrame.allocaBlock = crank_talk_HIRBasicBlock_createNamed(context, "alloca");
@@ -101,7 +108,24 @@ sysmel_vm_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, cr
     gcFrame.builder = crank_talk_HIRBuilder_create(context, hirFunction, gcFrame.entryBlock, gcFrame.allocaBuilder, gcFrame.lexicalEnvironment);
     crank_talk_HIRFunction_addBasicBlock(hirFunction, gcFrame.entryBlock);
 
-    // TODO: Analyze and build
+    // Analyze and build
+    gcFrame.analysisAndBuildContext = crank_talk_createAnalysisAndBuildContext(context, gcFrame.builder);
+    gcFrame.result = crank_talk_ParseTreeAnalyzeAndBuild(context, compiledFunction->definitionBody, gcFrame.analysisAndBuildContext);
+
+    if(!crank_talk_HIRBuilder_isLastTerminator(context, gcFrame.builder))
+    {
+        if(crank_talk_oop_asBoolean(context, compiledFunction->isBlock))
+        {
+            // Return the result.
+            crank_talk_HIRBuilder_return(context, gcFrame.builder, gcFrame.result, sourcePosition);
+        }
+        else
+        {
+            // TODO: return self.
+            printf("TODO: return self.\n");
+            crank_talk_HIRBuilder_unreachable(context, gcFrame.builder, sourcePosition);
+        }
+    }
 
     // Jump from the alloca block into the entry block.
     crank_talk_HIRBuilder_branch(context, gcFrame.allocaBuilder, gcFrame.entryBlock, sourcePosition);

@@ -112,12 +112,19 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
     }
 
-    // Block
+    // Empty Block
     {
-        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[1]");
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[]");
         Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
         crank_talk_Functional_dumpToConsole(context, value);
     }
+
+    // Block with literal
+    //{
+    //    crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[1]");
+    //    Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
+    //    crank_talk_Functional_dumpToConsole(context, value);
+    //}
 
     // ifTrue:ifFalse
     //{

@@ -106,7 +106,10 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t fullPrintOnSymbol;
     crank_talk_oop_t traverseAndCollectErrorsIntoSymbol;
     crank_talk_oop_t analyzeAndEvaluateWithSymbol;
+    crank_talk_oop_t analyzeAndBuildWithSymbol;
     crank_talk_oop_t lookupSymbolRecursively;
+
+    crank_talk_oop_t isTerminatorSymbol;
 
     // Front end classes
     crank_talk_oop_t ParseTreeNodeClass;
@@ -165,6 +168,7 @@ struct crank_talk_VMContextRoots_s
 
     // Passes
     crank_talk_oop_t AnalysisAndEvaluationContextClass;
+    crank_talk_oop_t AnalysisAndBuildContextClass;
 };
 
 struct crank_talk_VMContext_s

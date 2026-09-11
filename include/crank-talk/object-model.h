@@ -403,6 +403,7 @@ struct crank_talk_CompiledFunction_s {
     crank_talk_ByteArray_t *bytecode;
     crank_talk_Array_t *literalVector;
 
+    crank_talk_oop_t isBlock;
     crank_talk_oop_t definitionEnvironment;
     crank_talk_Array_t *definitionArguments;
     crank_talk_oop_t definitionBody;
@@ -675,6 +676,7 @@ crank_talk_oop_asFloat(crank_talk_oop_t oop)
 
 CRANK_TALK_API double crank_talk_oop_numberAsFloat(crank_talk_oop_t oop);
 
+CRANK_TALK_API bool crank_talk_oop_asBoolean(crank_talk_VMContext_t *context, crank_talk_oop_t value);
 CRANK_TALK_API crank_talk_oop_t crank_talk_oop_fromBoolean(crank_talk_VMContext_t *context, bool value);
 CRANK_TALK_API crank_talk_oop_t crank_talk_oop_fromFloat(crank_talk_VMContext_t *context, double value);
 CRANK_TALK_API crank_talk_Behavior_t *crank_talk_oop_getClass(crank_talk_VMContext_t *context, crank_talk_oop_t value);

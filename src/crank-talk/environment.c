@@ -29,6 +29,24 @@ crank_talk_LexicalEnvironment_setNewSymbolBinding(crank_talk_VMContext_t *contex
     crank_talk_LexicalEnvironment_setSymbolBinding(context, environment, symbol, binding);
 }
 
+
+CRANK_TALK_API crank_talk_oop_t
+sysmel_vm_FunctionAnalysisEnvironment_create(crank_talk_VMContext_t *context, crank_talk_oop_t parentEnvironment)
+{
+    crank_talk_oop_t functionEnvironmentValue = CrankAllocateValuesObjectWithClassName(context, FunctionAnalysisEnvironment);
+    crank_talk_FunctionAnalysisEnvironment_t*functionEnvironment = (crank_talk_FunctionAnalysisEnvironment_t*)functionEnvironmentValue;
+    functionEnvironment->super.parent = parentEnvironment;
+    functionEnvironment->super.symbolTable = crank_talk_IdentityDictionary_create(context);
+    return functionEnvironmentValue;
+}
+
+CRANK_TALK_API void
+sysmel_vm_FunctionAnalysisEnvironment_setReceiverValue(crank_talk_VMContext_t *context, crank_talk_oop_t environment, crank_talk_oop_t receiverValue)
+{
+    crank_talk_FunctionAnalysisEnvironment_t*functionEnvironment = (crank_talk_FunctionAnalysisEnvironment_t*)environment;
+    functionEnvironment->receiverValue = receiverValue;
+}
+
 CRANK_TALK_API crank_talk_oop_t
 crank_talk_Environment_lookupSymbolRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t environment, crank_talk_oop_t symbol)
 {
