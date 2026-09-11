@@ -254,6 +254,16 @@ crank_talk_HIRBuilder_isLastTerminator(crank_talk_VMContext_t *context, crank_ta
 }
 
 CRANK_TALK_API crank_talk_oop_t
+crank_talk_HIRBuilder_alloca(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_oop_t instructionValue = CrankAllocateValuesObjectWithClassName(context, HIRAllocaInstruction);
+    crank_talk_HIRAllocaInstruction_t *instruction = (crank_talk_HIRAllocaInstruction_t*)instructionValue;
+    instruction->super.super.super.sourcePosition = sourcePosition;
+    crank_talk_HIRBuilder_addInstruction(builder, &instruction->super);
+    return instructionValue;
+}
+
+CRANK_TALK_API crank_talk_oop_t
 crank_talk_HIRBuilder_branch(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRBasicBlock_t *destination, crank_talk_oop_t sourcePosition)
 {
     crank_talk_oop_t instructionValue = CrankAllocateValuesObjectWithClassName(context, HIRBranchInstruction);
@@ -322,6 +332,21 @@ crank_talk_HIRFunctionLocal_printOn_primitive(crank_talk_VMContext_t *context, c
         crank_talk_StringStream_insertBytesObject(context, stream, (crank_talk_oop_t)functionLocal->name);
     }
 
+
+    return receiver;
+}
+
+static crank_talk_oop_t
+crank_talk_HIRAllocaInstruction_fullPrintOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    
+    crank_talk_StringStream_print(context, stream, receiver);
+    crank_talk_StringStream_insertCString(context, stream, " := alloca");
 
     return receiver;
 }
@@ -416,6 +441,7 @@ crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRConstantLiteralValueClass, "printOn:", 2, crank_talk_HIRConstantLiteralValue_printOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRFunctionLocalClass, "printOn:", 2, crank_talk_HIRFunctionLocal_printOn_primitive);
 
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "fullPrintOn:", 2, crank_talk_HIRAllocaInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "fullPrintOn:", 2, crank_talk_HIRBranchInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRReturnInstructionClass, "fullPrintOn:", 2, crank_talk_HIRReturnInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRUnreachableInstructionClass, "fullPrintOn:", 2, crank_talk_HIRUnreachableInstruction_fullPrintOn_primitive);

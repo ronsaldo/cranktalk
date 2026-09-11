@@ -14,6 +14,7 @@ typedef struct crank_talk_HIRFunctionLocal_s crank_talk_HIRFunctionLocal_t;
     typedef struct crank_talk_HIRCapture_s crank_talk_HIRCapture_t;
     typedef struct crank_talk_HIRBasicBlock_s crank_talk_HIRBasicBlock_t;
     typedef struct crank_talk_HIRInstruction_s crank_talk_HIRInstruction_t;
+        typedef struct crank_talk_HIRAllocaInstruction_s crank_talk_HIRAllocaInstruction_t;
         typedef struct crank_talk_HIRBranchInstruction_s crank_talk_HIRBranchInstruction_t;
         typedef struct crank_talk_HIRReturnInstruction_s crank_talk_HIRReturnInstruction_t;
         typedef struct crank_talk_HIRUnreachableInstruction_s crank_talk_HIRUnreachableInstruction_t;
@@ -91,6 +92,11 @@ struct crank_talk_HIRInstruction_s
     crank_talk_HIRInstruction_t *previousInstruction;
 };
 
+struct crank_talk_HIRAllocaInstruction_s
+{
+    crank_talk_HIRInstruction_t super;
+};
+
 struct crank_talk_HIRBranchInstruction_s
 {
     crank_talk_HIRInstruction_t super;
@@ -135,6 +141,7 @@ CRANK_TALK_API crank_talk_HIRBuilder_t *crank_talk_HIRBuilder_copyWithBasicBlock
 CRANK_TALK_API void crank_talk_HIRBuilder_addInstruction(crank_talk_HIRBuilder_t *builder, crank_talk_HIRInstruction_t *instruction);
 CRANK_TALK_API bool crank_talk_HIRBuilder_isLastTerminator(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder);
 
+CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_alloca(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_branch(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRBasicBlock_t *destination, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_return(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *resultValue, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_unreachable(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_oop_t sourcePosition);

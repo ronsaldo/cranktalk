@@ -645,6 +645,7 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(HIRInstruction, previousInstruction),
         NULL);
 
+    context->roots.HIRAllocaInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRAllocaInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRAllocaInstruction_t), CrankTalkGCObjectDataTypeOops, NULL);
     context->roots.HIRBranchInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRBranchInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRBranchInstruction_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRBranchInstruction, destination),
         NULL);
