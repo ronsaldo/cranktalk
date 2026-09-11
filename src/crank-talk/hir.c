@@ -4,6 +4,7 @@
 #include "crank-talk/stack-frame.h"
 #include "crank-talk/string.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 CRANK_TALK_API void
 crank_talk_HIRFunction_ensureEnumeratedLocalValues(crank_talk_VMContext_t *context, crank_talk_HIRFunction_t *function)
@@ -190,6 +191,80 @@ crank_talk_HIRBasicBlock_createNamed(crank_talk_VMContext_t *context, const char
     basicBlock->super.name = crank_talk_Symbol_internWithCString(context, name);
     return basicBlock;
 }
+
+CRANK_TALK_API crank_talk_HIRBuilder_t *
+crank_talk_HIRBuilder_create(crank_talk_VMContext_t *context, crank_talk_HIRFunction_t *function, crank_talk_HIRBasicBlock_t *basicBlock, crank_talk_HIRBuilder_t *allocaBuilder, crank_talk_oop_t lexicalEnvironment)
+{
+    crank_talk_HIRBuilder_t *builder = (crank_talk_HIRBuilder_t *)CrankAllocateValuesObjectWithClassName(context, HIRBuilder);
+    builder->hirFunction = function;
+    builder->basicBlock = basicBlock;
+    builder->allocaBuilder = allocaBuilder;
+    builder->lexicalEnvironment = lexicalEnvironment;
+    return builder;
+}
+
+CRANK_TALK_API crank_talk_HIRBuilder_t *
+crank_talk_HIRBuilder_copyWithBasicBlock(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRBasicBlock_t *basicBlock)
+{
+    crank_talk_HIRBuilder_t *newBuilder = (crank_talk_HIRBuilder_t *)CrankAllocateValuesObjectWithClassName(context, HIRBuilder);
+    newBuilder->hirFunction = builder->hirFunction;
+    newBuilder->basicBlock = basicBlock;
+    newBuilder->allocaBuilder = builder->allocaBuilder;
+    newBuilder->lexicalEnvironment = builder->lexicalEnvironment;
+    return builder;
+}
+
+CRANK_TALK_API void
+crank_talk_HIRBuilder_addInstruction(crank_talk_HIRBuilder_t *builder, crank_talk_HIRInstruction_t *instruction)
+{
+    crank_talk_HIRBasicBlock_addInstruction(builder->basicBlock, instruction);
+}
+
+CRANK_TALK_API bool
+crank_talk_HIRBuilder_isLastTerminator(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder)
+{
+    if(!builder->basicBlock)
+        return true;
+
+    if(!builder->basicBlock->lastInstruction)
+        return false;
+
+    abort();
+}
+
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_HIRBuilder_branch(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRBasicBlock_t *destination, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_oop_t instructionValue = CrankAllocateValuesObjectWithClassName(context, HIRBranchInstruction);
+    crank_talk_HIRBranchInstruction_t *branchInstruction = (crank_talk_HIRBranchInstruction_t*)instructionValue;
+    branchInstruction->super.super.super.sourcePosition = sourcePosition;
+    branchInstruction->destination = destination;
+    crank_talk_HIRBuilder_addInstruction(builder, &branchInstruction->super);
+    return instructionValue;
+
+}
+
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_HIRBuilder_return(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *resultValue, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_oop_t instructionValue = CrankAllocateValuesObjectWithClassName(context, HIRReturnInstruction);
+    crank_talk_HIRReturnInstruction_t *instruction = (crank_talk_HIRReturnInstruction_t*)instructionValue;
+    instruction->super.super.super.sourcePosition = sourcePosition;
+    instruction->resultValue = resultValue;
+    crank_talk_HIRBuilder_addInstruction(builder, &instruction->super);
+    return instructionValue;
+}
+
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_HIRBuilder_unreachable(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_oop_t instructionValue = CrankAllocateValuesObjectWithClassName(context, HIRUnreachableInstruction);
+    crank_talk_HIRUnreachableInstruction_t *instruction = (crank_talk_HIRUnreachableInstruction_t*)instructionValue;
+    instruction->super.super.super.sourcePosition = sourcePosition;
+    crank_talk_HIRBuilder_addInstruction(builder, &instruction->super);
+    return instructionValue;
+}
+
 
 void
 crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)

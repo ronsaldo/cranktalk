@@ -2,6 +2,7 @@
 #include "crank-talk/context.h"
 #include "crank-talk/errors.h"
 #include "crank-talk/hir.h"
+#include "crank-talk/parse-tree.h"
 #include "crank-talk/stack-frame.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -72,25 +73,38 @@ sysmel_vm_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, cr
     if(!crank_talk_oop_isNil(compiledFunction->hirFunction))
         return;
 
+    if(!compiledFunction->definitionBody)
+        return;
+
     compiledFunction->hirFunction = CrankAllocateValuesObjectWithClassName(context, HIRFunction);
     crank_talk_HIRFunction_t *hirFunction = (crank_talk_HIRFunction_t*)compiledFunction->hirFunction;
+
+    crank_talk_oop_t sourcePosition = (crank_talk_oop_t)((crank_talk_ParseTreeNode_t*)compiledFunction->definitionBody)->sourcePosition;
 
     struct {
         crank_talk_HIRBasicBlock_t *allocaBlock;
         crank_talk_HIRBuilder_t *allocaBuilder;
         crank_talk_HIRBasicBlock_t *entryBlock;
         crank_talk_HIRBuilder_t *builder;
+        crank_talk_oop_t lexicalEnvironment;
     } gcFrame = {0};
 
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
 
     // Alloca builder
     gcFrame.allocaBlock = crank_talk_HIRBasicBlock_createNamed(context, "alloca");
+    gcFrame.allocaBuilder = crank_talk_HIRBuilder_create(context, hirFunction, gcFrame.allocaBlock, NULL, gcFrame.lexicalEnvironment);
     crank_talk_HIRFunction_addBasicBlock(hirFunction, gcFrame.allocaBlock);
 
     // Entry block and builder
     gcFrame.entryBlock = crank_talk_HIRBasicBlock_createNamed(context, "entry");
+    gcFrame.builder = crank_talk_HIRBuilder_create(context, hirFunction, gcFrame.entryBlock, gcFrame.allocaBuilder, gcFrame.lexicalEnvironment);
     crank_talk_HIRFunction_addBasicBlock(hirFunction, gcFrame.entryBlock);
+
+    // TODO: Analyze and build
+
+    // Jump from the alloca block into the entry block.
+    crank_talk_HIRBuilder_branch(context, gcFrame.allocaBuilder, gcFrame.entryBlock, sourcePosition);
 
     CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
     
