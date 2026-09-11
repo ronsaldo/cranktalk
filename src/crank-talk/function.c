@@ -115,7 +115,8 @@ sysmel_vm_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, cr
             crank_talk_HIRArgument_t *hirArgument = (crank_talk_HIRArgument_t*)hirArgumentValue;
             hirArgument->super.super.sourcePosition = (crank_talk_oop_t)argumentDefinition->super.sourcePosition;
             hirArgument->super.name = argumentDefinition->name;
-
+            if(argumentDefinition->name)
+                crank_talk_LexicalEnvironment_setNewHIRSymbolBinding(context, gcFrame.lexicalEnvironment, (crank_talk_oop_t)argumentDefinition->name, hirArgumentValue, (crank_talk_oop_t)argumentDefinition->super.sourcePosition);
         }
 
     }

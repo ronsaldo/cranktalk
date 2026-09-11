@@ -54,6 +54,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t LiteralVariableClass;
     crank_talk_oop_t GlobalVariableClass;
     crank_talk_oop_t LocalVariableClass;
+    crank_talk_oop_t HIRVariableClass;
     crank_talk_oop_t SlotClass;
 
     crank_talk_oop_t LookupKeyClass;

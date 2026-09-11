@@ -207,6 +207,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.LiteralVariableClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.VariableClass,        sizeof(crank_talk_LiteralVariable_t), CrankTalkGCObjectDataTypeOops);
     context->roots.GlobalVariableClass  = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.LiteralVariableClass, sizeof(crank_talk_GlobalVariable_t),  CrankTalkGCObjectDataTypeOops);
     context->roots.LocalVariableClass   = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.LiteralVariableClass, sizeof(crank_talk_LocalVariable_t),   CrankTalkGCObjectDataTypeOops);
+    context->roots.HIRVariableClass     = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.VariableClass,        sizeof(crank_talk_HIRVariable_t),     CrankTalkGCObjectDataTypeOops);
     context->roots.SlotClass            = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.VariableClass,        sizeof(crank_talk_Slot_t),            CrankTalkGCObjectDataTypeOops);
 
     // Association
@@ -345,6 +346,9 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.GlobalVariableClass, "GlobalVariable", NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.LocalVariableClass, "LocalVariable", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.HIRVariableClass, "HIRVariable",
+        CrankTalkSlotDef(HIRVariable, value),
+        NULL);
 
     crank_talk_context_setClassTypeMetadata(context, context->roots.SlotClass, "Slot",
         CrankTalkSlotDef(Slot, index),
@@ -448,6 +452,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_context_createClassTables(context, context->roots.LiteralVariableClass);
     crank_talk_context_createClassTables(context, context->roots.GlobalVariableClass);
     crank_talk_context_createClassTables(context, context->roots.LocalVariableClass);
+    crank_talk_context_createClassTables(context, context->roots.HIRVariableClass);
     crank_talk_context_createClassTables(context, context->roots.SlotClass);
 
     crank_talk_context_createClassTables(context, context->roots.LookupKeyClass);

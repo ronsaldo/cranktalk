@@ -113,6 +113,7 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
         typedef struct crank_talk_LiteralVariable_s crank_talk_LiteralVariable_t;
             typedef struct crank_talk_GlobalVariable_s crank_talk_GlobalVariable_t;
             typedef struct crank_talk_LocalVariable_s crank_talk_LocalVariable_t;
+        typedef struct crank_talk_HIRVariable_s crank_talk_HIRVariable_t;
         typedef struct crank_talk_Slot_s crank_talk_Slot_t;
 
     typedef struct crank_talk_LookupKey_s crank_talk_LookupKey_t;
@@ -502,6 +503,11 @@ struct crank_talk_Variable_s {
 };
 
 struct crank_talk_LiteralVariable_s {
+    crank_talk_Variable_t super;
+    crank_talk_oop_t value;
+};
+
+struct crank_talk_HIRVariable_s {
     crank_talk_Variable_t super;
     crank_talk_oop_t value;
 };
