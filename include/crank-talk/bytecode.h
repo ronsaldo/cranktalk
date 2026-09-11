@@ -10,19 +10,19 @@ typedef enum crank_talk_OperandVectorName_e crank_talk_OperandVectorName_t;
 
 enum crank_talk_Opcode_e
 {
-#define CRANK_TALK_OPCODE(x) SysmelVMOpcode ## x,
+#define CRANK_TALK_OPCODE(x) CrankTalkOpcode ## x,
 #include "opcodes.inc"
 #undef CRANK_TALK_OPCODE
 };
 
 typedef enum crank_talk_OperandVectorName_e
 {
-    SysmelVMOperandVectorTemporary = 0,
-    SysmelVMOperandVectorArguments,
-    SysmelVMOperandVectorCaptures,
-    SysmelVMOperandVectorLiteral,
-    SysmelVMOperandVectorBits = 2,
-    SysmelVMOperandVectorBitMask = 3,
+    CrankTalkOperandVectorTemporary = 0,
+    CrankTalkOperandVectorArguments,
+    CrankTalkOperandVectorCaptures,
+    CrankTalkOperandVectorLiteral,
+    CrankTalkOperandVectorBits = 2,
+    CrankTalkOperandVectorBitMask = 3,
 } crank_talk_OperandVectorName_t;
 
 CRANK_TALK_API const char *crank_talk_OperandVectorName_toString(crank_talk_OperandVectorName_t vectorName);
@@ -39,6 +39,42 @@ struct crank_talk_BytecodeAssembler_s
     crank_talk_oop_t currentSourcePosition;
 };
 
+struct crank_talk_BytecodeLabel_s
+{
+    crank_talk_Object_t super;
+    crank_talk_oop_t isDefined;
+    crank_talk_oop_t destinationValue;
+    crank_talk_oop_t pendingLocations;
+};
+
+typedef uint16_t crank_talk_BytecodeVectorOperand_t;
+
 CRANK_TALK_API const char *crank_talk_Opcode_toString(crank_talk_Opcode_t opcode);
+
+CRANK_TALK_API crank_talk_BytecodeAssembler_t *crank_talk_BytecodeAssembler_create(crank_talk_VMContext_t *context);
+CRANK_TALK_API void crank_talk_BytecodeAssembler_finishBuildingInFunction(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_CompiledFunction_t *compiledFunction);
+
+CRANK_TALK_API crank_talk_BytecodeLabel_t *crank_talk_BytecodeAssembler_newLabel(crank_talk_VMContext_t *context);
+CRANK_TALK_API crank_talk_BytecodeVectorOperand_t crank_talk_BytecodeAssembler_getArgumentOperand(size_t index);
+CRANK_TALK_API crank_talk_BytecodeVectorOperand_t crank_talk_BytecodeAssembler_getCaptureOperand(size_t index);
+CRANK_TALK_API crank_talk_BytecodeVectorOperand_t crank_talk_BytecodeAssembler_getOrCreateLiteral(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_oop_t literalValue);
+CRANK_TALK_API crank_talk_BytecodeVectorOperand_t crank_talk_BytecodeAssembler_newTemporary(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler);
+
+CRANK_TALK_API void crank_talk_BytecodeAssembler_opcode(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_Opcode_t opcode, crank_talk_oop_t sourcePosition);
+CRANK_TALK_API void crank_talk_BytecodeAssembler_vectorOperand(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t operand);
+CRANK_TALK_API void crank_talk_BytecodeAssembler_labelOperand(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeLabel_t *label);
+
+CRANK_TALK_API void crank_talk_BytecodeAssembler_putLabel(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeLabel_t *label);
+
+// Zero operands
+CRANK_TALK_API void crank_talk_BytecodeAssembler_nop(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_oop_t sourcePosition);
+CRANK_TALK_API void crank_talk_BytecodeAssembler_breakpoint(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_oop_t sourcePosition);
+CRANK_TALK_API void crank_talk_BytecodeAssembler_unreachable(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_oop_t sourcePosition);
+
+// One operands
+CRANK_TALK_API void crank_talk_BytecodeAssembler_jump(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeLabel_t *destinationLabel, crank_talk_oop_t sourcePosition);
+CRANK_TALK_API void crank_talk_BytecodeAssembler_return(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t resultValue, crank_talk_oop_t sourcePosition);
+
+CRANK_TALK_API void crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction);
 
 #endif //CRANK_TALK_BYTECODE_H

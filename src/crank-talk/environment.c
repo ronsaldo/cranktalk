@@ -46,7 +46,7 @@ crank_talk_LexicalEnvironment_setNewHIRSymbolBinding(crank_talk_VMContext_t *con
 }
 
 CRANK_TALK_API crank_talk_oop_t
-sysmel_vm_FunctionAnalysisEnvironment_create(crank_talk_VMContext_t *context, crank_talk_oop_t parentEnvironment)
+crank_talk_FunctionAnalysisEnvironment_create(crank_talk_VMContext_t *context, crank_talk_oop_t parentEnvironment)
 {
     crank_talk_oop_t functionEnvironmentValue = CrankAllocateValuesObjectWithClassName(context, FunctionAnalysisEnvironment);
     crank_talk_FunctionAnalysisEnvironment_t*functionEnvironment = (crank_talk_FunctionAnalysisEnvironment_t*)functionEnvironmentValue;
@@ -56,7 +56,7 @@ sysmel_vm_FunctionAnalysisEnvironment_create(crank_talk_VMContext_t *context, cr
 }
 
 CRANK_TALK_API void
-sysmel_vm_FunctionAnalysisEnvironment_setReceiverValue(crank_talk_VMContext_t *context, crank_talk_oop_t environment, crank_talk_oop_t receiverValue)
+crank_talk_FunctionAnalysisEnvironment_setReceiverValue(crank_talk_VMContext_t *context, crank_talk_oop_t environment, crank_talk_oop_t receiverValue)
 {
     crank_talk_FunctionAnalysisEnvironment_t*functionEnvironment = (crank_talk_FunctionAnalysisEnvironment_t*)environment;
     functionEnvironment->receiverValue = receiverValue;

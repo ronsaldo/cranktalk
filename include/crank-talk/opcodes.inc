@@ -8,5 +8,6 @@ CRANK_TALK_OPCODE(Alloca)
 
 // One operand
 CRANK_TALK_OPCODE(Jump)
+CRANK_TALK_OPCODE(Return)
 
 // Two operands

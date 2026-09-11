@@ -159,6 +159,8 @@ CRANK_TALK_API void crank_talk_HIRBasicBlock_addInstruction(crank_talk_HIRBasicB
 CRANK_TALK_API crank_talk_HIRBasicBlock_t *crank_talk_HIRBasicBlock_create(crank_talk_VMContext_t *context);
 CRANK_TALK_API crank_talk_HIRBasicBlock_t *crank_talk_HIRBasicBlock_createNamed(crank_talk_VMContext_t *context, const char *name);
 
+CRANK_TALK_API bool crank_talk_HIRInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_HIRInstruction_t *instruction);
+
 CRANK_TALK_API crank_talk_HIRBuilder_t *crank_talk_HIRBuilder_create(crank_talk_VMContext_t *context, crank_talk_HIRFunction_t *function, crank_talk_HIRBasicBlock_t *basicBlock, crank_talk_HIRBuilder_t *allocaBuilder, crank_talk_oop_t lexicalEnvironment);
 CRANK_TALK_API crank_talk_HIRBuilder_t *crank_talk_HIRBuilder_copyWithBasicBlock(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRBasicBlock_t *basicBlock);
 CRANK_TALK_API void crank_talk_HIRBuilder_addInstruction(crank_talk_HIRBuilder_t *builder, crank_talk_HIRInstruction_t *instruction);
@@ -171,6 +173,9 @@ CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_send(crank_talk_VMContext_
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_unreachable(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_variableLoad(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *variable, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_variableStore(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *variable, crank_talk_HIRValue_t *value, crank_talk_oop_t sourcePosition);
+
+CRANK_TALK_API uint16_t crank_talk_HIRValue_getBytecodeAssemblyOperandWith(crank_talk_VMContext_t *context, crank_talk_HIRValue_t *value, crank_talk_oop_t bytecodeAssembler);
+CRANK_TALK_API void crank_talk_HIRInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *context, crank_talk_HIRInstruction_t *instruction, crank_talk_oop_t bytecodeAssembler);
 
 
 #endif //CRANK_TALK_HIR_H

@@ -1,6 +1,7 @@
 #include "crank-talk/function.h"
 #include "crank-talk/analysis-build.h"
 #include "crank-talk/array.h"
+#include "crank-talk/bytecode.h"
 #include "crank-talk/context.h"
 #include "crank-talk/environment.h"
 #include "crank-talk/errors.h"
@@ -70,8 +71,8 @@ crank_talk_apply(crank_talk_VMContext_t *context, crank_talk_oop_t function, siz
     abort();
 }
 
-CRANK_TALK_API void
-sysmel_vm_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction)
+static void
+crank_talk_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction)
 {
     if(!crank_talk_oop_isNil(compiledFunction->hirFunction))
         return;
@@ -97,7 +98,7 @@ sysmel_vm_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, cr
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
 
     // Create the function analysis environment.
-    gcFrame.lexicalEnvironment = sysmel_vm_FunctionAnalysisEnvironment_create(context, compiledFunction->definitionEnvironment);
+    gcFrame.lexicalEnvironment = crank_talk_FunctionAnalysisEnvironment_create(context, compiledFunction->definitionEnvironment);
 
     // Arguments
     {
@@ -157,13 +158,96 @@ sysmel_vm_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, cr
     
 }
 
+static void
+crank_talk_CompiledFunction_ensureBytecodeGenerationAnalysis(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction)
+{
+    assert(compiledFunction->hirFunction);
+    if(compiledFunction->bytecode)
+        return;
+
+    struct {
+        crank_talk_BytecodeAssembler_t *assembler;
+    } gcFrame = {0};
+    
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    gcFrame.assembler = crank_talk_BytecodeAssembler_create(context);
+
+    crank_talk_HIRFunction_t *hirFunction = (crank_talk_HIRFunction_t *)compiledFunction->hirFunction;
+
+    // Arguments
+    {
+        size_t argumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)hirFunction->arguments);
+        crank_talk_oop_t *arguments = hirFunction->arguments->elements;
+        for(size_t i = 0; i < argumentCount; ++i)
+        {
+            crank_talk_HIRArgument_t *hirArgument = (crank_talk_HIRArgument_t*)arguments[i];
+            hirArgument->super.bytecodeVectorIndex = crank_talk_oop_encodeSmallInteger(crank_talk_BytecodeAssembler_getArgumentOperand(i));
+        }
+    }
+
+    // Captures
+    {
+        size_t captureCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)hirFunction->captures);
+        crank_talk_oop_t *captures = hirFunction->captures->elements;
+        for(size_t i = 0; i < captureCount; ++i)
+        {
+            crank_talk_HIRCapture_t *hirArgument = (crank_talk_HIRCapture_t*)captures[i];
+            hirArgument->super.bytecodeVectorIndex = crank_talk_oop_encodeSmallInteger(crank_talk_BytecodeAssembler_getCaptureOperand(i));
+        }
+    }
+
+    // Basic blocks labels and temporaries.
+    {
+        crank_talk_HIRBasicBlock_t *basicBlock = hirFunction->firstBasicBlock;
+        while(basicBlock)
+        {
+            basicBlock->bytecodeLabel = (crank_talk_oop_t)crank_talk_BytecodeAssembler_newLabel(context);
+
+            crank_talk_HIRInstruction_t *instruction = basicBlock->firstInstruction;
+            while(instruction)
+            {
+                if(crank_talk_HIRInstruction_hasResultValue(context, instruction))
+                    instruction->super.bytecodeVectorIndex = crank_talk_oop_encodeSmallInteger(crank_talk_BytecodeAssembler_newTemporary(context, gcFrame.assembler));
+                else
+                    instruction->super.bytecodeVectorIndex = crank_talk_oop_encodeSmallInteger(0);
+                instruction = instruction->nextInstruction;
+            }
+
+            basicBlock = basicBlock->nextBlock;
+        }
+    }
+
+    // Basic block construction
+    {
+        crank_talk_HIRBasicBlock_t *basicBlock = hirFunction->firstBasicBlock;
+        while(basicBlock)
+        {
+            crank_talk_BytecodeAssembler_putLabel(context, gcFrame.assembler, (crank_talk_BytecodeLabel_t*)basicBlock->bytecodeLabel);
+            crank_talk_HIRInstruction_t *instruction = basicBlock->firstInstruction;
+            while(instruction)
+            {
+                crank_talk_HIRInstruction_emitBytecodeAssemblyWith(context, instruction, (crank_talk_oop_t)gcFrame.assembler);
+
+                instruction = instruction->nextInstruction;
+            }
+
+            basicBlock = basicBlock->nextBlock;
+        }
+    }
+
+    crank_talk_BytecodeAssembler_finishBuildingInFunction(context, gcFrame.assembler, compiledFunction);
+    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+}
+
 CRANK_TALK_API void
 crank_talk_CompiledFunction_ensureAnalysis(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction)
 {
-    if(!crank_talk_oop_isNil(compiledFunction->hirFunction))
+    if(compiledFunction->hirFunction || compiledFunction->bytecode)
         return;
 
-    sysmel_vm_CompiledFunction_ensureHIRAnalysis(context, compiledFunction);
+    crank_talk_CompiledFunction_ensureHIRAnalysis(context, compiledFunction);
+    crank_talk_CompiledFunction_ensureBytecodeGenerationAnalysis(context, compiledFunction);
 }
 
 static void
@@ -172,6 +256,8 @@ crank_talk_CompiledFunction_dumpToConsole(crank_talk_VMContext_t *context, crank
     crank_talk_CompiledFunction_ensureAnalysis(context, compiledFunction);
     if(compiledFunction->hirFunction)
         crank_talk_HIRFunction_dumpToConsole(context, (crank_talk_HIRFunction_t*)compiledFunction->hirFunction);
+    if(compiledFunction->bytecode)
+        crank_talk_BytecodeFunction_dumpToConsole(context, compiledFunction);
 }
 
 static void

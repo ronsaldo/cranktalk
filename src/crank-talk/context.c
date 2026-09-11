@@ -3,6 +3,7 @@
 #include "crank-talk/analysis-build.h"
 #include "crank-talk/array.h"
 #include "crank-talk/behavior.h"
+#include "crank-talk/bytecode.h"
 #include "crank-talk/dictionary.h"
 #include "crank-talk/environment.h"
 #include "crank-talk/gc.h"
@@ -276,7 +277,10 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     context->roots.lookupSymbolRecursively = crank_talk_Symbol_internWithCString(context, "lookupSymbolRecursively:");
 
+    context->roots.hasResultValueSymbol = crank_talk_Symbol_internWithCString(context, "hasResultValue");
     context->roots.isTerminatorSymbol = crank_talk_Symbol_internWithCString(context, "isTerminator");
+    context->roots.getBytecodeAssemblyOperandWithSymbol = crank_talk_Symbol_internWithCString(context, "getBytecodeAssemblyOperandWith:");
+    context->roots.emitBytecodeAssemblyWithSymbol = crank_talk_Symbol_internWithCString(context, "emitBytecodeAssemblyWith:");
 
     // Field definitions
     crank_talk_context_setClassTypeMetadata(context, context->roots.ProtoObjectClass, "ProtoObject", NULL);
@@ -301,6 +305,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_context_setClassTypeMetadata(context, context->roots.CompiledFunctionClass, "CompiledFunction",
         CrankTalkSlotDef(CompiledFunction, name),
         CrankTalkSlotDef(CompiledFunction, argumentCount),
+        CrankTalkSlotDef(CompiledFunction, temporaryCount),
         CrankTalkSlotDef(CompiledFunction, nativeEntryPoint),
         CrankTalkSlotDef(CompiledFunction, bytecode),
         CrankTalkSlotDef(CompiledFunction, literalVector),
@@ -689,7 +694,19 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
     context->roots.AnalysisAndBuildContextClass = crank_talk_context_createClassAndMetaclass(context, "AnalysisAndBuildContext", context->roots.ObjectClass, sizeof(crank_talk_AnalysisAndBuildContext_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(AnalysisAndBuildContext, builder),
         NULL);
-    
+
+    // Bytecode assembler
+    context->roots.BytecodeAssemblerClass = crank_talk_context_createClassAndMetaclass(context, "BytecodeAssembler", context->roots.ObjectClass, sizeof(crank_talk_AnalysisAndBuildContext_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(BytecodeAssembler, byteStream),
+        CrankTalkSlotDef(BytecodeAssembler, literals),
+        CrankTalkSlotDef(BytecodeAssembler, temporaryCount),
+        CrankTalkSlotDef(BytecodeAssembler, currentSourcePosition),
+        NULL);
+    context->roots.BytecodeLabelClass = crank_talk_context_createClassAndMetaclass(context, "BytecodeAssembler", context->roots.ObjectClass, sizeof(crank_talk_AnalysisAndBuildContext_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(BytecodeLabel, isDefined),
+        CrankTalkSlotDef(BytecodeLabel, destinationValue),
+        CrankTalkSlotDef(BytecodeLabel, pendingLocations),
+        NULL);
 }
 
 static void 

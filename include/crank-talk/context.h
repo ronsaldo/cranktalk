@@ -114,7 +114,10 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t analyzeAndBuildAssignmentWithValueWithSymbol;
     crank_talk_oop_t lookupSymbolRecursively;
 
+    crank_talk_oop_t hasResultValueSymbol;
     crank_talk_oop_t isTerminatorSymbol;
+    crank_talk_oop_t getBytecodeAssemblyOperandWithSymbol;
+    crank_talk_oop_t emitBytecodeAssemblyWithSymbol;
 
     // Front end classes
     crank_talk_oop_t ParseTreeNodeClass;
@@ -178,6 +181,11 @@ struct crank_talk_VMContextRoots_s
     // Passes
     crank_talk_oop_t AnalysisAndEvaluationContextClass;
     crank_talk_oop_t AnalysisAndBuildContextClass;
+
+    // Bytecode assembler
+    crank_talk_oop_t BytecodeAssemblerClass;
+    crank_talk_oop_t BytecodeLabelClass;
+    
 };
 
 struct crank_talk_VMContext_s
