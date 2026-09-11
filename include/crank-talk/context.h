@@ -110,6 +110,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t analyzeAndBuildWithSymbol;
     crank_talk_oop_t analyzeAndEvaluateIdentifierReferenceWithSymbol;
     crank_talk_oop_t analyzeAndBuildIdentifierReferenceWithSymbol;
+    crank_talk_oop_t analyzeAndBuildAssignmentWithValueWithSymbol;
     crank_talk_oop_t lookupSymbolRecursively;
 
     crank_talk_oop_t isTerminatorSymbol;

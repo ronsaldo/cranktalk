@@ -271,6 +271,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     context->roots.analyzeAndEvaluateIdentifierReferenceWithSymbol = crank_talk_Symbol_internWithCString(context, "analyzeAndEvaluateIdentifierReference:with:");
     context->roots.analyzeAndBuildIdentifierReferenceWithSymbol = crank_talk_Symbol_internWithCString(context, "analyzeAndBuildIdentifierReference:with:");
+    context->roots.analyzeAndBuildAssignmentWithValueWithSymbol = crank_talk_Symbol_internWithCString(context, "analyzeAndBuildAssignment:withValue:with:");
 
     context->roots.lookupSymbolRecursively = crank_talk_Symbol_internWithCString(context, "lookupSymbolRecursively:");
 
