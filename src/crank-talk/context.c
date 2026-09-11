@@ -244,6 +244,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     context->roots.OrderedCollectionClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.SequenceableCollectionClass,      sizeof(crank_talk_OrderedCollection_t),      CrankTalkGCObjectDataTypeOops);
 
+    context->roots.ByteStreamClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_ByteStream_t), CrankTalkGCObjectDataTypeOops);
     context->roots.StringStreamClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_StringStream_t), CrankTalkGCObjectDataTypeOops);
 
     context->roots.ExternalAddressClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_ExternalAddress_t), CrankTalkGCObjectDataTypeBytes);
@@ -413,6 +414,11 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(OrderedCollection, storage),
         NULL);
 
+    crank_talk_context_setClassTypeMetadata(context, context->roots.ByteStreamClass, "ByteStream",
+        CrankTalkSlotDef(ByteStream, size),
+        CrankTalkSlotDef(ByteStream, storage),
+        NULL);
+
     crank_talk_context_setClassTypeMetadata(context, context->roots.StringStreamClass, "StringStream",
         CrankTalkSlotDef(StringStream, size),
         CrankTalkSlotDef(StringStream, storage),
@@ -488,6 +494,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     
     crank_talk_context_createClassTables(context, context->roots.OrderedCollectionClass);
 
+    crank_talk_context_createClassTables(context, context->roots.ByteStreamClass);
     crank_talk_context_createClassTables(context, context->roots.StringStreamClass);
 
     crank_talk_context_createClassTables(context, context->roots.ExternalAddressClass);

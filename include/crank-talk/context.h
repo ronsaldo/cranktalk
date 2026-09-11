@@ -86,6 +86,7 @@ struct crank_talk_VMContextRoots_s
     
     crank_talk_oop_t OrderedCollectionClass;
 
+    crank_talk_oop_t ByteStreamClass;
     crank_talk_oop_t StringStreamClass;
 
     crank_talk_oop_t ExternalAddressClass;

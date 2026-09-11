@@ -4,6 +4,8 @@ set(CrankTalk_Sources
     array.c
     association.c
     behavior.c
+    bytecode.c
+    bytes.c
     context.c
     dictionary.c
     dynarray.c

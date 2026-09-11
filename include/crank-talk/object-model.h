@@ -145,6 +145,7 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
                 typedef struct crank_talk_Symbol_s crank_talk_Symbol_t;
             typedef struct crank_talk_OrderedCollection_s crank_talk_OrderedCollection_t;
 
+    typedef struct crank_talk_ByteStream_s crank_talk_ByteStream_t;
     typedef struct crank_talk_StringStream_s crank_talk_StringStream_t;
 
     typedef struct crank_talk_ExternalAddress_s crank_talk_ExternalAddress_t;
@@ -657,6 +658,13 @@ struct crank_talk_OrderedCollection_s
     crank_talk_SequenceableCollection_t super;
     crank_talk_oop_t size;
     crank_talk_Array_t *storage;
+};
+
+struct crank_talk_ByteStream_s
+{
+    crank_talk_Object_t super;
+    crank_talk_oop_t size;
+    crank_talk_ByteArray_t *storage;
 };
 
 struct crank_talk_StringStream_s
