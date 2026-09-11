@@ -140,7 +140,7 @@ void analysisAndEvaluation_runTests(void)
 
     // Block with argument
     {
-        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x |]");
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x]");
         Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
         crank_talk_Functional_dumpToConsole(context, value);
     }

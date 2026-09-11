@@ -269,6 +269,9 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.analyzeAndEvaluateWithSymbol = crank_talk_Symbol_internWithCString(context, "analyzeAndEvaluateWith:");
     context->roots.analyzeAndBuildWithSymbol = crank_talk_Symbol_internWithCString(context, "analyzeAndBuildWith:");
 
+    context->roots.analyzeAndEvaluateIdentifierReferenceWithSymbol = crank_talk_Symbol_internWithCString(context, "analyzeAndEvaluateIdentifierReference:with:");
+    context->roots.analyzeAndBuildIdentifierReferenceWithSymbol = crank_talk_Symbol_internWithCString(context, "analyzeAndBuildIdentifierReference:with:");
+
     context->roots.lookupSymbolRecursively = crank_talk_Symbol_internWithCString(context, "lookupSymbolRecursively:");
 
     context->roots.isTerminatorSymbol = crank_talk_Symbol_internWithCString(context, "isTerminator");
@@ -587,14 +590,17 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
 
     // Environment
     context->roots.AbstractEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "AbstractEnvironment", context->roots.ObjectClass, sizeof(crank_talk_AbstractEnvironment_t), CrankTalkGCObjectDataTypeOops, NULL);
-    context->roots.EmptyEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "EmptyEnvironment", context->roots.AbstractEnvironmentClass, sizeof(crank_talk_AbstractEnvironment_t), CrankTalkGCObjectDataTypeOops, NULL);
-    context->roots.SystemEnvironmentEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "SystemEnvironmentEnvironment", context->roots.AbstractEnvironmentClass, sizeof(crank_talk_AbstractEnvironment_t), CrankTalkGCObjectDataTypeOops,
+    context->roots.EmptyEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "EmptyEnvironment", context->roots.AbstractEnvironmentClass, sizeof(crank_talk_EmptyEnvironment_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.SystemEnvironmentEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "SystemEnvironmentEnvironment", context->roots.AbstractEnvironmentClass, sizeof(crank_talk_SystemEnvironmentEnvironment_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(SystemEnvironmentEnvironment, parent),
         CrankTalkSlotDef(SystemEnvironmentEnvironment, systemEnvironment),
         NULL);
-    context->roots.LexicalEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "LexicalEnvironment", context->roots.AbstractEnvironmentClass, sizeof(crank_talk_AbstractEnvironment_t), CrankTalkGCObjectDataTypeOops,
+    context->roots.LexicalEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "LexicalEnvironment", context->roots.AbstractEnvironmentClass, sizeof(crank_talk_LexicalEnvironment_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(LexicalEnvironment, parent),
         CrankTalkSlotDef(LexicalEnvironment, symbolTable),
+        NULL);
+    context->roots.FunctionAnalysisEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "FunctionAnalysisEnvironment", context->roots.LexicalEnvironmentClass, sizeof(crank_talk_FunctionAnalysisEnvironment_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(FunctionAnalysisEnvironment, receiverValue),
         NULL);
 
     // HIR
