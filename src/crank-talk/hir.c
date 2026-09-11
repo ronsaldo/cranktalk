@@ -287,6 +287,18 @@ crank_talk_HIRBuilder_return(crank_talk_VMContext_t *context, crank_talk_HIRBuil
 }
 
 CRANK_TALK_API crank_talk_oop_t
+crank_talk_HIRBuilder_send(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *selector, crank_talk_Array_t *receiverWithArguments, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_oop_t instructionValue = CrankAllocateValuesObjectWithClassName(context, HIRSendInstruction);
+    crank_talk_HIRSendInstruction_t *instruction = (crank_talk_HIRSendInstruction_t*)instructionValue;
+    instruction->super.super.super.sourcePosition = sourcePosition;
+    instruction->selector = selector;
+    instruction->receiverWithArguments = receiverWithArguments;
+    crank_talk_HIRBuilder_addInstruction(builder, &instruction->super);
+    return instructionValue;
+}
+
+CRANK_TALK_API crank_talk_oop_t
 crank_talk_HIRBuilder_unreachable(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_oop_t sourcePosition)
 {
     crank_talk_oop_t instructionValue = CrankAllocateValuesObjectWithClassName(context, HIRUnreachableInstruction);
@@ -410,6 +422,30 @@ crank_talk_HIRReturnInstruction_fullPrintOn_primitive(crank_talk_VMContext_t *co
 }
 
 static crank_talk_oop_t
+crank_talk_HIRSendInstruction_fullPrintOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    
+    crank_talk_HIRSendInstruction_t *instruction = (crank_talk_HIRSendInstruction_t*)receiver;
+
+    crank_talk_StringStream_print(context, stream, receiver);
+    crank_talk_StringStream_insertCString(context, stream, " := send ");
+    crank_talk_StringStream_print(context, stream, (crank_talk_oop_t)instruction->selector);
+    size_t messageArgumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)instruction->receiverWithArguments);
+    for(size_t i = 0 ; i < messageArgumentCount; ++i)
+    {
+        crank_talk_StringStream_insertCString(context, stream, ", ");
+        crank_talk_StringStream_print(context, stream, (crank_talk_oop_t)instruction->receiverWithArguments->elements[i]);
+    }
+
+    return receiver;
+}
+
+static crank_talk_oop_t
 crank_talk_HIRUnreachableInstruction_fullPrintOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -501,6 +537,7 @@ crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "fullPrintOn:", 2, crank_talk_HIRAllocaInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "fullPrintOn:", 2, crank_talk_HIRBranchInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRReturnInstructionClass, "fullPrintOn:", 2, crank_talk_HIRReturnInstruction_fullPrintOn_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRSendInstructionClass, "fullPrintOn:", 2, crank_talk_HIRSendInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRUnreachableInstructionClass, "fullPrintOn:", 2, crank_talk_HIRUnreachableInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableLoadInstructionClass, "fullPrintOn:", 2, crank_talk_HIRVariableLoadInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableStoreInstructionClass, "fullPrintOn:", 2, crank_talk_HIRVariableStoreInstruction_fullPrintOn_primitive);

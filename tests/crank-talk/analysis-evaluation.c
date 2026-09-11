@@ -159,6 +159,13 @@ void analysisAndEvaluation_runTests(void)
         crank_talk_Functional_dumpToConsole(context, value);
     }
 
+    // Block message send
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x negated ]");
+        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
+        crank_talk_Functional_dumpToConsole(context, value);
+    }
+
     // ifTrue:ifFalse
     //{
     //    crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "true ifTrue: [1] ifFalse: [2]");

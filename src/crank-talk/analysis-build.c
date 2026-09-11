@@ -1,4 +1,5 @@
 #include "crank-talk/analysis-build.h"
+#include "crank-talk/array.h"
 #include "crank-talk/context.h"
 #include "crank-talk/environment.h"
 #include "crank-talk/errors.h"
@@ -205,6 +206,32 @@ crank_talk_ParseTreeTrueReferenceNode_analyzeAndBuildWith(crank_talk_VMContext_t
     return crank_talk_HIRConstantLiteralValue_create(context, context->roots.trueValue, (crank_talk_oop_t)node->sourcePosition);
 }
 
+static crank_talk_oop_t
+crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    assert(argumentCount >= 2);
+    crank_talk_ParseTreeMessageSendNode_t *node = (crank_talk_ParseTreeMessageSendNode_t*)arguments[0];
+    crank_talk_oop_t buildContextValue = arguments[1];
+    crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)buildContextValue;
+
+    struct {
+        crank_talk_HIRValue_t *selector;
+        crank_talk_HIRValue_t *receiver;
+        crank_talk_Array_t *argumentsWithReceiver;
+    } gcFrame = {0};
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    gcFrame.selector = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->selector, buildContextValue);
+    gcFrame.receiver = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->receiver, buildContextValue);
+    size_t messageArgumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments);
+    gcFrame.argumentsWithReceiver = (crank_talk_Array_t*)crank_talk_Array_create(context, 1 + messageArgumentCount);
+    gcFrame.argumentsWithReceiver->elements[0] = (crank_talk_oop_t)gcFrame.receiver;
+    for(size_t i = 0; i < messageArgumentCount; ++i)
+        gcFrame.argumentsWithReceiver->elements[i + 1] = (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndBuild(context, node->arguments->elements[i], buildContextValue);
+
+    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+    return crank_talk_HIRBuilder_send(context, buildContext->builder, gcFrame.selector, gcFrame.argumentsWithReceiver, (crank_talk_oop_t)node->super.sourcePosition);
+}
 
 static crank_talk_oop_t
 crank_talk_ParseTreeSequenceNodeWithLocals_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
@@ -293,6 +320,7 @@ crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeFalseReferenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeTrueReferenceNode_analyzeAndBuildWith);
 
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeSequenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeVariableDefinitionNode_analyzeAndBuildWith);
 }

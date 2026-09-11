@@ -653,6 +653,10 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
     context->roots.HIRReturnInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRReturnInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRReturnInstruction_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRReturnInstruction, resultValue),
         NULL);
+    context->roots.HIRSendInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRSendInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRSendInstruction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRSendInstruction, selector),
+        CrankTalkSlotDef(HIRSendInstruction, receiverWithArguments),
+        NULL);
     context->roots.HIRUnreachableInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRUnreachableInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRUnreachableInstruction_t), CrankTalkGCObjectDataTypeOops, NULL);
 
     context->roots.HIRVariableLoadInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRVariableLoadInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRVariableLoadInstruction_t), CrankTalkGCObjectDataTypeOops,

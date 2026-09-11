@@ -167,6 +167,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t HIRAllocaInstructionClass;
     crank_talk_oop_t HIRBranchInstructionClass;
     crank_talk_oop_t HIRReturnInstructionClass;
+    crank_talk_oop_t HIRSendInstructionClass;
     crank_talk_oop_t HIRUnreachableInstructionClass;
     crank_talk_oop_t HIRVariableLoadInstructionClass;
     crank_talk_oop_t HIRVariableStoreInstructionClass;
