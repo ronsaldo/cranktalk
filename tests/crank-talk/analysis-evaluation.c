@@ -120,11 +120,11 @@ void analysisAndEvaluation_runTests(void)
     }
 
     // Block with literal
-    //{
-    //    crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[1]");
-    //    Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
-    //    crank_talk_Functional_dumpToConsole(context, value);
-    //}
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[1]");
+        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
+        crank_talk_Functional_dumpToConsole(context, value);
+    }
 
     // ifTrue:ifFalse
     //{
