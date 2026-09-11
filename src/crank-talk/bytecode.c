@@ -170,6 +170,21 @@ crank_talk_BytecodeAssembler_unreachable(crank_talk_VMContext_t *context, crank_
 }
 
 CRANK_TALK_API void
+crank_talk_BytecodeAssembler_alloca(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t resultTemporary, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeAlloca, sourcePosition);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, resultTemporary);
+}
+
+CRANK_TALK_API void
+crank_talk_BytecodeAssembler_loadFromVariable(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t resultTemporary, crank_talk_BytecodeVectorOperand_t variable, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeLoadFromVariable, sourcePosition);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, variable);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, resultTemporary);
+}
+
+CRANK_TALK_API void
 crank_talk_BytecodeAssembler_jump(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeLabel_t *destinationLabel, crank_talk_oop_t sourcePosition)
 {
     crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeJump, sourcePosition);
@@ -181,6 +196,14 @@ crank_talk_BytecodeAssembler_return(crank_talk_VMContext_t *context, crank_talk_
 {
     crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeReturn, sourcePosition);
     crank_talk_BytecodeAssembler_vectorOperand(context, assembler, resultValue);
+}
+
+CRANK_TALK_API void
+crank_talk_BytecodeAssembler_storeInVariable(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t value, crank_talk_BytecodeVectorOperand_t variable, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeStoreInVariable, sourcePosition);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, value);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, variable);
 }
 
 CRANK_TALK_INLINE int16_t
@@ -249,6 +272,13 @@ crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank
             break;
 
         // One operand
+        case CrankTalkOpcodeLoadFromVariable:
+        {
+            printf(" *");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            printf(" -> ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+        }   break;
         case CrankTalkOpcodeJump:
         {
             int16_t offset = crank_talk_BytecodeFunction_fetchInt16(bytecodesSize, &pc, bytecodes);
@@ -259,6 +289,16 @@ crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank
             printf(" ");
             crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
             break;
+
+        // Two operands
+        case CrankTalkOpcodeStoreInVariable:
+            printf(" ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            printf(" -> *");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            break;
+
+        // Unsupported bytecode
         default:
             printf(" Unsupported opcode %d", opcode);
             break;

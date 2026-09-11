@@ -634,6 +634,21 @@ crank_talk_HIRFunctionLocal_getBytecodeAssemblyOperandWith(crank_talk_VMContext_
 }
 
 static crank_talk_oop_t
+crank_talk_HIRAllocaInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount == 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_HIRAllocaInstruction_t *allocaInstruction = (crank_talk_HIRAllocaInstruction_t*)self;
+    crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
+
+    crank_talk_BytecodeAssembler_alloca(context, bytecodeAssembler, crank_talk_oop_decodeSmallInteger(allocaInstruction->super.super.bytecodeVectorIndex), allocaInstruction->super.super.super.sourcePosition);
+    return self;
+}
+
+static crank_talk_oop_t
 crank_talk_HIRBranchInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)context;
@@ -661,6 +676,40 @@ crank_talk_HIRReturnInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t 
 
     crank_talk_BytecodeVectorOperand_t resultValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, returnInstruction->resultValue, (crank_talk_oop_t)bytecodeAssembler);
     crank_talk_BytecodeAssembler_return(context, bytecodeAssembler, resultValue, returnInstruction->super.super.super.sourcePosition);
+    return self;
+}
+
+static crank_talk_oop_t
+crank_talk_HIRVariableLoadInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount == 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_HIRVariableLoadInstruction_t *loadInstruction = (crank_talk_HIRVariableLoadInstruction_t*)self;
+    crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
+
+    crank_talk_BytecodeVectorOperand_t variableValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, loadInstruction->variable, (crank_talk_oop_t)bytecodeAssembler);
+    crank_talk_BytecodeAssembler_loadFromVariable(context, bytecodeAssembler, crank_talk_oop_decodeSmallInteger(loadInstruction->super.super.bytecodeVectorIndex), variableValue, loadInstruction->super.super.super.sourcePosition);
+    return self;
+}
+
+static crank_talk_oop_t
+crank_talk_HIRVariableStoreInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount == 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_HIRVariableStoreInstruction_t *storeInstruction = (crank_talk_HIRVariableStoreInstruction_t*)self;
+    crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
+
+    crank_talk_BytecodeVectorOperand_t variableValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, storeInstruction->variable, (crank_talk_oop_t)bytecodeAssembler);
+    crank_talk_BytecodeVectorOperand_t valueValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, storeInstruction->value, (crank_talk_oop_t)bytecodeAssembler);
+
+    crank_talk_BytecodeAssembler_storeInVariable(context, bytecodeAssembler, valueValue, variableValue, storeInstruction->super.super.super.sourcePosition);
     return self;
 }
 
@@ -694,7 +743,10 @@ crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRConstantLiteralValueClass, "getBytecodeAssemblyOperandWith:", 2, crank_talk_HIRConstantLiteralValue_getBytecodeAssemblyOperandWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRFunctionLocalClass, "getBytecodeAssemblyOperandWith:", 2, crank_talk_HIRFunctionLocal_getBytecodeAssemblyOperandWith);
 
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRAllocaInstruction_emitBytecodeAssemblyWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRBranchInstruction_emitBytecodeAssemblyWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRReturnInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRReturnInstruction_emitBytecodeAssemblyWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableLoadInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRVariableLoadInstruction_emitBytecodeAssemblyWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableStoreInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRVariableStoreInstruction_emitBytecodeAssemblyWith);
 
 }
