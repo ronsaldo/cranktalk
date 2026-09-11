@@ -95,6 +95,7 @@ struct crank_talk_ParseTreeArgumentDefinitionNode_s
 {
     crank_talk_ParseTreeNode_t super;
     crank_talk_Symbol_t *name;
+    crank_talk_oop_t isSelf;
 };
 
 struct crank_talk_ParseTreeBlockNode_s

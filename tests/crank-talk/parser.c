@@ -393,7 +393,7 @@ void parser_runTests(void)
         Assert(crank_talk_isParseTreeMethodDefinitionNode(context, ast));
 
         crank_talk_ParseTreeMethodDefinitionNode_t *methodNode = (crank_talk_ParseTreeMethodDefinitionNode_t*)ast;
-        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)methodNode->arguments));
+        AssertEquals(1, crank_talk_object_getSizeInSlots((crank_talk_oop_t)methodNode->arguments));
 
         Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)methodNode->selector, "unary"));
         Assert(crank_talk_isParseTreeReturnNode(context, (crank_talk_oop_t)methodNode->body));
@@ -405,7 +405,7 @@ void parser_runTests(void)
         Assert(crank_talk_isParseTreeMethodDefinitionNode(context, ast));
 
         crank_talk_ParseTreeMethodDefinitionNode_t *methodNode = (crank_talk_ParseTreeMethodDefinitionNode_t*)ast;
-        AssertEquals(1, crank_talk_object_getSizeInSlots((crank_talk_oop_t)methodNode->arguments));
+        AssertEquals(2, crank_talk_object_getSizeInSlots((crank_talk_oop_t)methodNode->arguments));
 
         Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)methodNode->selector, "+"));
         Assert(crank_talk_isParseTreeReturnNode(context, (crank_talk_oop_t)methodNode->body));
@@ -417,7 +417,7 @@ void parser_runTests(void)
         Assert(crank_talk_isParseTreeMethodDefinitionNode(context, ast));
 
         crank_talk_ParseTreeMethodDefinitionNode_t *methodNode = (crank_talk_ParseTreeMethodDefinitionNode_t*)ast;
-        AssertEquals(2, crank_talk_object_getSizeInSlots((crank_talk_oop_t)methodNode->arguments));
+        AssertEquals(3, crank_talk_object_getSizeInSlots((crank_talk_oop_t)methodNode->arguments));
 
         Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)methodNode->selector, "test:with:"));
         Assert(crank_talk_isParseTreeReturnNode(context, (crank_talk_oop_t)methodNode->body));
@@ -433,7 +433,7 @@ void parser_runTests(void)
         Assert(crank_talk_isParseTreeMethodDefinitionNode(context, (crank_talk_oop_t)addMethod->method));
 
         crank_talk_ParseTreeMethodDefinitionNode_t *methodNode = (crank_talk_ParseTreeMethodDefinitionNode_t*)addMethod->method;
-        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)methodNode->arguments));
+        AssertEquals(1, crank_talk_object_getSizeInSlots((crank_talk_oop_t)methodNode->arguments));
         Assert(crank_talk_Symbol_equalsCString((crank_talk_oop_t)methodNode->selector, "myYourself"));
     }
 

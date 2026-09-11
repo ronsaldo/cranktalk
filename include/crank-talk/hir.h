@@ -56,7 +56,7 @@ struct crank_talk_HIRFunction_s
 struct crank_talk_HIRFunctionLocal_s
 {
     crank_talk_HIRValue_t super;
-    crank_talk_oop_t name;
+    crank_talk_Symbol_t *name;
     crank_talk_oop_t index;
 
     crank_talk_oop_t bytecodeVectorIndex;

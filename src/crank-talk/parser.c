@@ -490,6 +490,7 @@ crank_talk_parseBlockArgument(crank_talk_VMContext_t *context, crank_talk_Parser
     crank_talk_ParseTreeArgumentDefinitionNode_t *argument = (crank_talk_ParseTreeArgumentDefinitionNode_t *)argumentValue;
     argument->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startingPosition);
     argument->name = (crank_talk_Symbol_t*)optionalName;
+    argument->isSelf = crank_talk_oop_fromBoolean(context, false);
     return argumentValue;
 }
 
@@ -556,6 +557,7 @@ crank_talk_parseMethodArgument(crank_talk_VMContext_t *context, crank_talk_Parse
     crank_talk_ParseTreeArgumentDefinitionNode_t *argument = (crank_talk_ParseTreeArgumentDefinitionNode_t*)argumentValue;
     argument->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startingPosition);
     argument->name = (crank_talk_Symbol_t*)crank_talk_Symbol_internWithString(context, tokenString.size, tokenString.text);
+    argument->isSelf = crank_talk_oop_fromBoolean(context, false);
 
     if(crank_talk_oop_decodeSmallInteger(identifierToken->kind) != CrankTalkTokenKindIdentifier)
         return crank_talk_ParserState_expectAddingErrorToNode(context, state, CrankTalkTokenKindIdentifier, argumentValue);
@@ -569,6 +571,16 @@ crank_talk_parseMethodHeader(crank_talk_VMContext_t *context, crank_talk_ParserS
     size_t startingPosition = state->position;
     crank_talk_oop_t arguments = crank_talk_OrderedCollection_create(context);
     crank_talk_oop_t selectorBuilder = crank_talk_StringStream_create(context);
+
+    // Implicit self.
+    {
+        crank_talk_oop_t selfValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeArgumentDefinitionNode);
+        crank_talk_ParseTreeArgumentDefinitionNode_t *self = (crank_talk_ParseTreeArgumentDefinitionNode_t*)selfValue;
+        self->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startingPosition);
+        self->name = (crank_talk_Symbol_t*)crank_talk_Symbol_internWithCString(context, "self");
+        self->isSelf = crank_talk_oop_fromBoolean(context, true);
+        crank_talk_OrderedCollection_add(context, arguments, selfValue);
+    }
 
     crank_talk_TokenKind_t headerTokenKind = crank_talk_ParserState_peekKind(state, 0);
     if(headerTokenKind == CrankTalkTokenKindIdentifier)

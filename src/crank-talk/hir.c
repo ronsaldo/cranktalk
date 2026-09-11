@@ -107,6 +107,7 @@ crank_talk_HIRFunction_dumpToStream(crank_talk_VMContext_t *context, crank_talk_
         {
             crank_talk_StringStream_insertCString(context, stringStream, "  argument ");
             crank_talk_StringStream_print(context, stringStream, arguments[i]);
+            crank_talk_StringStream_insertCString(context, stringStream, "\n");
         }
     }
 
@@ -208,7 +209,7 @@ CRANK_TALK_API crank_talk_HIRBasicBlock_t*
 crank_talk_HIRBasicBlock_createNamed(crank_talk_VMContext_t *context, const char *name)
 {
     crank_talk_HIRBasicBlock_t *basicBlock = crank_talk_HIRBasicBlock_create(context);
-    basicBlock->super.name = crank_talk_Symbol_internWithCString(context, name);
+    basicBlock->super.name = (crank_talk_Symbol_t*)crank_talk_Symbol_internWithCString(context, name);
     return basicBlock;
 }
 
@@ -318,7 +319,7 @@ crank_talk_HIRFunctionLocal_printOn_primitive(crank_talk_VMContext_t *context, c
     if(functionLocal->name)
     {
         crank_talk_StringStream_insertCString(context, stream, "|");
-        crank_talk_StringStream_insertBytesObject(context, stream, functionLocal->name);
+        crank_talk_StringStream_insertBytesObject(context, stream, (crank_talk_oop_t)functionLocal->name);
     }
 
 

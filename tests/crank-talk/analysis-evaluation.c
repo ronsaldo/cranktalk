@@ -124,6 +124,25 @@ void analysisAndEvaluation_runTests(void)
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[1]");
         Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
         crank_talk_Functional_dumpToConsole(context, value);
+
+        value = crank_talk_analyzeAndEvaluateString(context, "[nil]");
+        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
+        crank_talk_Functional_dumpToConsole(context, value);
+
+        value = crank_talk_analyzeAndEvaluateString(context, "[false]");
+        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
+        crank_talk_Functional_dumpToConsole(context, value);
+
+        value = crank_talk_analyzeAndEvaluateString(context, "[true]");
+        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
+        crank_talk_Functional_dumpToConsole(context, value);
+    }
+
+    // Block with argument
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x |]");
+        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
+        crank_talk_Functional_dumpToConsole(context, value);
     }
 
     // ifTrue:ifFalse

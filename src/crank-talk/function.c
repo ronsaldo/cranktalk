@@ -1,5 +1,6 @@
 #include "crank-talk/function.h"
 #include "crank-talk/analysis-build.h"
+#include "crank-talk/array.h"
 #include "crank-talk/context.h"
 #include "crank-talk/environment.h"
 #include "crank-talk/errors.h"
@@ -97,6 +98,27 @@ sysmel_vm_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, cr
 
     // Create the function analysis environment.
     gcFrame.lexicalEnvironment = sysmel_vm_FunctionAnalysisEnvironment_create(context, compiledFunction->definitionEnvironment);
+
+    // Arguments
+    {
+        size_t argumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)compiledFunction->definitionArguments);
+        crank_talk_oop_t *definitionArguments = compiledFunction->definitionArguments->elements;
+
+        hirFunction->arguments = (crank_talk_Array_t*)crank_talk_Array_create(context, argumentCount);
+        crank_talk_oop_t *hirArguments = hirFunction->arguments->elements;
+        for(size_t i = 0; i < argumentCount; ++i)
+        {
+            crank_talk_ParseTreeArgumentDefinitionNode_t *argumentDefinition = (crank_talk_ParseTreeArgumentDefinitionNode_t*)definitionArguments[i];
+            crank_talk_oop_t hirArgumentValue = CrankAllocateValuesObjectWithClassName(context, HIRArgument);
+            hirArguments[i] = hirArgumentValue;
+
+            crank_talk_HIRArgument_t *hirArgument = (crank_talk_HIRArgument_t*)hirArgumentValue;
+            hirArgument->super.super.sourcePosition = (crank_talk_oop_t)argumentDefinition->super.sourcePosition;
+            hirArgument->super.name = argumentDefinition->name;
+
+        }
+
+    }
 
     // Alloca builder
     gcFrame.allocaBlock = crank_talk_HIRBasicBlock_createNamed(context, "alloca");
