@@ -1,6 +1,7 @@
 #include "crank-talk/function.h"
 #include "crank-talk/context.h"
 #include "crank-talk/errors.h"
+#include "crank-talk/hir.h"
 #include "crank-talk/stack-frame.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -71,6 +72,27 @@ sysmel_vm_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, cr
     if(!crank_talk_oop_isNil(compiledFunction->hirFunction))
         return;
 
+    compiledFunction->hirFunction = CrankAllocateValuesObjectWithClassName(context, HIRFunction);
+    crank_talk_HIRFunction_t *hirFunction = (crank_talk_HIRFunction_t*)compiledFunction->hirFunction;
+
+    struct {
+        crank_talk_HIRBasicBlock_t *allocaBlock;
+        crank_talk_HIRBuilder_t *allocaBuilder;
+        crank_talk_HIRBasicBlock_t *entryBlock;
+        crank_talk_HIRBuilder_t *builder;
+    } gcFrame = {0};
+
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    // Alloca builder
+    gcFrame.allocaBlock = crank_talk_HIRBasicBlock_createNamed(context, "alloca");
+    crank_talk_HIRFunction_addBasicBlock(hirFunction, gcFrame.allocaBlock);
+
+    // Entry block and builder
+    gcFrame.entryBlock = crank_talk_HIRBasicBlock_createNamed(context, "entry");
+    crank_talk_HIRFunction_addBasicBlock(hirFunction, gcFrame.entryBlock);
+
+    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
     
 }
 
@@ -87,7 +109,8 @@ static void
 crank_talk_CompiledFunction_dumpToConsole(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction)
 {
     crank_talk_CompiledFunction_ensureAnalysis(context, compiledFunction);
-    printf("Compiled function: TODO dump HIR function\n");
+    if(compiledFunction->hirFunction)
+        crank_talk_HIRFunction_dumpToConsole(context, (crank_talk_HIRFunction_t*)compiledFunction->hirFunction);
 }
 
 static void
