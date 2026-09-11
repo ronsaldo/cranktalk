@@ -654,12 +654,21 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         NULL);
     context->roots.HIRUnreachableInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRUnreachableInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRUnreachableInstruction_t), CrankTalkGCObjectDataTypeOops, NULL);
 
+    context->roots.HIRVariableLoadInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRVariableLoadInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRVariableLoadInstruction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRVariableLoadInstruction, variable),
+        NULL);
+    context->roots.HIRVariableStoreInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRVariableStoreInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRVariableStoreInstruction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRVariableStoreInstruction, variable),
+        CrankTalkSlotDef(HIRVariableStoreInstruction, value),
+        NULL);
+
     context->roots.HIRBuilderClass = crank_talk_context_createClassAndMetaclass(context, "HIRBuilder", context->roots.ObjectClass, sizeof(crank_talk_HIRBuilder_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRBuilder, hirFunction),
         CrankTalkSlotDef(HIRBuilder, basicBlock),
         CrankTalkSlotDef(HIRBuilder, allocaBuilder),
         CrankTalkSlotDef(HIRBuilder, lexicalEnvironment),
         NULL);
+        
 
     // Passes
     context->roots.AnalysisAndEvaluationContextClass = crank_talk_context_createClassAndMetaclass(context, "AnalysisAndEvaluationContext", context->roots.ObjectClass, sizeof(crank_talk_AnalysisAndEvaluationContext_t), CrankTalkGCObjectDataTypeOops,

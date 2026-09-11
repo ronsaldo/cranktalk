@@ -18,6 +18,8 @@ typedef struct crank_talk_HIRFunctionLocal_s crank_talk_HIRFunctionLocal_t;
         typedef struct crank_talk_HIRBranchInstruction_s crank_talk_HIRBranchInstruction_t;
         typedef struct crank_talk_HIRReturnInstruction_s crank_talk_HIRReturnInstruction_t;
         typedef struct crank_talk_HIRUnreachableInstruction_s crank_talk_HIRUnreachableInstruction_t;
+        typedef struct crank_talk_HIRVariableLoadInstruction_s crank_talk_HIRVariableLoadInstruction_t;
+        typedef struct crank_talk_HIRVariableStoreInstruction_s crank_talk_HIRVariableStoreInstruction_t;
 
 typedef struct crank_talk_HIRBuilder_s crank_talk_HIRBuilder_t;
     
@@ -114,6 +116,19 @@ struct crank_talk_HIRUnreachableInstruction_s
     crank_talk_HIRInstruction_t super;
 };
 
+struct crank_talk_HIRVariableLoadInstruction_s
+{
+    crank_talk_HIRInstruction_t super;
+    crank_talk_HIRValue_t *variable;
+};
+
+struct crank_talk_HIRVariableStoreInstruction_s
+{
+    crank_talk_HIRInstruction_t super;
+    crank_talk_HIRValue_t *variable;
+    crank_talk_HIRValue_t *value;
+};
+
 struct crank_talk_HIRBuilder_s
 {
     crank_talk_Object_t super;
@@ -145,5 +160,7 @@ CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_alloca(crank_talk_VMContex
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_branch(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRBasicBlock_t *destination, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_return(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *resultValue, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_unreachable(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_oop_t sourcePosition);
+CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_variableLoad(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *variable, crank_talk_oop_t sourcePosition);
+CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_variableStore(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *variable, crank_talk_HIRValue_t *value, crank_talk_oop_t sourcePosition);
 
 #endif //CRANK_TALK_HIR_H

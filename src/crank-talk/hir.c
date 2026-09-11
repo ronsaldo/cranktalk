@@ -296,6 +296,30 @@ crank_talk_HIRBuilder_unreachable(crank_talk_VMContext_t *context, crank_talk_HI
     return instructionValue;
 }
 
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_HIRBuilder_variableLoad(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *variable, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_oop_t instructionValue = CrankAllocateValuesObjectWithClassName(context, HIRVariableLoadInstruction);
+    crank_talk_HIRVariableLoadInstruction_t *instruction = (crank_talk_HIRVariableLoadInstruction_t*)instructionValue;
+    instruction->super.super.super.sourcePosition = sourcePosition;
+    instruction->variable = variable;
+    crank_talk_HIRBuilder_addInstruction(builder, &instruction->super);
+    return instructionValue;
+}
+
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_HIRBuilder_variableStore(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *variable, crank_talk_HIRValue_t *value, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_oop_t instructionValue = CrankAllocateValuesObjectWithClassName(context, HIRVariableStoreInstruction);
+    crank_talk_HIRVariableStoreInstruction_t *instruction = (crank_talk_HIRVariableStoreInstruction_t*)instructionValue;
+    instruction->super.super.super.sourcePosition = sourcePosition;
+    instruction->variable = variable;
+    instruction->value = value;
+    crank_talk_HIRBuilder_addInstruction(builder, &instruction->super);
+    return instructionValue;
+}
+
+
 static crank_talk_oop_t
 crank_talk_HIRConstantLiteralValue_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
@@ -435,6 +459,22 @@ crank_talk_HIRUnreachableInstruction_isTerminator(crank_talk_VMContext_t *contex
     return crank_talk_oop_fromBoolean(context, true);
 }
 
+static crank_talk_oop_t
+crank_talk_HIRVariableLoadInstruction_fullPrintOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+    
+    crank_talk_HIRVariableLoadInstruction_t *instruction = (crank_talk_HIRVariableLoadInstruction_t *)receiver;
+    crank_talk_StringStream_print(context, stream, receiver);
+    crank_talk_StringStream_insertCString(context, stream, " := variableLoad ");
+    crank_talk_StringStream_print(context, stream, (crank_talk_oop_t)instruction->variable);
+    return receiver;
+}
+
 void
 crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
 {
@@ -445,6 +485,7 @@ crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "fullPrintOn:", 2, crank_talk_HIRBranchInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRReturnInstructionClass, "fullPrintOn:", 2, crank_talk_HIRReturnInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRUnreachableInstructionClass, "fullPrintOn:", 2, crank_talk_HIRUnreachableInstruction_fullPrintOn_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableLoadInstructionClass, "fullPrintOn:", 2, crank_talk_HIRVariableLoadInstruction_fullPrintOn_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRInstructionClass, "isTerminator", 1, crank_talk_HIRInstruction_isTerminator);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "isTerminator", 1, crank_talk_HIRBranchInstruction_isTerminator);
