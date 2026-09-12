@@ -1,6 +1,8 @@
 #include "crank-talk/bytecode.h"
 #include "crank-talk/bytes.h"
 #include "crank-talk/context.h"
+#include "crank-talk/errors.h"
+#include "crank-talk/gc.h"
 #include "crank-talk/ordered-collection.h"
 #include "crank-talk/string.h"
 #include <stdlib.h>
@@ -252,6 +254,158 @@ crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(size_t bytecodesSize, siz
     uint32_t vectorIndex = vectorOperand >> CrankTalkOperandVectorBits;
 
     printf("%s@%d", crank_talk_OperandVectorName_toString(vectorName), vectorIndex);
+}
+
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_vm_BytecodeFunction_apply(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction, crank_talk_BlockClosure_t *closureValue, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    crank_talk_stackFrameBytecodeFunctionActivationRecord_t activationRecord = {
+        .super.type = CrankTalkStackFrameRecordBytecodeFunctionActivationRecord
+    };
+    activationRecord.function = (crank_talk_oop_t)compiledFunction;
+    activationRecord.bytecode = (crank_talk_oop_t)compiledFunction->bytecode;
+
+    activationRecord.literalVector = (crank_talk_oop_t)compiledFunction->literalVector;
+    if(closureValue)
+        activationRecord.captureVector = (crank_talk_oop_t)closureValue->captureVector;
+
+    activationRecord.argumentCount = argumentCount;
+    activationRecord.arguments = arguments;
+
+    activationRecord.temporaryCount = crank_talk_oop_decodeSmallInteger(compiledFunction->temporaryCount);
+    activationRecord.temporaries = alloca(activationRecord.temporaryCount*sizeof(crank_talk_oop_t));
+    memset(activationRecord.temporaries, 0, activationRecord.temporaryCount*sizeof(crank_talk_oop_t));
+
+    crank_talk_stackFrame_pushRecord(&activationRecord.super);
+
+    if(!_setjmp(activationRecord.jmpbuffer))
+        crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(context, &activationRecord);
+
+    crank_talk_stackFrame_popRecord(&activationRecord.super);
+    return activationRecord.result;
+}
+
+
+CRANK_TALK_INLINE crank_talk_oop_t
+crank_talk_BytecodeFunction_fetchVectorOperand(crank_talk_stackFrameBytecodeFunctionActivationRecord_t *activationRecord)
+{
+    size_t bytecodesSize = crank_talk_object_getSizeInBytes(activationRecord->bytecode);
+    uint8_t *bytecodes = crank_talk_oop_getBytesData(activationRecord->bytecode);
+    uint16_t vectorOperand = crank_talk_BytecodeFunction_fetchUInt16(bytecodesSize, &activationRecord->pc, bytecodes);
+    crank_talk_OperandVectorName_t vectorName = vectorOperand & CrankTalkOperandVectorBitMask;
+    uint32_t vectorIndex = vectorOperand >> CrankTalkOperandVectorBits;
+
+    switch (vectorName)
+    {
+    case CrankTalkOperandVectorArguments:
+        assert(vectorIndex < activationRecord->argumentCount);
+        return activationRecord->arguments[vectorIndex];
+    case CrankTalkOperandVectorCaptures:
+        assert(vectorIndex < crank_talk_object_getSizeInSlots(activationRecord->captureVector));
+        return crank_talk_oop_getSlotsData(activationRecord->captureVector)[vectorIndex];
+    case CrankTalkOperandVectorLiteral:
+        assert(vectorIndex < crank_talk_object_getSizeInSlots(activationRecord->literalVector));
+        return crank_talk_oop_getSlotsData(activationRecord->literalVector)[vectorIndex];
+    case CrankTalkOperandVectorTemporary:
+        assert(vectorIndex <= activationRecord->temporaryCount);
+        if(vectorIndex == 0)
+            return crank_talk_oop_nil();
+        return activationRecord->temporaries[vectorIndex - 1];
+
+    default: abort();
+    }
+
+    abort();
+}
+
+CRANK_TALK_INLINE void
+crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(crank_talk_stackFrameBytecodeFunctionActivationRecord_t *activationRecord, crank_talk_oop_t value)
+{
+    size_t bytecodesSize = crank_talk_object_getSizeInBytes(activationRecord->bytecode);
+    uint8_t *bytecodes = crank_talk_oop_getBytesData(activationRecord->bytecode);
+    uint16_t vectorOperand = crank_talk_BytecodeFunction_fetchUInt16(bytecodesSize, &activationRecord->pc, bytecodes);
+    crank_talk_OperandVectorName_t vectorName = vectorOperand & CrankTalkOperandVectorBitMask;
+    uint32_t vectorIndex = vectorOperand >> CrankTalkOperandVectorBits;
+    if((vectorName != CrankTalkOperandVectorTemporary) || (vectorIndex > activationRecord->temporaryCount))
+        crank_talk_error("Expected a valid temporary vector.");
+    if(vectorIndex != 0)
+        activationRecord->temporaries[vectorIndex - 1] = value;
+}
+
+CRANK_TALK_API void
+crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContext_t *context, crank_talk_stackFrameBytecodeFunctionActivationRecord_t *activationRecord)
+{
+    size_t bytecodesSize = crank_talk_object_getSizeInBytes(activationRecord->bytecode);
+    uint8_t *bytecodes = crank_talk_oop_getBytesData(activationRecord->bytecode);
+
+    activationRecord->pc = 0;
+    crank_talk_gc_safepoint(context);
+
+    while(activationRecord->pc < bytecodesSize)
+    {
+        crank_talk_Opcode_t opcode = bytecodes[activationRecord->pc++];
+
+        switch (opcode)
+        {
+        // Zero operands
+        case CrankTalkOpcodeNop:
+            break;
+
+        case CrankTalkOpcodeBreakpoint:
+            crank_talk_error("TODO: breakpoint");
+            break;
+        case CrankTalkOpcodeUnreachable:
+            crank_talk_error("Unreachable reached");
+            break;
+
+        case CrankTalkOpcodeAlloca:
+        {
+            crank_talk_oop_t localVariableValue = CrankAllocateValuesObjectWithClassName(context, LocalVariable);
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, localVariableValue);
+        } break;
+
+        case CrankTalkOpcodeBeginSend:
+            activationRecord->calloutArgumentCount = 0;
+            break;
+
+        // One operands
+        case CrankTalkOpcodeLoadFromVariable:
+        {
+            crank_talk_oop_t variable = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
+            crank_talk_LiteralVariable_t *literalVariable = (crank_talk_LiteralVariable_t *)variable;
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, literalVariable->value);
+        } break;
+        case CrankTalkOpcodeJump:
+        {
+            int16_t offset = crank_talk_BytecodeFunction_fetchInt16(bytecodesSize, &activationRecord->pc, bytecodes);
+            activationRecord->pc += offset;
+            if(offset < 0)
+                crank_talk_gc_safepoint(context);
+        } break;
+        case CrankTalkOpcodeReturn:
+        {
+            activationRecord->result = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
+            crank_talk_gc_safepoint(context);
+            return;
+        } break;
+
+        // Two operands
+        case CrankTalkOpcodeStoreInVariable:
+        {
+            crank_talk_oop_t valueToStore = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
+            crank_talk_oop_t variable = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
+            crank_talk_LiteralVariable_t *literalVariable = (crank_talk_LiteralVariable_t *)variable;
+            literalVariable->value = valueToStore;
+        } break;
+
+        
+        // Unsupported opcode
+        default:
+            crank_talk_errorPrintf(context, "Unsupported opcode %d[%s].", opcode, crank_talk_Opcode_toString(opcode));
+            break;
+        }
+    }
+    abort();
 }
 
 CRANK_TALK_API void

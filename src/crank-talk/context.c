@@ -20,6 +20,7 @@
 void crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerEnvironmentPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerFunctionalPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerHIRPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context);
@@ -715,6 +716,7 @@ crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
     crank_talk_registerAnalysisAndBuildPrimitives(context);
     crank_talk_registerAnalysisAndEvaluationPrimitives(context);
     crank_talk_registerEnvironmentPrimitives(context);
+    crank_talk_registerFunctionalPrimitives(context);
     crank_talk_registerNumbersPrimitives(context);
     crank_talk_registerHIRPrimitives(context);
     crank_talk_registerObjectPrimitives(context);

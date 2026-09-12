@@ -86,6 +86,8 @@ CRANK_TALK_API void crank_talk_BytecodeAssembler_sendMessage(crank_talk_VMContex
 // Two operands
 CRANK_TALK_API void crank_talk_BytecodeAssembler_storeInVariable(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t value, crank_talk_BytecodeVectorOperand_t variable, crank_talk_oop_t sourcePosition);
 
+CRANK_TALK_API crank_talk_oop_t crank_talk_vm_BytecodeFunction_apply(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction, crank_talk_BlockClosure_t *closureValue, size_t argumentCount, crank_talk_oop_t *arguments);
+CRANK_TALK_API void crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContext_t *context, crank_talk_stackFrameBytecodeFunctionActivationRecord_t *activationRecord);
 CRANK_TALK_API void crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction);
 
 #endif //CRANK_TALK_BYTECODE_H

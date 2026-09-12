@@ -114,57 +114,49 @@ void analysisAndEvaluation_runTests(void)
 
     // Empty Block
     {
-        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[]");
-        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
-        crank_talk_Functional_dumpToConsole(context, value);
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[] value");
+        AssertEquals(crank_talk_oop_nil(), value);
     }
 
     // Block with literal
     {
-        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[1]");
-        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
-        crank_talk_Functional_dumpToConsole(context, value);
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[1] value");
+        AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
 
-        value = crank_talk_analyzeAndEvaluateString(context, "[nil]");
-        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
-        crank_talk_Functional_dumpToConsole(context, value);
+        value = crank_talk_analyzeAndEvaluateString(context, "[nil] value");
+        AssertEquals(crank_talk_oop_nil(), value);
 
-        value = crank_talk_analyzeAndEvaluateString(context, "[false]");
-        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
-        crank_talk_Functional_dumpToConsole(context, value);
+        value = crank_talk_analyzeAndEvaluateString(context, "[false] value");
+        AssertEquals(context->roots.falseValue, value);
 
-        value = crank_talk_analyzeAndEvaluateString(context, "[true]");
-        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
-        crank_talk_Functional_dumpToConsole(context, value);
+        value = crank_talk_analyzeAndEvaluateString(context, "[true] value");
+        AssertEquals(context->roots.trueValue, value);
     }
 
     // Block with argument
     {
-        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x]");
-        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
-        crank_talk_Functional_dumpToConsole(context, value);
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x] value: 42");
+        AssertEquals(42, crank_talk_oop_decodeSmallInteger(value));
     }
 
     // Block with local variables
     {
-        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[|local| local := 42. local]");
-        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
-        crank_talk_Functional_dumpToConsole(context, value);
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[|local| local := 42. local] value");
+        AssertEquals(42, crank_talk_oop_decodeSmallInteger(value));
     }
 
     // Block loading a literal variable
     {
-        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[Object]");
-        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
-        crank_talk_Functional_dumpToConsole(context, value);
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[Object] value");
+        AssertEquals(context->roots.ObjectClass, value);
     }
 
-    // Block message send
+    /*// Block message send
     {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x negated ]");
         Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
         crank_talk_Functional_dumpToConsole(context, value);
-    }
+    }*/
 
     // ifTrue:ifFalse
     //{

@@ -6,6 +6,7 @@
 #include "crank-talk/environment.h"
 #include "crank-talk/errors.h"
 #include "crank-talk/hir.h"
+#include "crank-talk/message.h"
 #include "crank-talk/parse-tree.h"
 #include "crank-talk/stack-frame.h"
 #include <stdlib.h>
@@ -22,7 +23,6 @@ crank_talk_CompiledFunction_createForPrimitive(crank_talk_VMContext_t *context, 
     primitiveFunction->argumentCount = crank_talk_oop_encodeSmallInteger(argumentCount);
     primitiveFunction->nativeEntryPoint = entryPointAddress;
     return primitiveFunction; 
-
 }
 
 crank_talk_oop_t
@@ -41,6 +41,8 @@ crank_talk_CompiledFunction_apply(crank_talk_VMContext_t *context, crank_talk_Co
 
     crank_talk_stackFrame_pushRecord(&rootsRecord.super);
 
+    crank_talk_CompiledFunction_ensureAnalysis(context, function);
+
     if(function->nativeEntryPoint)
     {
         crank_talk_CompiledFunctionNativeEntryPoint_t entryPoint = (crank_talk_CompiledFunctionNativeEntryPoint_t)function->nativeEntryPoint->address;
@@ -49,8 +51,9 @@ crank_talk_CompiledFunction_apply(crank_talk_VMContext_t *context, crank_talk_Co
         return result;
     }
 
-    crank_talk_error("TODO: interpreted or lazy definition function.");
-    abort();
+    crank_talk_stackFrame_popRecord(&rootsRecord.super);
+
+    return crank_talk_vm_BytecodeFunction_apply(context, function, closure, argumentCount, arguments);
 }
 
 CRANK_TALK_API crank_talk_oop_t
@@ -243,7 +246,7 @@ crank_talk_CompiledFunction_ensureBytecodeGenerationAnalysis(crank_talk_VMContex
 CRANK_TALK_API void
 crank_talk_CompiledFunction_ensureAnalysis(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction)
 {
-    if(compiledFunction->hirFunction || compiledFunction->bytecode)
+    if(compiledFunction->hirFunction || compiledFunction->bytecode || compiledFunction->nativeEntryPoint)
         return;
 
     crank_talk_CompiledFunction_ensureHIRAnalysis(context, compiledFunction);
@@ -274,5 +277,25 @@ crank_talk_Functional_dumpToConsole(crank_talk_VMContext_t *context, crank_talk_
     else if(crank_talk_oop_isKindOf(context, functional, context->roots.BlockClosureClass))
         crank_talk_BlockClosure_dumpToConsole(context, (crank_talk_BlockClosure_t*)functional);
     else
-        crank_talk_error("Expected a functinal for dumping.");
+        crank_talk_error("Expected a functional for dumping.");
+}
+
+static crank_talk_oop_t
+crank_talk_BlockClosure_value_primitives(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_oop_t self = arguments[0];
+    return crank_talk_apply(context, self, argumentCount - 1, arguments + 1);
+}
+
+void
+crank_talk_registerFunctionalPrimitives(crank_talk_VMContext_t* context)
+{
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "value", 1, crank_talk_BlockClosure_value_primitives);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "value:", 2, crank_talk_BlockClosure_value_primitives);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "value:value:", 3, crank_talk_BlockClosure_value_primitives);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "value:value:value:", 4, crank_talk_BlockClosure_value_primitives);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "value:value:value:value:", 5, crank_talk_BlockClosure_value_primitives);
 }
