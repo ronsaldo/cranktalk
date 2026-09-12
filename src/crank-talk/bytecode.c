@@ -3,6 +3,7 @@
 #include "crank-talk/context.h"
 #include "crank-talk/errors.h"
 #include "crank-talk/gc.h"
+#include "crank-talk/message.h"
 #include "crank-talk/ordered-collection.h"
 #include "crank-talk/string.h"
 #include <stdlib.h>
@@ -387,6 +388,19 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
             activationRecord->result = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
             crank_talk_gc_safepoint(context);
             return;
+        } break;
+
+        case CrankTalkOpcodeCallArgument:
+        {
+            assert(activationRecord->calloutArgumentCount < CRANK_TALK_MAX_CALL_ARGUMENT_COUNT);
+            activationRecord->calloutArguments[activationRecord->calloutArgumentCount++] = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
+        } break;
+        case CrankTalkOpcodeSendMessage:
+        {
+            crank_talk_oop_t selector = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
+            crank_talk_oop_t result = crank_talk_send(context, selector, activationRecord->calloutArgumentCount, activationRecord->calloutArguments);
+            activationRecord->calloutArgumentCount = 0;
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, result);
         } break;
 
         // Two operands

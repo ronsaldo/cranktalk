@@ -151,12 +151,17 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(context->roots.ObjectClass, value);
     }
 
-    /*// Block message send
+    // Block message send
     {
-        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x negated ]");
-        Assert(crank_talk_oop_isKindOf(context, value, context->roots.BlockClosureClass));
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x negated ] value: 42");
+        AssertEquals(-42, crank_talk_oop_decodeSmallInteger(value));
+    }
+
+    // Block message send cascade
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x negated; yourself ]");
         crank_talk_Functional_dumpToConsole(context, value);
-    }*/
+    }
 
     // ifTrue:ifFalse
     //{
