@@ -168,6 +168,11 @@ crank_talk_BytecodeAssembler_unreachable(crank_talk_VMContext_t *context, crank_
 {
     crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeUnreachable, sourcePosition);
 }
+CRANK_TALK_API void
+crank_talk_BytecodeAssembler_beginSend(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeBeginSend, sourcePosition);
+}
 
 CRANK_TALK_API void
 crank_talk_BytecodeAssembler_alloca(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t resultTemporary, crank_talk_oop_t sourcePosition)
@@ -196,6 +201,21 @@ crank_talk_BytecodeAssembler_return(crank_talk_VMContext_t *context, crank_talk_
 {
     crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeReturn, sourcePosition);
     crank_talk_BytecodeAssembler_vectorOperand(context, assembler, resultValue);
+}
+
+CRANK_TALK_API void
+crank_talk_BytecodeAssembler_callArgument(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t argumentValue, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeCallArgument, sourcePosition);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, argumentValue);
+}
+
+CRANK_TALK_API void
+crank_talk_BytecodeAssembler_sendMessage(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t resultTemporary, crank_talk_BytecodeVectorOperand_t selectorValue, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeSendMessage, sourcePosition);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, selectorValue);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, resultTemporary);
 }
 
 CRANK_TALK_API void
@@ -264,6 +284,7 @@ crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank
         case CrankTalkOpcodeNop:
         case CrankTalkOpcodeBreakpoint:
         case CrankTalkOpcodeUnreachable:
+        case CrankTalkOpcodeBeginSend:
             break;
 
         case CrankTalkOpcodeAlloca:
@@ -289,7 +310,17 @@ crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank
             printf(" ");
             crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
             break;
-
+        case CrankTalkOpcodeCallArgument:
+            printf(" ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            break;
+        
+        case CrankTalkOpcodeSendMessage:
+            printf(" ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            printf(" -> ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            break;
         // Two operands
         case CrankTalkOpcodeStoreInVariable:
             printf(" ");
