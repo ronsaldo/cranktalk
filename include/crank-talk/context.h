@@ -119,6 +119,8 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t getBytecodeAssemblyOperandWithSymbol;
     crank_talk_oop_t emitBytecodeAssemblyWithSymbol;
 
+    crank_talk_oop_t valueSymbol;
+
     // Front end classes
     crank_talk_oop_t ParseTreeNodeClass;
     

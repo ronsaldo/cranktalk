@@ -19,6 +19,7 @@
 
 void crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerControlFlowPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerEnvironmentPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerFunctionalPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context);
@@ -282,6 +283,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.isTerminatorSymbol = crank_talk_Symbol_internWithCString(context, "isTerminator");
     context->roots.getBytecodeAssemblyOperandWithSymbol = crank_talk_Symbol_internWithCString(context, "getBytecodeAssemblyOperandWith:");
     context->roots.emitBytecodeAssemblyWithSymbol = crank_talk_Symbol_internWithCString(context, "emitBytecodeAssemblyWith:");
+
+    context->roots.valueSymbol = crank_talk_Symbol_internWithCString(context, "value");
 
     // Field definitions
     crank_talk_context_setClassTypeMetadata(context, context->roots.ProtoObjectClass, "ProtoObject", NULL);
@@ -715,6 +718,7 @@ crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_registerAnalysisAndBuildPrimitives(context);
     crank_talk_registerAnalysisAndEvaluationPrimitives(context);
+    crank_talk_registerControlFlowPrimitives(context);
     crank_talk_registerEnvironmentPrimitives(context);
     crank_talk_registerFunctionalPrimitives(context);
     crank_talk_registerNumbersPrimitives(context);

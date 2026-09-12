@@ -7,6 +7,7 @@ set(CrankTalk_Sources
     bytecode.c
     bytes.c
     context.c
+    control-flow.c
     dictionary.c
     dynarray.c
     environment.c
