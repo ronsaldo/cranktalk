@@ -189,6 +189,18 @@ crank_talk_ParseTree_checkAndPrintErrors(crank_talk_VMContext_t *context, crank_
     return errorCount == 0;
 }
 
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_ParseTreeCascadedMessageNode_asMessageSendWithReceiver(crank_talk_VMContext_t *context, crank_talk_ParseTreeCascadedMessageNode_t *cascadedMessage, crank_talk_oop_t receiver)
+{
+    crank_talk_oop_t messageSendNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeMessageSendNode);
+    crank_talk_ParseTreeMessageSendNode_t *messageSendNode = (crank_talk_ParseTreeMessageSendNode_t *)messageSendNodeValue;
+    messageSendNode->super.sourcePosition = cascadedMessage->super.sourcePosition;
+    messageSendNode->receiver = (crank_talk_ParseTreeNode_t*)receiver;
+    messageSendNode->selector = cascadedMessage->selector;
+    messageSendNode->arguments = cascadedMessage->arguments;
+    return messageSendNodeValue;
+}
+
 static crank_talk_oop_t
 crank_talk_ParseTreeParseErrorNode_traverseAndCollectErrorsInto(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {

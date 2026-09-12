@@ -159,8 +159,8 @@ void analysisAndEvaluation_runTests(void)
 
     // Block message send cascade
     {
-        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x negated; yourself ]");
-        crank_talk_Functional_dumpToConsole(context, value);
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x negated; yourself ] value: 42");
+        AssertEquals(42, crank_talk_oop_decodeSmallInteger(value));
     }
 
     // ifTrue:ifFalse

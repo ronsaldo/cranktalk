@@ -239,18 +239,6 @@ crank_talk_ParseTreeSequenceNodeWithLocals_analyzeAndEvaluateWith(crank_talk_VMC
 }
 
 static crank_talk_oop_t
-crank_talk_ParseTreeCascadedMessageNode_asMessageSendWithReceiver(crank_talk_VMContext_t *context, crank_talk_ParseTreeCascadedMessageNode_t *cascadedMessage, crank_talk_oop_t receiver)
-{
-    crank_talk_oop_t messageSendNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeMessageSendNode);
-    crank_talk_ParseTreeMessageSendNode_t *messageSendNode = (crank_talk_ParseTreeMessageSendNode_t *)messageSendNodeValue;
-    messageSendNode->super.sourcePosition = cascadedMessage->super.sourcePosition;
-    messageSendNode->receiver = (crank_talk_ParseTreeNode_t*)receiver;
-    messageSendNode->selector = cascadedMessage->selector;
-    messageSendNode->arguments = cascadedMessage->arguments;
-    return messageSendNodeValue;
-}
-
-static crank_talk_oop_t
 crank_talk_ParseTreeCascadedMessageNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
