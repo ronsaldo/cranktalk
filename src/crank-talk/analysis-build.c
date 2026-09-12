@@ -9,6 +9,7 @@
 #include "crank-talk/stack-frame.h"
 #include "crank-talk/string.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 CRANK_TALK_API crank_talk_oop_t
 crank_talk_createAnalysisAndBuildContext(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder)
@@ -80,6 +81,56 @@ crank_talk_ParseTreeAssignmentNode_analyzeAndBuildWith(crank_talk_VMContext_t *c
         crank_talk_errorPrintfAtSourcePosition(context, (crank_talk_oop_t)node->super.sourcePosition, "Binding not found for symbol #" CRANK_TALK_STRING_FORMAT, CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)storeIdentifer->symbol));
 
     return crank_talk_send3(context, context->roots.analyzeAndBuildAssignmentWithValueWithSymbol, foundBinding, self, (crank_talk_oop_t)assignedValue, buildContextValue);
+}
+
+static crank_talk_oop_t
+crank_talk_ParseTreeBlockNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t buildContextValue = arguments[1];
+
+    crank_talk_ParseTreeBlockNode_t *node = (crank_talk_ParseTreeBlockNode_t*)self;
+    crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t*)buildContextValue;
+
+        struct {
+        crank_talk_oop_t compiledFunctionValue;
+        crank_talk_oop_t blockClosureValue;
+    } gcFrame = {};
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    // Compile the function
+    gcFrame.compiledFunctionValue = CrankAllocateValuesObjectWithClassName(context, CompiledFunction);
+    crank_talk_CompiledFunction_t *compiledFunction = (crank_talk_CompiledFunction_t*)gcFrame.compiledFunctionValue;
+    compiledFunction->argumentCount = crank_talk_oop_encodeSmallInteger(crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments));
+    compiledFunction->isBlock = crank_talk_oop_fromBoolean(context, true);
+    compiledFunction->definitionEnvironment = buildContext->builder->lexicalEnvironment;
+    compiledFunction->definitionArguments = (crank_talk_Array_t*)node->arguments;
+    compiledFunction->definitionBody = (crank_talk_oop_t)node->body;
+    crank_talk_CompiledFunction_ensureAnalysis(context, compiledFunction);
+
+    crank_talk_HIRFunction_t *hirFunction = (crank_talk_HIRFunction_t *)compiledFunction->hirFunction;
+    size_t captureCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)hirFunction->captures);
+    if(captureCount == 0)
+    {
+        // FIXME: Create a closure with the captured values.
+        // Create the captureless block closure
+        gcFrame.blockClosureValue = CrankAllocateValuesObjectWithClassName(context, BlockClosure);
+        crank_talk_BlockClosure_t *blockClosure = (crank_talk_BlockClosure_t *)gcFrame.blockClosureValue;
+        blockClosure->captureVector = (crank_talk_Array_t*)crank_talk_Array_create(context, 0);
+        blockClosure->function = compiledFunction;
+
+        CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+        return crank_talk_HIRConstantLiteralValue_create(context, gcFrame.blockClosureValue, (crank_talk_oop_t)node->super.sourcePosition);
+    }
+    else
+    {
+        printf("TODO: instantiate the block closure with the captured values\n");
+        abort();
+    }
+
 }
 
 static crank_talk_oop_t
@@ -351,6 +402,7 @@ crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRAllocaInstruction_analyzeAndBuildIdentifierReferenceWith);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeAssignmentNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeAssignmentNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeBlockNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeBlockNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeLiteralNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeNilReferenceNode_analyzeAndBuildWith);

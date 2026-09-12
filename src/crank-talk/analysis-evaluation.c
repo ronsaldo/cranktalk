@@ -3,6 +3,7 @@
 #include "crank-talk/context.h"
 #include "crank-talk/environment.h"
 #include "crank-talk/errors.h"
+#include "crank-talk/hir.h"
 #include "crank-talk/message.h"
 #include "crank-talk/parse-tree.h"
 #include "crank-talk/stack-frame.h"
@@ -112,6 +113,7 @@ crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *con
     crank_talk_CompiledFunction_ensureAnalysis(context, compiledFunction);
 
     // Create the captureless block closure
+    assert(crank_talk_object_getSizeInSlots((crank_talk_oop_t)((crank_talk_HIRFunction_t*)compiledFunction->hirFunction)->captures) == 0);
     gcFrame.blockClosureValue = CrankAllocateValuesObjectWithClassName(context, BlockClosure);
     crank_talk_BlockClosure_t *blockClosure = (crank_talk_BlockClosure_t *)gcFrame.blockClosureValue;
     blockClosure->captureVector = (crank_talk_Array_t*)crank_talk_Array_create(context, 0);
