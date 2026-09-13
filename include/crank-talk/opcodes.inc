@@ -1,6 +1,7 @@
 
 // Zero operands
 CRANK_TALK_OPCODE(Nop)
+CRANK_TALK_OPCODE(BooleanExpected)
 CRANK_TALK_OPCODE(Breakpoint)
 CRANK_TALK_OPCODE(Unreachable)
 CRANK_TALK_OPCODE(BeginSend)
@@ -17,4 +18,9 @@ CRANK_TALK_OPCODE(CallArgument)
 CRANK_TALK_OPCODE(SendMessage)
 
 // Two operands
+CRANK_TALK_OPCODE(JumpIfTrue)
+CRANK_TALK_OPCODE(JumpIfFalse)
+
 CRANK_TALK_OPCODE(StoreInVariable)
+
+CRANK_TALK_OPCODE(Move)

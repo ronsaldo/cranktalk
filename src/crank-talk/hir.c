@@ -799,6 +799,10 @@ crank_talk_HIRConditionalBranchInstruction_emitBytecodeAssemblyWith(crank_talk_V
     crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
 
     // TODO: Implement this
+    crank_talk_BytecodeVectorOperand_t condition = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, branchInstruction->condition, (crank_talk_oop_t)bytecodeAssembler);
+    crank_talk_BytecodeAssembler_jumpIfTrue(context, bytecodeAssembler, condition, (crank_talk_BytecodeLabel_t*)branchInstruction->trueDestination->bytecodeLabel, branchInstruction->super.super.super.sourcePosition);
+    crank_talk_BytecodeAssembler_jumpIfFalse(context, bytecodeAssembler, condition, (crank_talk_BytecodeLabel_t*)branchInstruction->falseDestination->bytecodeLabel, branchInstruction->super.super.super.sourcePosition);
+    crank_talk_BytecodeAssembler_booleanExpected(context, bytecodeAssembler, branchInstruction->super.super.super.sourcePosition);
     return self;
 }
 
@@ -810,8 +814,6 @@ crank_talk_HIRPhiInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *co
     (void)argumentCount;
     assert(argumentCount == 2);
     crank_talk_oop_t self = arguments[0];
-    //crank_talk_HIRConditionalBranchInstruction_t *branchInstruction = (crank_talk_HIRConditionalBranchInstruction_t*)self;
-    //crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
 
     // Nothing is required here.
     return self;
@@ -825,10 +827,13 @@ crank_talk_HIRPhiSourceInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext
     (void)argumentCount;
     assert(argumentCount == 2);
     crank_talk_oop_t self = arguments[0];
-    crank_talk_HIRPhiSourceInstruction_t *phiInstruction = (crank_talk_HIRPhiSourceInstruction_t*)self;
+    crank_talk_HIRPhiSourceInstruction_t *phiSourceInstruction = (crank_talk_HIRPhiSourceInstruction_t*)self;
     crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
 
     // TODO: Move onto the target phi.
+    crank_talk_BytecodeVectorOperand_t sourceValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, phiSourceInstruction->value, (crank_talk_oop_t)bytecodeAssembler);
+    crank_talk_BytecodeVectorOperand_t targetPhi = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, &phiSourceInstruction->targetPhi->super.super.super, (crank_talk_oop_t)bytecodeAssembler);
+    crank_talk_BytecodeAssembler_move(context, bytecodeAssembler, sourceValue, targetPhi, phiSourceInstruction->super.super.super.sourcePosition);
     return self;
 }
 
