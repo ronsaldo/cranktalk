@@ -301,6 +301,96 @@ crank_talk_SmallInteger_add_primitive(crank_talk_VMContext_t *context, crank_tal
 }
 
 static crank_talk_oop_t
+crank_talk_SmallInteger_minus_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    intptr_t value = crank_talk_oop_decodeSmallInteger(self);
+    intptr_t operandValue = crank_talk_oop_decodeSmallInteger(operand);
+    return crank_talk_oop_encodeSmallInteger(value - operandValue);
+}
+
+static crank_talk_oop_t
+crank_talk_SmallInteger_times_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    intptr_t value = crank_talk_oop_decodeSmallInteger(self);
+    intptr_t operandValue = crank_talk_oop_decodeSmallInteger(operand);
+    return crank_talk_oop_encodeSmallInteger(value * operandValue);
+}
+
+static crank_talk_oop_t
+crank_talk_SmallInteger_divide_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    intptr_t value = crank_talk_oop_decodeSmallInteger(self);
+    intptr_t operandValue = crank_talk_oop_decodeSmallInteger(operand);
+    return crank_talk_oop_encodeSmallInteger(value / operandValue);
+}
+
+static crank_talk_oop_t
+crank_talk_SmallInteger_equals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    intptr_t value = crank_talk_oop_decodeSmallInteger(self);
+    intptr_t operandValue = crank_talk_oop_decodeSmallInteger(operand);
+    return crank_talk_oop_fromBoolean(context, value == operandValue);
+}
+
+static crank_talk_oop_t
+crank_talk_SmallInteger_notEquals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    intptr_t value = crank_talk_oop_decodeSmallInteger(self);
+    intptr_t operandValue = crank_talk_oop_decodeSmallInteger(operand);
+    return crank_talk_oop_fromBoolean(context, value != operandValue);
+}
+
+static crank_talk_oop_t
+crank_talk_SmallInteger_lessThan_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    intptr_t value = crank_talk_oop_decodeSmallInteger(self);
+    intptr_t operandValue = crank_talk_oop_decodeSmallInteger(operand);
+    return crank_talk_oop_fromBoolean(context, value < operandValue);
+}
+
+static crank_talk_oop_t
 crank_talk_SmallInteger_lessOrEquals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -313,6 +403,36 @@ crank_talk_SmallInteger_lessOrEquals_primitive(crank_talk_VMContext_t *context, 
     intptr_t value = crank_talk_oop_decodeSmallInteger(self);
     intptr_t operandValue = crank_talk_oop_decodeSmallInteger(operand);
     return crank_talk_oop_fromBoolean(context, value <= operandValue);
+}
+
+static crank_talk_oop_t
+crank_talk_SmallInteger_greaterThan_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    intptr_t value = crank_talk_oop_decodeSmallInteger(self);
+    intptr_t operandValue = crank_talk_oop_decodeSmallInteger(operand);
+    return crank_talk_oop_fromBoolean(context, value > operandValue);
+}
+
+static crank_talk_oop_t
+crank_talk_SmallInteger_greaterOrEquals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+
+    intptr_t value = crank_talk_oop_decodeSmallInteger(self);
+    intptr_t operandValue = crank_talk_oop_decodeSmallInteger(operand);
+    return crank_talk_oop_fromBoolean(context, value >= operandValue);
 }
 
 void
@@ -344,6 +464,14 @@ crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context)
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "negated", 1, crank_talk_SmallInteger_negated_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "+", 2, crank_talk_SmallInteger_add_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "-", 2, crank_talk_SmallInteger_minus_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "*", 2, crank_talk_SmallInteger_times_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "//", 2, crank_talk_SmallInteger_divide_primitive);
 
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "=", 2, crank_talk_SmallInteger_equals_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "~=", 2, crank_talk_SmallInteger_notEquals_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "<", 2, crank_talk_SmallInteger_lessThan_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "<=", 2, crank_talk_SmallInteger_lessOrEquals_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, ">", 2, crank_talk_SmallInteger_greaterThan_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, ">=", 2, crank_talk_SmallInteger_greaterOrEquals_primitive);
 }
