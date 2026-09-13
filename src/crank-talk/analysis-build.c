@@ -29,11 +29,29 @@ crank_talk_ParseTreeAnalyzeAndBuild(crank_talk_VMContext_t *context, crank_talk_
 }
 
 static crank_talk_oop_t
+crank_talk_LiteralVariable_analyzeAndBuildAssignmentWithWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 4);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_ParseTreeAssignmentNode_t *assignmentNode =(crank_talk_ParseTreeAssignmentNode_t*)arguments[1];
+    crank_talk_HIRValue_t *assignedValue = (crank_talk_HIRValue_t*)arguments[2];
+    crank_talk_oop_t buildContextValue = arguments[3];
+
+    crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t*)buildContextValue;
+
+    crank_talk_HIRValue_t *literalVariableValue = (crank_talk_HIRValue_t *)crank_talk_HIRConstantLiteralValue_create(context, self, (crank_talk_oop_t)assignmentNode->super.sourcePosition);
+    crank_talk_HIRBuilder_variableStore(context, buildContext->builder, literalVariableValue, assignedValue, (crank_talk_oop_t)assignmentNode->super.sourcePosition);
+    return (crank_talk_oop_t)assignedValue;
+}
+
+static crank_talk_oop_t
 crank_talk_HIRVariable_analyzeAndBuildAssignmentWithWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
     (void)argumentCount;
-    assert(argumentCount >= 2);
+    assert(argumentCount >= 4);
     crank_talk_oop_t self = arguments[0];
     crank_talk_oop_t assignmentNode = arguments[1];
     crank_talk_oop_t assignedValue = arguments[2];
@@ -48,7 +66,7 @@ crank_talk_HIRAlloca_analyzeAndBuildAssignmentWithWith(crank_talk_VMContext_t *c
 {
     (void)closure;
     (void)argumentCount;
-    assert(argumentCount >= 2);
+    assert(argumentCount >= 4);
     crank_talk_HIRValue_t* self = (crank_talk_HIRValue_t*)arguments[0];
     crank_talk_ParseTreeAssignmentNode_t *assignmentNode =(crank_talk_ParseTreeAssignmentNode_t*)arguments[1];
     crank_talk_HIRValue_t *assignedValue = (crank_talk_HIRValue_t*)arguments[2];
@@ -507,6 +525,7 @@ crank_talk_ParseTreeIfSelectionNode_analyzeAndBuildWith(crank_talk_VMContext_t *
 void
 crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
 {
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.LiteralVariableClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_LiteralVariable_analyzeAndBuildAssignmentWithWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_HIRVariable_analyzeAndBuildAssignmentWithWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_HIRAlloca_analyzeAndBuildAssignmentWithWith);
 

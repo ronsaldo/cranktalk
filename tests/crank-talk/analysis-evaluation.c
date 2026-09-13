@@ -205,6 +205,13 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
     }
 
+    // whileTrue:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "| count | count := 1. [count <= 10] whileTrue: [count := count + 1]. count");
+        //crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "| count | count := 1. [count := count + 1]");
+        //crank_talk_Functional_dumpToConsole(context, value);
+    }
+
     // Block with ifTrue:ifFalse:
     {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x ifTrue: [1] ifFalse: [2]] value: true");
