@@ -463,8 +463,19 @@ crank_talk_ParseTreeCullNodeNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *
     if(blockArgumentCount > cullArgumentCount)
         crank_talk_errorPrintfAtSourcePosition(context, (crank_talk_oop_t)node->super.sourcePosition, "Inlinable block expects %d instead of %d optinal arguments", (int)blockArgumentCount, (int)cullArgumentCount);
 
-    // TODO: set the block arguments.
+    // Set the block arguments.
+    crank_talk_oop_t *blockArguments = blockNode->arguments->elements;
+    crank_talk_oop_t *cullArguments = node->arguments->elements;
+    for(size_t i = 0; i < blockArgumentCount; ++i)
+    {
+        crank_talk_oop_t argumentDefinitionValue = blockArguments[i];
 
+        if(!crank_talk_oop_isKindOf(context, argumentDefinitionValue, context->roots.ParseTreeArgumentDefinitionNodeClass))
+            crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)((crank_talk_ParseTreeNode_t*)argumentDefinitionValue)->sourcePosition, "Expected an argument definition node.");
+
+        crank_talk_ParseTreeArgumentDefinitionNode_t *argumentDefinition = (crank_talk_ParseTreeArgumentDefinitionNode_t*)argumentDefinitionValue;
+        crank_talk_LexicalEnvironment_setNewSymbolBinding(context, evaluationContext->lexicalEnvironment, (crank_talk_oop_t)argumentDefinition->name, cullArguments[i], (crank_talk_oop_t)node->super.sourcePosition);
+    }
    
     // Evaluate the block body
     gcFrame.result = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)blockNode->body, evaluationContextValue);
