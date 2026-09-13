@@ -163,6 +163,12 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(42, crank_talk_oop_decodeSmallInteger(value));
     }
 
+    // Block with yourself:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x yourself] value: 42");
+        AssertEquals(42, crank_talk_oop_decodeSmallInteger(value));
+    }
+
     // ifTrue:ifFalse:
     {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "true ifTrue: [1] ifFalse: [2]");
@@ -214,6 +220,24 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(2, crank_talk_oop_decodeSmallInteger(value));
 
         value = crank_talk_analyzeAndEvaluateString(context, "[:x | x ifFalse: [1] ifTrue: [2]] value: false");
+        AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
+    }
+
+    // Block with ifTrue:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x ifTrue: [1]] value: true");
+        AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
+
+        value = crank_talk_analyzeAndEvaluateString(context, "[:x | x ifTrue: [1]] value: false");
+        AssertEquals(crank_talk_oop_nil(), value);
+    }
+
+    // Block with ifFalse:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x ifFalse: [1]] value: true");
+        AssertEquals(crank_talk_oop_nil(), value);
+
+        value = crank_talk_analyzeAndEvaluateString(context, "[:x | x ifFalse: [1]] value: false");
         AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
     }
 
