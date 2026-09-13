@@ -3,6 +3,26 @@
 #include <stdlib.h>
 
 static crank_talk_oop_t
+crank_talk_True_not_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    return context->roots.falseValue;
+}
+
+static crank_talk_oop_t
+crank_talk_False_not_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    return context->roots.trueValue;
+}
+
+static crank_talk_oop_t
 crank_talk_True_ifTrueIfFalse_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -158,6 +178,9 @@ crank_talk_BlockClosure_whileNotNilWith_primitive(crank_talk_VMContext_t *contex
 void
 crank_talk_registerControlFlowPrimitives(crank_talk_VMContext_t* context)
 {
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.TrueClass, "not", 1, crank_talk_True_not_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FalseClass, "not", 1, crank_talk_False_not_primitive);
+
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.TrueClass, "ifTrue:ifFalse:", 3, crank_talk_True_ifTrueIfFalse_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.TrueClass, "ifFalse:ifTrue:", 3, crank_talk_True_ifFalseIfTrue_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.TrueClass, "ifTrue:", 2, crank_talk_True_ifTrue_primitive);

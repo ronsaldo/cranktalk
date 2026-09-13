@@ -169,6 +169,15 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(42, crank_talk_oop_decodeSmallInteger(value));
     }
 
+    // not
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "true not");
+        AssertEquals(context->roots.falseValue, value);
+
+        value = crank_talk_analyzeAndEvaluateString(context, "false not");
+        AssertEquals(context->roots.trueValue, value);
+    }
+
     // ifTrue:ifFalse:
     {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "true ifTrue: [1] ifFalse: [2]");

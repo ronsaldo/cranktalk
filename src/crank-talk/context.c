@@ -618,6 +618,14 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(ParseTreeIfSelectionNode, trueExpression),
         CrankTalkSlotDef(ParseTreeIfSelectionNode, falseExpression),
         NULL);
+    context->roots.ParseTreeWhileNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeWhileNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeWhileNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeWhileNode, condition),
+        CrankTalkSlotDef(ParseTreeWhileNode, bodyExpression),
+        NULL);
+    context->roots.ParseTreeDoWhileNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeDoWhileNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeDoWhileNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeDoWhileNode, bodyExpression),
+        CrankTalkSlotDef(ParseTreeDoWhileNode, condition),
+        NULL);
 
     // Environment
     context->roots.AbstractEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "AbstractEnvironment", context->roots.ObjectClass, sizeof(crank_talk_AbstractEnvironment_t), CrankTalkGCObjectDataTypeOops, NULL);

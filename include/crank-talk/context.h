@@ -156,6 +156,8 @@ struct crank_talk_VMContextRoots_s
 
     crank_talk_oop_t ParseTreeCullBlockNodeClass;
     crank_talk_oop_t ParseTreeIfSelectionNodeClass;
+    crank_talk_oop_t ParseTreeWhileNodeClass;
+    crank_talk_oop_t ParseTreeDoWhileNodeClass;
 
     // Environment
     crank_talk_oop_t AbstractEnvironmentClass;

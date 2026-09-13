@@ -107,6 +107,39 @@ crank_talk_MessageMacro_ifFalse(crank_talk_VMContext_t *context, crank_talk_oop_
     return ifSelectionNodeValue;
 }
 
+static crank_talk_oop_t
+crank_talk_MessageMacro_whileTrue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_ParseTreeMessageSendNode_t *sendNode = (crank_talk_ParseTreeMessageSendNode_t *)arguments[0];
+    assert(crank_talk_object_getSizeInSlots((crank_talk_oop_t)sendNode->arguments) == 0);
+
+    crank_talk_oop_t whileNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeWhileNode);
+    crank_talk_ParseTreeWhileNode_t *whileNode = (crank_talk_ParseTreeWhileNode_t *)whileNodeValue;
+    whileNode->super.sourcePosition = sendNode->super.sourcePosition;
+    whileNode->condition = crank_talk_ParseTree_addEmptyCullBlockNode(context, (crank_talk_ParseTreeNode_t*)sendNode->receiver);
+    return whileNodeValue;
+}
+
+static crank_talk_oop_t
+crank_talk_MessageMacro_whileTrueWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_ParseTreeMessageSendNode_t *sendNode = (crank_talk_ParseTreeMessageSendNode_t *)arguments[0];
+    assert(crank_talk_object_getSizeInSlots((crank_talk_oop_t)sendNode->arguments) == 1);
+
+    crank_talk_oop_t whileNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeWhileNode);
+    crank_talk_ParseTreeWhileNode_t *whileNode = (crank_talk_ParseTreeWhileNode_t *)whileNodeValue;
+    whileNode->super.sourcePosition = sendNode->super.sourcePosition;
+    whileNode->condition = crank_talk_ParseTree_addEmptyCullBlockNode(context, (crank_talk_ParseTreeNode_t*)sendNode->receiver);
+    whileNode->bodyExpression = crank_talk_ParseTree_addEmptyCullBlockNode(context, (crank_talk_ParseTreeNode_t*)sendNode->arguments->elements[0]);
+    return whileNodeValue;
+}
+
 void crank_talk_registerMacrosPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_createAndSetMessageMacro(context, "yourself", crank_talk_MessageMacro_yourself);
@@ -114,4 +147,7 @@ void crank_talk_registerMacrosPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetMessageMacro(context, "ifFalse:ifTrue:", crank_talk_MessageMacro_ifFalseIfTrue);
     crank_talk_createAndSetMessageMacro(context, "ifTrue:", crank_talk_MessageMacro_ifTrue);
     crank_talk_createAndSetMessageMacro(context, "ifFalse:", crank_talk_MessageMacro_ifFalse);
+
+    crank_talk_createAndSetMessageMacro(context, "whileTrue", crank_talk_MessageMacro_whileTrue);
+    crank_talk_createAndSetMessageMacro(context, "whileTrue:", crank_talk_MessageMacro_whileTrueWith);
 }

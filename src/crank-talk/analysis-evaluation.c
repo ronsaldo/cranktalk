@@ -519,6 +519,26 @@ crank_talk_ParseTreeIfSelectionNode_analyzeAndEvaluateWith(crank_talk_VMContext_
     }
 }
 
+static crank_talk_oop_t
+crank_talk_ParseTreeWhileNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t evaluationContextValue = arguments[1];
+
+    crank_talk_ParseTreeWhileNode_t *node = (crank_talk_ParseTreeWhileNode_t*)self;
+
+    while(!node->condition || crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->condition, evaluationContextValue) == context->roots.trueValue)
+    {
+        if(node->bodyExpression)
+            crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->bodyExpression, evaluationContextValue);
+    }
+
+    return crank_talk_oop_nil();
+}
+
 void
 crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context)
 {
@@ -541,4 +561,5 @@ crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* conte
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeCullBlockNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeCullNodeNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIfSelectionNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeIfSelectionNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeWhileNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeWhileNode_analyzeAndEvaluateWith);
 }
