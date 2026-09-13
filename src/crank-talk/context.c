@@ -680,6 +680,18 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
     context->roots.HIRBranchInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRBranchInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRBranchInstruction_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRBranchInstruction, destination),
         NULL);
+    context->roots.HIRConditionalBranchInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRConditionalBranchInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRConditionalBranchInstruction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRConditionalBranchInstruction, condition),
+        CrankTalkSlotDef(HIRConditionalBranchInstruction, trueDestination),
+        CrankTalkSlotDef(HIRConditionalBranchInstruction, falseDestination),
+        NULL);
+    context->roots.HIRPhiInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRPhiInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRPhiInstruction_t), CrankTalkGCObjectDataTypeOops,
+        NULL);
+    context->roots.HIRPhiSourceInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRPhiSourceInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRPhiSourceInstruction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRPhiSourceInstruction, targetPhi),
+        CrankTalkSlotDef(HIRPhiSourceInstruction, value),
+        NULL);
+
     context->roots.HIRReturnInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRReturnInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRReturnInstruction_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRReturnInstruction, resultValue),
         NULL);

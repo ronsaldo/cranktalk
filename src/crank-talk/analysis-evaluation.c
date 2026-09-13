@@ -450,7 +450,7 @@ crank_talk_ParseTreeCullNodeNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *
     gcFrame.oldLexicalEnvironment = evaluationContext->lexicalEnvironment;
     evaluationContext->lexicalEnvironment = crank_talk_LexicalEnvironment_create(context, evaluationContext->lexicalEnvironment);
 
-    // Make sure we have an inlinanble block
+    // Make sure we have an inlinable block
     crank_talk_ParseTreeCullBlockNode_t *node = (crank_talk_ParseTreeCullBlockNode_t*)self;
     if(!crank_talk_oop_isKindOf(context, (crank_talk_oop_t)node->blockExpression, context->roots.ParseTreeBlockNodeClass))
         crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->blockExpression->sourcePosition, "Expected an inlinable block expression.");

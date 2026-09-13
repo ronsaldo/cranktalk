@@ -181,10 +181,10 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
     }
 
-    /*{
+    {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x ifTrue: [1] ifFalse: [2]]");
         crank_talk_Functional_dumpToConsole(context, value);
-    }*/
+    }
     /*// Block with ifTrue:ifFalse:
     {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x ifTrue: [1] ifFalse: [2]] value: true");
