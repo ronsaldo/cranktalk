@@ -121,6 +121,9 @@ struct crank_talk_VMContextRoots_s
 
     crank_talk_oop_t valueSymbol;
 
+    // Message send macro dictionary.
+    crank_talk_oop_t messageSendMacroDictionary;
+
     // Front end classes
     crank_talk_oop_t ParseTreeNodeClass;
     
@@ -150,6 +153,9 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t ParseTreeMethodDefinitionNodeClass;
     crank_talk_oop_t ParseTreePragmaNodeClass;
     crank_talk_oop_t ParseTreeVariableDefinitionNodeClass;
+
+    crank_talk_oop_t ParseTreeCullBlockNodeClass;
+    crank_talk_oop_t ParseTreeIfSelectionNodeClass;
 
     // Environment
     crank_talk_oop_t AbstractEnvironmentClass;

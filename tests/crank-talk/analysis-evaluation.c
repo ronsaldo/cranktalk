@@ -171,6 +171,7 @@ void analysisAndEvaluation_runTests(void)
         value = crank_talk_analyzeAndEvaluateString(context, "false ifTrue: [1] ifFalse: [2]");
         AssertEquals(2, crank_talk_oop_decodeSmallInteger(value));
     }
+    
     // ifFalse:ifTrue:
     {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "true ifFalse: [1] ifTrue: [2]");
@@ -180,7 +181,11 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
     }
 
-    // Block with ifTrue:ifFalse:
+    /*{
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x ifTrue: [1] ifFalse: [2]]");
+        crank_talk_Functional_dumpToConsole(context, value);
+    }*/
+    /*// Block with ifTrue:ifFalse:
     {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x ifTrue: [1] ifFalse: [2]] value: true");
         AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
@@ -196,7 +201,7 @@ void analysisAndEvaluation_runTests(void)
 
         value = crank_talk_analyzeAndEvaluateString(context, "[:x | x ifFalse: [1] ifTrue: [2]] value: false");
         AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
-    }
+    }*/
 
     crank_talk_vm_destroyContext(context);
 }

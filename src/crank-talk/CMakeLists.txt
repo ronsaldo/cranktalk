@@ -17,6 +17,7 @@ set(CrankTalk_Sources
     gc.c
     heap.c
     hir.c
+    macros.c
     message.c
     numbers.c
     object-model.c

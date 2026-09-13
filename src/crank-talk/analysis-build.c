@@ -1,8 +1,10 @@
 #include "crank-talk/analysis-build.h"
 #include "crank-talk/array.h"
 #include "crank-talk/context.h"
+#include "crank-talk/dictionary.h"
 #include "crank-talk/environment.h"
 #include "crank-talk/errors.h"
+#include "crank-talk/function.h"
 #include "crank-talk/hir.h"
 #include "crank-talk/message.h"
 #include "crank-talk/parse-tree.h"
@@ -304,12 +306,26 @@ crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith(crank_talk_VMContext_t *
 
     struct {
         crank_talk_HIRValue_t *selector;
+        crank_talk_oop_t selectorValue;
         crank_talk_HIRValue_t *receiver;
         crank_talk_Array_t *argumentsWithReceiver;
     } gcFrame = {0};
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
 
+    // Fetch the selector value.
     gcFrame.selector = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->selector, buildContextValue);
+    assert(crank_talk_oop_isKindOf(context, (crank_talk_oop_t)gcFrame.selector, context->roots.HIRConstantLiteralValueClass));
+    gcFrame.selectorValue = ((crank_talk_HIRConstantLiteralValue_t*)gcFrame.selector)->value;
+
+    // Is this a macro message send?
+    if(crank_talk_IdentityDictionary_includesKey(context->roots.messageSendMacroDictionary, gcFrame.selectorValue))
+    {
+        crank_talk_oop_t messageMacro = crank_talk_IdentityDictionary_at(context->roots.messageSendMacroDictionary, gcFrame.selectorValue);
+        crank_talk_oop_t expandedMacro = crank_talk_apply1(context, messageMacro, arguments[0]);
+        CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+        return (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndBuild(context, expandedMacro, buildContextValue);
+    }
+
     gcFrame.receiver = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->receiver, buildContextValue);
     size_t messageArgumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments);
     gcFrame.argumentsWithReceiver = (crank_talk_Array_t*)crank_talk_Array_create(context, 1 + messageArgumentCount);

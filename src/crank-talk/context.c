@@ -22,6 +22,7 @@ void crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* 
 void crank_talk_registerControlFlowPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerEnvironmentPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerFunctionalPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerMacrosPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerHIRPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context);
@@ -285,6 +286,9 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.emitBytecodeAssemblyWithSymbol = crank_talk_Symbol_internWithCString(context, "emitBytecodeAssemblyWith:");
 
     context->roots.valueSymbol = crank_talk_Symbol_internWithCString(context, "value");
+
+    // Message send macro dictionary.
+    context->roots.messageSendMacroDictionary = crank_talk_IdentityDictionary_create(context);
 
     // Field definitions
     crank_talk_context_setClassTypeMetadata(context, context->roots.ProtoObjectClass, "ProtoObject", NULL);
@@ -596,13 +600,23 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(ParseTreeMethodDefinitionNode, body),
         NULL);
 
-    context->roots.ParseTreePragmaNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreePragmaNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeMethodDefinitionNode_t), CrankTalkGCObjectDataTypeOops,
+    context->roots.ParseTreePragmaNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreePragmaNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreePragmaNode_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(ParseTreePragmaNode, selector),
         CrankTalkSlotDef(ParseTreePragmaNode, arguments),
         NULL);
 
-    context->roots.ParseTreeVariableDefinitionNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeVariableDefinitionNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeMethodDefinitionNode_t), CrankTalkGCObjectDataTypeOops,
+    context->roots.ParseTreeVariableDefinitionNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeVariableDefinitionNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeVariableDefinitionNode_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(ParseTreeVariableDefinitionNode, name),
+        NULL);
+
+    context->roots.ParseTreeCullBlockNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeCullBlockNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeCullBlockNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeCullBlockNode, blockExpression),
+        CrankTalkSlotDef(ParseTreeCullBlockNode, arguments),
+        NULL);
+    context->roots.ParseTreeIfSelectionNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeIfSelectionNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeIfSelectionNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeIfSelectionNode, condition),
+        CrankTalkSlotDef(ParseTreeIfSelectionNode, trueExpression),
+        CrankTalkSlotDef(ParseTreeIfSelectionNode, falseExpression),
         NULL);
 
     // Environment
@@ -721,6 +735,7 @@ crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
     crank_talk_registerControlFlowPrimitives(context);
     crank_talk_registerEnvironmentPrimitives(context);
     crank_talk_registerFunctionalPrimitives(context);
+    crank_talk_registerMacrosPrimitives(context);
     crank_talk_registerNumbersPrimitives(context);
     crank_talk_registerHIRPrimitives(context);
     crank_talk_registerObjectPrimitives(context);

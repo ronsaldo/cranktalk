@@ -1,6 +1,7 @@
 #include "crank-talk/analysis-evaluation.h"
 #include "crank-talk/array.h"
 #include "crank-talk/context.h"
+#include "crank-talk/dictionary.h"
 #include "crank-talk/environment.h"
 #include "crank-talk/errors.h"
 #include "crank-talk/hir.h"
@@ -320,6 +321,15 @@ crank_talk_ParseTreeMessageSendNode_analyzeAndEvaluateWith(crank_talk_VMContext_
     if(!crank_talk_oop_isKindOf(context, gcFrame.selector, context->roots.SymbolClass))
         crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->selector->sourcePosition, "Expected a symbol as the message selector.");
 
+    // Is this a macro message send?
+    if(crank_talk_IdentityDictionary_includesKey(context->roots.messageSendMacroDictionary, gcFrame.selector))
+    {
+        crank_talk_oop_t messageMacro = crank_talk_IdentityDictionary_at(context->roots.messageSendMacroDictionary, gcFrame.selector);
+        crank_talk_oop_t expandedMacro = crank_talk_apply1(context, messageMacro, arguments[0]);
+        CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+        return (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndEvaluate(context, expandedMacro, evaluationContext);
+    }
+
     size_t messageArgumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments);
     assert(messageArgumentCount < CRANK_TALK_MAX_CALL_ARGUMENT_COUNT);
     gcFrame.callArguments[0] = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->receiver, evaluationContext);
@@ -417,6 +427,87 @@ crank_talk_ParseTreeVariableDefinitionNode_analyzeAndEvaluateWith(crank_talk_VMC
     return crank_talk_oop_nil();
 }
 
+static crank_talk_oop_t
+crank_talk_ParseTreeCullNodeNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t evaluationContextValue = arguments[1];
+
+    crank_talk_AnalysisAndEvaluationContext_t *evaluationContext = (crank_talk_AnalysisAndEvaluationContext_t*)evaluationContextValue;
+
+    struct {
+        crank_talk_oop_t oldLexicalEnvironment;
+        crank_talk_oop_t result;
+    } gcFrame = {
+        .oldLexicalEnvironment = evaluationContext->lexicalEnvironment,
+        .result = crank_talk_oop_nil()
+    };
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    gcFrame.oldLexicalEnvironment = evaluationContext->lexicalEnvironment;
+    evaluationContext->lexicalEnvironment = crank_talk_LexicalEnvironment_create(context, evaluationContext->lexicalEnvironment);
+
+    // Make sure we have an inlinanble block
+    crank_talk_ParseTreeCullBlockNode_t *node = (crank_talk_ParseTreeCullBlockNode_t*)self;
+    if(!crank_talk_oop_isKindOf(context, (crank_talk_oop_t)node->blockExpression, context->roots.ParseTreeBlockNodeClass))
+        crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->blockExpression->sourcePosition, "Expected an inlinable block expression.");
+
+    crank_talk_ParseTreeBlockNode_t *blockNode = (crank_talk_ParseTreeBlockNode_t*)node->blockExpression;
+
+    // Check the block argument counts.
+    size_t blockArgumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)blockNode->arguments);
+    size_t cullArgumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments);
+    if(blockArgumentCount > cullArgumentCount)
+        crank_talk_errorPrintfAtSourcePosition(context, (crank_talk_oop_t)node->super.sourcePosition, "Inlinable block expects %d instead of %d optinal arguments", (int)blockArgumentCount, (int)cullArgumentCount);
+
+    // TODO: set the block arguments.
+
+   
+    // Evaluate the block body
+    gcFrame.result = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)blockNode->body, evaluationContextValue);
+
+    // Finish
+    evaluationContext->lexicalEnvironment = gcFrame.oldLexicalEnvironment;
+    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+    return gcFrame.result;
+}
+
+static crank_talk_oop_t
+crank_talk_ParseTreeIfSelectionNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t evaluationContextValue = arguments[1];
+
+    crank_talk_ParseTreeIfSelectionNode_t *node = (crank_talk_ParseTreeIfSelectionNode_t*)self;
+
+    crank_talk_oop_t condition = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->condition, evaluationContextValue);
+    if(condition == context->roots.trueValue)
+    {
+        if(node->trueExpression)
+            return crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->trueExpression, evaluationContextValue);
+        else
+            return crank_talk_oop_nil();
+    }
+    else if(condition == context->roots.falseValue)
+    {
+        if(node->falseExpression)
+            return crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->falseExpression, evaluationContextValue);
+        else
+            return crank_talk_oop_nil();
+    }
+    else
+    {
+        crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->condition->sourcePosition, "If condition must be true or false.");
+        abort();
+    }
+}
+
 void
 crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context)
 {
@@ -436,4 +527,7 @@ crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* conte
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeArrayNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeArrayNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeReturnNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeReturnNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeVariableDefinitionNode_analyzeAndEvaluateWith);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeCullBlockNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeCullNodeNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIfSelectionNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeIfSelectionNode_analyzeAndEvaluateWith);
 }
