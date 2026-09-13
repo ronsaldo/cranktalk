@@ -1,5 +1,6 @@
 #include "crank-talk/object-model.h"
 #include "crank-talk/context.h"
+#include "crank-talk/errors.h"
 #include "crank-talk/message.h"
 #include <stdlib.h>
 
@@ -103,7 +104,7 @@ crank_talk_Object_species_primitive(crank_talk_VMContext_t *context, crank_talk_
 }
 
 static crank_talk_oop_t
-crank_talk_Object_yourself_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+crank_talk_ProtoObject_yourself_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)context;
     (void)closure;
@@ -112,10 +113,100 @@ crank_talk_Object_yourself_primitive(crank_talk_VMContext_t *context, crank_talk
     return arguments[0];
 }
 
+static crank_talk_oop_t
+crank_talk_ProtoObject_identityEquals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 1);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+    return crank_talk_oop_fromBoolean(context, self == operand);
+}
+
+static crank_talk_oop_t
+crank_talk_ProtoObject_identityNotEquals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 1);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+    return crank_talk_oop_fromBoolean(context, self != operand);
+}
+
+static crank_talk_oop_t
+crank_talk_ProtoObject_identityHash_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_oop_t self = arguments[0];
+    return crank_talk_oop_encodeSmallInteger(crank_talk_oop_getIdentityHash(self));
+}
+
+static crank_talk_oop_t
+crank_talk_Object_equals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 1);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+    return crank_talk_oop_fromBoolean(context, self == operand);
+}
+
+static crank_talk_oop_t
+crank_talk_Object_notEquals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 1);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t operand = arguments[1];
+    crank_talk_oop_t isEquals = crank_talk_send1(context, context->roots.equalsSymbol, self, operand);
+    if(isEquals == context->roots.trueValue)
+    {
+        return context->roots.falseValue;
+    }
+    else if(isEquals == context->roots.falseValue)
+    {
+        return context->roots.trueValue;
+    }
+    else
+    {
+        crank_talk_error("Expected a boolean result for ~=.");
+        abort();
+    }
+}
+
+static crank_talk_oop_t
+crank_talk_Object_hash_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_oop_t self = arguments[0];
+    return crank_talk_oop_encodeSmallInteger(crank_talk_oop_getIdentityHash(self));
+}
+
 void
 crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "class", 1, crank_talk_ProtoObject_class_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "==", 2, crank_talk_ProtoObject_identityEquals_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "~~", 2, crank_talk_ProtoObject_identityNotEquals_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "identityHash", 2, crank_talk_ProtoObject_identityHash_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "yourself", 1, crank_talk_ProtoObject_yourself_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "=", 2, crank_talk_Object_equals_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "~=", 2, crank_talk_Object_notEquals_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "hash", 2, crank_talk_Object_hash_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "species", 1, crank_talk_Object_species_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "yourself", 1, crank_talk_Object_yourself_primitive);
 }

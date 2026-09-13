@@ -29,7 +29,7 @@ crank_talk_ParseTree_addNotMessage(crank_talk_VMContext_t *context, crank_talk_P
 {
     crank_talk_ParseTreeLiteralNode_t *selector = (crank_talk_ParseTreeLiteralNode_t *)CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
     selector->super.sourcePosition = expression->sourcePosition;
-    selector->value = crank_talk_Symbol_internWithCString(context, "not");
+    selector->value = context->roots.notSymbol;
 
     crank_talk_ParseTreeMessageSendNode_t *notSend = (crank_talk_ParseTreeMessageSendNode_t *)CrankAllocateValuesObjectWithClassName(context, ParseTreeMessageSendNode);
     notSend->super.sourcePosition = expression->sourcePosition;

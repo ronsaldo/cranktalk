@@ -121,6 +121,11 @@ struct crank_talk_VMContextRoots_s
 
     crank_talk_oop_t valueSymbol;
 
+    crank_talk_oop_t notSymbol;
+    crank_talk_oop_t equalsSymbol;
+    crank_talk_oop_t identityEqualsSymbol;
+    crank_talk_oop_t identityNotEqualsSymbol;
+
     // Message send macro dictionary.
     crank_talk_oop_t messageSendMacroDictionary;
 
