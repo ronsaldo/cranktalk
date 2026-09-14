@@ -351,7 +351,7 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(11, crank_talk_oop_decodeSmallInteger(value));
     }
 
-    // Block with doWhileFalse:
+    // Block with block:
     {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "([:x | [:y | x + y]] value: 42) value: 5");
         AssertEquals(47, crank_talk_oop_decodeSmallInteger(value));
