@@ -39,6 +39,44 @@ crank_talk_ParseTree_addNotMessage(crank_talk_VMContext_t *context, crank_talk_P
     return &notSend->super;
 }
 
+static crank_talk_ParseTreeNode_t *
+crank_talk_ParseTree_equalsNilMessage(crank_talk_VMContext_t *context, crank_talk_ParseTreeNode_t *expression)
+{
+    crank_talk_ParseTreeLiteralNode_t *selector = (crank_talk_ParseTreeLiteralNode_t *)CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+    selector->super.sourcePosition = expression->sourcePosition;
+    selector->value = context->roots.identityEqualsSymbol;
+
+    crank_talk_ParseTreeLiteralNode_t *nilLiteral = (crank_talk_ParseTreeLiteralNode_t *)CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+    nilLiteral->super.sourcePosition = expression->sourcePosition;
+    nilLiteral->value = crank_talk_oop_nil();
+
+    crank_talk_ParseTreeMessageSendNode_t *notSend = (crank_talk_ParseTreeMessageSendNode_t *)CrankAllocateValuesObjectWithClassName(context, ParseTreeMessageSendNode);
+    notSend->super.sourcePosition = expression->sourcePosition;
+    notSend->receiver = expression;
+    notSend->selector = &selector->super;
+    notSend->arguments = (crank_talk_Array_t*)crank_talk_Array_With(context, (crank_talk_oop_t)nilLiteral);
+    return &notSend->super;
+}
+
+static crank_talk_ParseTreeNode_t *
+crank_talk_ParseTree_equalsNotNilMessage(crank_talk_VMContext_t *context, crank_talk_ParseTreeNode_t *expression)
+{
+    crank_talk_ParseTreeLiteralNode_t *selector = (crank_talk_ParseTreeLiteralNode_t *)CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+    selector->super.sourcePosition = expression->sourcePosition;
+    selector->value = context->roots.identityNotEqualsSymbol;
+
+    crank_talk_ParseTreeLiteralNode_t *nilLiteral = (crank_talk_ParseTreeLiteralNode_t *)CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+    nilLiteral->super.sourcePosition = expression->sourcePosition;
+    nilLiteral->value = crank_talk_oop_nil();
+
+    crank_talk_ParseTreeMessageSendNode_t *notSend = (crank_talk_ParseTreeMessageSendNode_t *)CrankAllocateValuesObjectWithClassName(context, ParseTreeMessageSendNode);
+    notSend->super.sourcePosition = expression->sourcePosition;
+    notSend->receiver = expression;
+    notSend->selector = &selector->super;
+    notSend->arguments = (crank_talk_Array_t*)crank_talk_Array_With(context, (crank_talk_oop_t)nilLiteral);
+    return &notSend->super;
+}
+
 static crank_talk_oop_t
 crank_talk_MessageMacro_yourself(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
@@ -189,6 +227,40 @@ crank_talk_MessageMacro_whileFalseWith(crank_talk_VMContext_t *context, crank_ta
     return whileNodeValue;
 }
 
+static crank_talk_oop_t
+crank_talk_MessageMacro_whileNilWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_ParseTreeMessageSendNode_t *sendNode = (crank_talk_ParseTreeMessageSendNode_t *)arguments[0];
+    assert(crank_talk_object_getSizeInSlots((crank_talk_oop_t)sendNode->arguments) == 1);
+
+    crank_talk_oop_t whileNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeWhileNode);
+    crank_talk_ParseTreeWhileNode_t *whileNode = (crank_talk_ParseTreeWhileNode_t *)whileNodeValue;
+    whileNode->super.sourcePosition = sendNode->super.sourcePosition;
+    whileNode->condition = crank_talk_ParseTree_equalsNilMessage(context, crank_talk_ParseTree_addEmptyCullBlockNode(context, (crank_talk_ParseTreeNode_t*)sendNode->receiver));
+    whileNode->bodyExpression = crank_talk_ParseTree_addEmptyCullBlockNode(context, (crank_talk_ParseTreeNode_t*)sendNode->arguments->elements[0]);
+    return whileNodeValue;
+}
+
+static crank_talk_oop_t
+crank_talk_MessageMacro_whileNotNilWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_ParseTreeMessageSendNode_t *sendNode = (crank_talk_ParseTreeMessageSendNode_t *)arguments[0];
+    assert(crank_talk_object_getSizeInSlots((crank_talk_oop_t)sendNode->arguments) == 1);
+
+    crank_talk_oop_t whileNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeWhileNode);
+    crank_talk_ParseTreeWhileNode_t *whileNode = (crank_talk_ParseTreeWhileNode_t *)whileNodeValue;
+    whileNode->super.sourcePosition = sendNode->super.sourcePosition;
+    whileNode->condition = crank_talk_ParseTree_equalsNotNilMessage(context, crank_talk_ParseTree_addEmptyCullBlockNode(context, (crank_talk_ParseTreeNode_t*)sendNode->receiver));
+    whileNode->bodyExpression = crank_talk_ParseTree_addEmptyCullBlockNode(context, (crank_talk_ParseTreeNode_t*)sendNode->arguments->elements[0]);
+    return whileNodeValue;
+}
+
 void crank_talk_registerMacrosPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_createAndSetMessageMacro(context, "yourself", crank_talk_MessageMacro_yourself);
@@ -202,4 +274,8 @@ void crank_talk_registerMacrosPrimitives(crank_talk_VMContext_t* context)
 
     crank_talk_createAndSetMessageMacro(context, "whileFalse", crank_talk_MessageMacro_whileFalse);
     crank_talk_createAndSetMessageMacro(context, "whileFalse:", crank_talk_MessageMacro_whileFalseWith);
+
+    crank_talk_createAndSetMessageMacro(context, "whileNil:", crank_talk_MessageMacro_whileNilWith);
+    crank_talk_createAndSetMessageMacro(context, "whileNotNil:", crank_talk_MessageMacro_whileNotNilWith);
 }
+
