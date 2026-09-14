@@ -287,6 +287,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     context->roots.valueSymbol = crank_talk_Symbol_internWithCString(context, "value");
 
+    context->roots.classSymbol = crank_talk_Symbol_internWithCString(context, "class");
     context->roots.notSymbol = crank_talk_Symbol_internWithCString(context, "not");
     context->roots.equalsSymbol = crank_talk_Symbol_internWithCString(context, "=");
     context->roots.identityEqualsSymbol = crank_talk_Symbol_internWithCString(context, "==");

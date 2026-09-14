@@ -24,3 +24,9 @@ CRANK_TALK_OPCODE(JumpIfFalse)
 CRANK_TALK_OPCODE(StoreInVariable)
 
 CRANK_TALK_OPCODE(Move)
+CRANK_TALK_OPCODE(Class)
+CRANK_TALK_OPCODE(Not)
+
+// Three operands
+CRANK_TALK_OPCODE(IdentityEquals)
+CRANK_TALK_OPCODE(IdentityNotEquals)

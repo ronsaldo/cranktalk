@@ -169,6 +169,12 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(42, crank_talk_oop_decodeSmallInteger(value));
     }
 
+    // Block with class
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[:x | x class] value: 42");
+        AssertEquals(context->roots.SmallIntegerClass, value);
+    }
+
     // not
     {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "true not");

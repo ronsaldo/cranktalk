@@ -848,8 +848,45 @@ crank_talk_HIRSendInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *c
     crank_talk_HIRSendInstruction_t *sendInstruction = (crank_talk_HIRSendInstruction_t*)self;
     crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
 
-    crank_talk_BytecodeAssembler_beginSend(context, bytecodeAssembler, sendInstruction->super.super.super.sourcePosition);
+    // Some messages are optimized.
     size_t messageArgumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)sendInstruction->receiverWithArguments);
+    if(crank_talk_oop_isKindOf(context, (crank_talk_oop_t)sendInstruction->selector, context->roots.HIRConstantLiteralValueClass))
+    {
+        // TODO: Factore does cases in a dictionary.
+        crank_talk_HIRConstantLiteralValue_t *selectorLiteralValue = (crank_talk_HIRConstantLiteralValue_t *)sendInstruction->selector;
+        if(selectorLiteralValue->value == context->roots.classSymbol && messageArgumentCount == 1)
+        {
+            uint16_t operand = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, (crank_talk_HIRValue_t*)sendInstruction->receiverWithArguments->elements[0], (crank_talk_oop_t)bytecodeAssembler);  
+            uint16_t result = crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex);
+            crank_talk_BytecodeAssembler_class(context, bytecodeAssembler, result, operand, sendInstruction->super.super.super.sourcePosition);
+            return self;
+        }
+        else if(selectorLiteralValue->value == context->roots.notSymbol && messageArgumentCount == 1)
+        {
+            uint16_t operand = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, (crank_talk_HIRValue_t*)sendInstruction->receiverWithArguments->elements[0], (crank_talk_oop_t)bytecodeAssembler);  
+            uint16_t result = crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex);
+            crank_talk_BytecodeAssembler_not(context, bytecodeAssembler, result, operand, sendInstruction->super.super.super.sourcePosition);
+            return self;
+        }
+        else if(selectorLiteralValue->value == context->roots.identityEqualsSymbol && messageArgumentCount == 2)
+        {
+            uint16_t leftOperand = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, (crank_talk_HIRValue_t*)sendInstruction->receiverWithArguments->elements[0], (crank_talk_oop_t)bytecodeAssembler);
+            uint16_t rightOperand = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, (crank_talk_HIRValue_t*)sendInstruction->receiverWithArguments->elements[1], (crank_talk_oop_t)bytecodeAssembler);
+            uint16_t result = crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex);
+            crank_talk_BytecodeAssembler_identityEquals(context, bytecodeAssembler, result, leftOperand, rightOperand, sendInstruction->super.super.super.sourcePosition);
+            return self;
+        }
+        else if(selectorLiteralValue->value == context->roots.identityNotEqualsSymbol && messageArgumentCount == 2)
+        {
+            uint16_t leftOperand = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, (crank_talk_HIRValue_t*)sendInstruction->receiverWithArguments->elements[0], (crank_talk_oop_t)bytecodeAssembler);
+            uint16_t rightOperand = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, (crank_talk_HIRValue_t*)sendInstruction->receiverWithArguments->elements[1], (crank_talk_oop_t)bytecodeAssembler);
+            uint16_t result = crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex);
+            crank_talk_BytecodeAssembler_identityNotEquals(context, bytecodeAssembler, result, leftOperand, rightOperand, sendInstruction->super.super.super.sourcePosition);
+            return self;
+        }
+    }
+
+    crank_talk_BytecodeAssembler_beginSend(context, bytecodeAssembler, sendInstruction->super.super.super.sourcePosition);
     for(size_t i = 0; i < messageArgumentCount; ++i)
     {
         crank_talk_BytecodeVectorOperand_t argumentValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, (crank_talk_HIRValue_t*)sendInstruction->receiverWithArguments->elements[i], (crank_talk_oop_t)bytecodeAssembler);  
