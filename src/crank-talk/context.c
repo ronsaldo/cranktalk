@@ -292,6 +292,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.equalsSymbol = crank_talk_Symbol_internWithCString(context, "=");
     context->roots.identityEqualsSymbol = crank_talk_Symbol_internWithCString(context, "==");
     context->roots.identityNotEqualsSymbol = crank_talk_Symbol_internWithCString(context, "~~");
+    
+    context->roots.selfSymbol = crank_talk_Symbol_internWithCString(context, "self");
 
     // Message send macro dictionary.
     context->roots.messageSendMacroDictionary = crank_talk_IdentityDictionary_create(context);
@@ -645,7 +647,8 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(LexicalEnvironment, symbolTable),
         NULL);
     context->roots.FunctionAnalysisEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "FunctionAnalysisEnvironment", context->roots.LexicalEnvironmentClass, sizeof(crank_talk_FunctionAnalysisEnvironment_t), CrankTalkGCObjectDataTypeOops,
-        CrankTalkSlotDef(FunctionAnalysisEnvironment, receiverValue),
+        CrankTalkSlotDef(FunctionAnalysisEnvironment, captureSymbolTable),
+        CrankTalkSlotDef(FunctionAnalysisEnvironment, captureList),
         NULL);
 
     // HIR
@@ -674,7 +677,9 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(HIRFunctionLocal, bytecodeVectorIndex),
         NULL);
     context->roots.HIRArgumentClass = crank_talk_context_createClassAndMetaclass(context, "HIRArgument", context->roots.HIRFunctionLocalClass, sizeof(crank_talk_HIRArgument_t), CrankTalkGCObjectDataTypeOops, NULL);
-    context->roots.HIRCaptureClass = crank_talk_context_createClassAndMetaclass(context, "HIRCapture", context->roots.HIRFunctionLocalClass, sizeof(crank_talk_HIRCapture_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.HIRCaptureClass = crank_talk_context_createClassAndMetaclass(context, "HIRCapture", context->roots.HIRFunctionLocalClass, sizeof(crank_talk_HIRCapture_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRCapture, capturedValue),
+        NULL);
     context->roots.HIRBasicBlockClass = crank_talk_context_createClassAndMetaclass(context, "HIRBasicBlock", context->roots.HIRFunctionLocalClass, sizeof(crank_talk_HIRBasicBlock_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRBasicBlock, nextBlock),
         CrankTalkSlotDef(HIRBasicBlock, previousBlock),
@@ -698,6 +703,10 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(HIRConditionalBranchInstruction, condition),
         CrankTalkSlotDef(HIRConditionalBranchInstruction, trueDestination),
         CrankTalkSlotDef(HIRConditionalBranchInstruction, falseDestination),
+        NULL);
+    context->roots.HIRMakeClosureInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRMakeClosureInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRMakeClosureInstruction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRMakeClosureInstruction, function),
+        CrankTalkSlotDef(HIRMakeClosureInstruction, capturedValues),
         NULL);
     context->roots.HIRPhiInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRPhiInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRPhiInstruction_t), CrankTalkGCObjectDataTypeOops,
         NULL);

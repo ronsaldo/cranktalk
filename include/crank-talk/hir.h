@@ -17,6 +17,7 @@ typedef struct crank_talk_HIRFunctionLocal_s crank_talk_HIRFunctionLocal_t;
         typedef struct crank_talk_HIRAllocaInstruction_s crank_talk_HIRAllocaInstruction_t;
         typedef struct crank_talk_HIRBranchInstruction_s crank_talk_HIRBranchInstruction_t;
         typedef struct crank_talk_HIRConditionalBranchInstruction_s crank_talk_HIRConditionalBranchInstruction_t;
+        typedef struct crank_talk_HIRMakeClosureInstruction_s crank_talk_HIRMakeClosureInstruction_t;
         typedef struct crank_talk_HIRPhiInstruction_s crank_talk_HIRPhiInstruction_t;
         typedef struct crank_talk_HIRPhiSourceInstruction_s crank_talk_HIRPhiSourceInstruction_t;
         typedef struct crank_talk_HIRReturnInstruction_s crank_talk_HIRReturnInstruction_t;
@@ -77,6 +78,7 @@ struct crank_talk_HIRArgument_s
 struct crank_talk_HIRCapture_s
 {
     crank_talk_HIRFunctionLocal_t super;
+    crank_talk_HIRFunctionLocal_t *capturedValue;
 };
 
 struct crank_talk_HIRBasicBlock_s
@@ -115,6 +117,13 @@ struct crank_talk_HIRConditionalBranchInstruction_s
     crank_talk_HIRValue_t *condition;
     crank_talk_HIRBasicBlock_t *trueDestination;
     crank_talk_HIRBasicBlock_t *falseDestination;
+};
+
+struct crank_talk_HIRMakeClosureInstruction_s
+{
+    crank_talk_HIRInstruction_t super;
+    crank_talk_CompiledFunction_t *function;
+    crank_talk_Array_t *capturedValues;
 };
 
 struct crank_talk_HIRPhiInstruction_s
@@ -192,6 +201,7 @@ CRANK_TALK_API bool crank_talk_HIRBuilder_isLastTerminator(crank_talk_VMContext_
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_alloca(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_branch(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRBasicBlock_t *destination, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_conditionalBranch(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *condition, crank_talk_HIRBasicBlock_t *trueDestination, crank_talk_HIRBasicBlock_t *falseDestination, crank_talk_oop_t sourcePosition);
+CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_makeClosure(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_CompiledFunction_t *function, crank_talk_Array_t *capturedValues, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_HIRPhiInstruction_t *crank_talk_HIRBuilder_phi(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_phiSource(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRPhiInstruction_t *targetPhi, crank_talk_HIRValue_t *value, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_return(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *resultValue, crank_talk_oop_t sourcePosition);

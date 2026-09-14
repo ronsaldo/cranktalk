@@ -126,6 +126,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t equalsSymbol;
     crank_talk_oop_t identityEqualsSymbol;
     crank_talk_oop_t identityNotEqualsSymbol;
+    crank_talk_oop_t selfSymbol;
 
     // Message send macro dictionary.
     crank_talk_oop_t messageSendMacroDictionary;
@@ -187,6 +188,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t HIRAllocaInstructionClass;
     crank_talk_oop_t HIRBranchInstructionClass;
     crank_talk_oop_t HIRConditionalBranchInstructionClass;
+    crank_talk_oop_t HIRMakeClosureInstructionClass;
     crank_talk_oop_t HIRPhiInstructionClass;
     crank_talk_oop_t HIRPhiSourceInstructionClass;
     crank_talk_oop_t HIRReturnInstructionClass;

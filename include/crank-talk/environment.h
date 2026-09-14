@@ -36,7 +36,8 @@ struct crank_talk_LexicalEnvironment_s
 struct crank_talk_FunctionAnalysisEnvironment_s
 {
     crank_talk_LexicalEnvironment_t super;
-    crank_talk_oop_t receiverValue;
+    crank_talk_oop_t captureSymbolTable;
+    crank_talk_oop_t captureList;
 };
 
 CRANK_TALK_API crank_talk_oop_t crank_talk_LexicalEnvironment_create(crank_talk_VMContext_t *context, crank_talk_oop_t parentEnvironment);
@@ -46,9 +47,9 @@ CRANK_TALK_API void crank_talk_LexicalEnvironment_setHIRSymbolBinding(crank_talk
 CRANK_TALK_API void crank_talk_LexicalEnvironment_setNewHIRSymbolBinding(crank_talk_VMContext_t *context, crank_talk_oop_t environment, crank_talk_oop_t symbol, crank_talk_oop_t binding, crank_talk_oop_t sourcePosition);
 
 CRANK_TALK_API crank_talk_oop_t crank_talk_FunctionAnalysisEnvironment_create(crank_talk_VMContext_t *context, crank_talk_oop_t parentEnvironment);
-CRANK_TALK_API void crank_talk_FunctionAnalysisEnvironment_setReceiverValue(crank_talk_VMContext_t *context, crank_talk_oop_t environment, crank_talk_oop_t receiverValue);
 
 CRANK_TALK_API crank_talk_oop_t crank_talk_Environment_lookupSymbolRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t environment, crank_talk_oop_t symbol);
+CRANK_TALK_API crank_talk_oop_t crank_talk_Environment_lookupReceiverRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t environment);
 
 
 #endif //CRANK_TALK_ENVIRONMENT_H

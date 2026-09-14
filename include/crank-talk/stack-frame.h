@@ -58,6 +58,10 @@ typedef struct crank_talk_stackFrameBytecodeFunctionActivationRecord_s
 
     crank_talk_oop_t result;
 
+    crank_talk_Array_t *arrayInConstruction;
+    size_t arrayInConstructionSize;
+    crank_talk_oop_t closureInConstruction;
+
     size_t pc;
     jmp_buf jmpbuffer;
 } crank_talk_stackFrameBytecodeFunctionActivationRecord_t;

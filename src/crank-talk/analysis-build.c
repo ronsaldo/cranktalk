@@ -147,10 +147,16 @@ crank_talk_ParseTreeBlockNode_analyzeAndBuildWith(crank_talk_VMContext_t *contex
     }
     else
     {
-        printf("TODO: instantiate the block closure with the captured values\n");
-        abort();
-    }
+        crank_talk_Array_t *capturedValues = (crank_talk_Array_t*)crank_talk_Array_create(context, captureCount);
+        for(size_t i = 0; i < captureCount; ++i)
+        {
+            crank_talk_HIRCapture_t *capture = (crank_talk_HIRCapture_t*)hirFunction->captures->elements[i];
+            capturedValues->elements[i] = (crank_talk_oop_t)capture->capturedValue;
+        }
 
+        CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+        return crank_talk_HIRBuilder_makeClosure(context, buildContext->builder, compiledFunction, capturedValues, (crank_talk_oop_t)node->super.sourcePosition);
+    }
 }
 
 static crank_talk_oop_t

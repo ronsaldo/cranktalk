@@ -4,6 +4,7 @@ CRANK_TALK_OPCODE(Nop)
 CRANK_TALK_OPCODE(BooleanExpected)
 CRANK_TALK_OPCODE(Breakpoint)
 CRANK_TALK_OPCODE(Unreachable)
+CRANK_TALK_OPCODE(BeginClosure)
 CRANK_TALK_OPCODE(BeginSend)
 
 CRANK_TALK_OPCODE(Alloca)
@@ -16,6 +17,9 @@ CRANK_TALK_OPCODE(Return)
 
 CRANK_TALK_OPCODE(CallArgument)
 CRANK_TALK_OPCODE(SendMessage)
+
+CRANK_TALK_OPCODE(PushClosureCapture)
+CRANK_TALK_OPCODE(FinishClosure)
 
 // Two operands
 CRANK_TALK_OPCODE(JumpIfTrue)

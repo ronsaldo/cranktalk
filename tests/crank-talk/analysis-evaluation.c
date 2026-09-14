@@ -350,5 +350,11 @@ void analysisAndEvaluation_runTests(void)
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[| count | count := 1. [count := count + 1] doWhileFalse: [count > 10]. count] value");
         AssertEquals(11, crank_talk_oop_decodeSmallInteger(value));
     }
+
+    // Block with doWhileFalse:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "([:x | [:y | x + y]] value: 42) value: 5");
+        AssertEquals(47, crank_talk_oop_decodeSmallInteger(value));
+    }
     crank_talk_vm_destroyContext(context);
 }

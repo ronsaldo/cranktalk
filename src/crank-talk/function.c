@@ -7,6 +7,7 @@
 #include "crank-talk/errors.h"
 #include "crank-talk/hir.h"
 #include "crank-talk/message.h"
+#include "crank-talk/ordered-collection.h"
 #include "crank-talk/parse-tree.h"
 #include "crank-talk/stack-frame.h"
 #include <stdlib.h>
@@ -95,13 +96,15 @@ crank_talk_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, c
         crank_talk_HIRBuilder_t *builder;
         crank_talk_oop_t lexicalEnvironment;
         crank_talk_oop_t analysisAndBuildContext;
-        crank_talk_HIRValue_t * result;
+        crank_talk_HIRValue_t *result;
+        crank_talk_HIRValue_t *receiverValue;
     } gcFrame = {0};
 
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
 
     // Create the function analysis environment.
     gcFrame.lexicalEnvironment = crank_talk_FunctionAnalysisEnvironment_create(context, compiledFunction->definitionEnvironment);
+    crank_talk_FunctionAnalysisEnvironment_t *functionAnalysisEnvironment = (crank_talk_FunctionAnalysisEnvironment_t *)gcFrame.lexicalEnvironment;
 
     // Arguments
     {
@@ -121,6 +124,11 @@ crank_talk_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, c
             hirArgument->super.name = argumentDefinition->name;
             if(argumentDefinition->name)
                 crank_talk_LexicalEnvironment_setNewHIRSymbolBinding(context, gcFrame.lexicalEnvironment, (crank_talk_oop_t)argumentDefinition->name, hirArgumentValue, (crank_talk_oop_t)argumentDefinition->super.sourcePosition);
+
+            if(crank_talk_oop_asBoolean(context, argumentDefinition->isSelf))
+            {
+                gcFrame.receiverValue = &hirArgument->super.super;
+            }
         }
 
     }
@@ -148,17 +156,20 @@ crank_talk_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, c
         }
         else
         {
-            // TODO: return self.
-            printf("TODO: return self.\n");
-            crank_talk_HIRBuilder_unreachable(context, gcFrame.builder, sourcePosition);
+            // Return self.
+            if(!gcFrame.receiverValue)
+                crank_talk_errorAtSourcePosition(context, sourcePosition, "Method is missing a self argument.");
+            crank_talk_HIRBuilder_return(context, gcFrame.builder, gcFrame.receiverValue, sourcePosition);
         }
     }
 
     // Jump from the alloca block into the entry block.
     crank_talk_HIRBuilder_branch(context, gcFrame.allocaBuilder, gcFrame.entryBlock, sourcePosition);
 
+    // Captures
+    hirFunction->captures = (crank_talk_Array_t*)crank_talk_OrderedCollection_asArray(context, functionAnalysisEnvironment->captureList);
+
     CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-    
 }
 
 static void
