@@ -134,6 +134,8 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t basicNewWithSymbol;
     crank_talk_oop_t environmentSymbol;
     crank_talk_oop_t initializeSymbol;
+    
+    crank_talk_oop_t asSlotSymbol;
 
     // Message send macro dictionary.
     crank_talk_oop_t messageSendMacroDictionary;

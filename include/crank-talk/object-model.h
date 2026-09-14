@@ -688,9 +688,9 @@ struct crank_talk_ShiftClassBuilder_s
 {
     crank_talk_Object_t super;
     crank_talk_oop_t superclass;
-    crank_talk_oop_t name;
+    crank_talk_Symbol_t *name;
     crank_talk_oop_t environment;
-    crank_talk_oop_t slots;
+    crank_talk_Array_t *slots;
 };
 
 CRANK_TALK_INLINE double

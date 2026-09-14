@@ -423,5 +423,19 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(0, crank_talk_oop_decodeSmallInteger(value));
     }
 
+    // MyClass build
+    {
+        crank_talk_oop_t myClass = crank_talk_analyzeAndEvaluateString(context, "Object << #MyClass slots: {#first . #second}; build");
+        Assert(crank_talk_oop_isKindOf(context, myClass, context->roots.ClassClass));
+
+        myClass = crank_talk_analyzeAndEvaluateString(context, "MyClass");
+        Assert(crank_talk_oop_isKindOf(context, myClass, context->roots.ClassClass));
+
+        crank_talk_oop_t myValue = crank_talk_analyzeAndEvaluateString(context, "MyClass new");
+        Assert(crank_talk_oop_isKindOf(context, myValue, myClass));
+
+        AssertEquals(2, crank_talk_object_getSizeInSlots(myValue));
+    }
+
     crank_talk_vm_destroyContext(context);
 }
