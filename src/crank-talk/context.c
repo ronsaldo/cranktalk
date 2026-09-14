@@ -19,6 +19,7 @@
 
 void crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerBehaviorPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerControlFlowPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerEnvironmentPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerFunctionalPrimitives(crank_talk_VMContext_t* context);
@@ -68,6 +69,9 @@ crank_talk_context_setClassTypeMetadataVList(crank_talk_VMContext_t *context, cr
         clazz->name = (crank_talk_Symbol_t*)nameSymbol;
         crank_talk_SystemEnvironment_atPut(context, context->roots.systemEnvironment, nameSymbol, classValue);
     }
+
+    if(!clazz->environment)
+        clazz->environment = context->roots.systemEnvironment;
 
     crank_talk_oop_t slots = crank_talk_OrderedCollection_create(context);
     
@@ -253,6 +257,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     context->roots.ExternalAddressClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_ExternalAddress_t), CrankTalkGCObjectDataTypeBytes);
 
+    context->roots.ShiftClassBuilderClass = crank_talk_context_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_ShiftClassBuilder_t), CrankTalkGCObjectDataTypeBytes);
+
     // System environment
     context->roots.systemEnvironment = crank_talk_SystemEnvironment_create(context);
 
@@ -295,6 +301,12 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     
     context->roots.selfSymbol = crank_talk_Symbol_internWithCString(context, "self");
 
+    context->roots.basicNewSymbol = crank_talk_Symbol_internWithCString(context, "basicNew");
+    context->roots.basicNewWithSymbol = crank_talk_Symbol_internWithCString(context, "basicNew:");
+    context->roots.environmentSymbol = crank_talk_Symbol_internWithCString(context, "environment");
+    context->roots.initializeSymbol = crank_talk_Symbol_internWithCString(context, "initialize");
+
+
     // Message send macro dictionary.
     context->roots.messageSendMacroDictionary = crank_talk_IdentityDictionary_create(context);
 
@@ -313,6 +325,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_context_setClassTypeMetadata(context, context->roots.ClassDescriptionClass, "ClassDescription", NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.ClassClass, "Class",
         CrankTalkSlotDef(Class, name),
+        CrankTalkSlotDef(Class, environment),
         NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.MetaclassClass, "Metaclass",
         CrankTalkSlotDef(Metaclass, thisClass),
@@ -447,6 +460,13 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     crank_talk_context_setClassTypeMetadata(context, context->roots.ExternalAddressClass, "ExternalAddress", NULL);
 
+    crank_talk_context_setClassTypeMetadata(context, context->roots.ShiftClassBuilderClass, "ShiftClassBuilder",
+        CrankTalkSlotDef(ShiftClassBuilder, superclass),
+        CrankTalkSlotDef(ShiftClassBuilder, name),
+        CrankTalkSlotDef(ShiftClassBuilder, environment),
+        CrankTalkSlotDef(ShiftClassBuilder, slots),
+        NULL);
+
     // Tables
     crank_talk_context_createClassTables(context, context->roots.ProtoObjectClass);
     crank_talk_context_createClassTables(context, context->roots.ObjectClass);
@@ -519,6 +539,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_context_createClassTables(context, context->roots.StringStreamClass);
 
     crank_talk_context_createClassTables(context, context->roots.ExternalAddressClass);
+
+    crank_talk_context_createClassTables(context, context->roots.ShiftClassBuilderClass);
 }
 
 static void 
@@ -767,6 +789,7 @@ crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_registerAnalysisAndBuildPrimitives(context);
     crank_talk_registerAnalysisAndEvaluationPrimitives(context);
+    crank_talk_registerBehaviorPrimitives(context);
     crank_talk_registerControlFlowPrimitives(context);
     crank_talk_registerEnvironmentPrimitives(context);
     crank_talk_registerFunctionalPrimitives(context);

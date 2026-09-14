@@ -149,6 +149,17 @@ crank_talk_ProtoObject_identityHash_primitive(crank_talk_VMContext_t *context, c
 }
 
 static crank_talk_oop_t
+crank_talk_ProtoObject_initialize_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_oop_t self = arguments[0];
+    return self;
+}
+
+static crank_talk_oop_t
 crank_talk_Object_equals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)context;
@@ -196,6 +207,113 @@ crank_talk_Object_hash_primitive(crank_talk_VMContext_t *context, crank_talk_oop
     return crank_talk_oop_encodeSmallInteger(crank_talk_oop_getIdentityHash(self));
 }
 
+static crank_talk_oop_t
+crank_talk_Object_basicSize_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+    crank_talk_oop_t self = arguments[0];
+    if(!crank_talk_oop_isNonNullPointer(self))
+        return crank_talk_oop_encodeSmallInteger(0);
+
+    crank_talk_ObjectHeader_t *header = crank_talk_object_getHeader(self);
+    size_t classSize = crank_talk_oop_decodeSmallInteger(header->behavior->instanceSize);
+    assert(header->byteSize >= classSize);
+    size_t variableByteSize = header->byteSize - classSize;
+    if(header->dataType == CrankTalkGCObjectDataTypeBytes)
+        return crank_talk_oop_encodeSmallInteger(variableByteSize);
+    else
+        return crank_talk_oop_encodeSmallInteger(variableByteSize / sizeof(crank_talk_oop_t));
+}
+
+static crank_talk_oop_t
+crank_talk_Object_basicAt_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t indexValue = arguments[1];
+
+    if(!crank_talk_oop_isNonNullPointer(self))
+        crank_talk_error("Expected a non-immediate object.");
+    if(!crank_talk_oop_isSmallInteger(indexValue))
+        crank_talk_error("Expected a small integer index.");
+
+    size_t index = crank_talk_oop_decodeSmallInteger(indexValue);
+
+    crank_talk_ObjectHeader_t *header = crank_talk_object_getHeader(self);
+    size_t classSize = crank_talk_oop_decodeSmallInteger(header->behavior->instanceSize);
+    assert(header->byteSize >= classSize);
+
+    size_t variableByteSize = header->byteSize - classSize;
+    uint8_t *variableByteData = (uint8_t*)header + classSize;
+
+    if(header->dataType == CrankTalkGCObjectDataTypeBytes)
+    {
+        if(index < 1 || index > variableByteSize)
+            crank_talk_error("Index is out of bounds.");
+        return crank_talk_oop_encodeSmallInteger(variableByteData[index - 1]);
+    }
+    else
+    {
+        size_t variableSlotSize = variableByteSize / sizeof(crank_talk_oop_t);
+        crank_talk_oop_t *variableSlotData = (crank_talk_oop_t *)variableByteData;
+        if(index < 1 || index > variableSlotSize)
+            crank_talk_error("Index is out of bounds.");
+        return variableSlotData[index - 1];
+    }
+}
+
+static crank_talk_oop_t
+crank_talk_Object_basicAtPut_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 3);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t indexValue = arguments[1];
+    crank_talk_oop_t value = arguments[2];
+
+    if(!crank_talk_oop_isNonNullPointer(self))
+        crank_talk_error("Expected a non-immediate object.");
+    if(!crank_talk_oop_isSmallInteger(indexValue))
+        crank_talk_error("Expected a small integer index.");
+
+    size_t index = crank_talk_oop_decodeSmallInteger(indexValue);
+
+    crank_talk_ObjectHeader_t *header = crank_talk_object_getHeader(self);
+    size_t classSize = crank_talk_oop_decodeSmallInteger(header->behavior->instanceSize);
+    assert(header->byteSize >= classSize);
+
+    size_t variableByteSize = header->byteSize - classSize;
+    uint8_t *variableByteData = (uint8_t*)header + classSize;
+
+    if(header->dataType == CrankTalkGCObjectDataTypeBytes)
+    {
+        if(index < 1 || index > variableByteSize)
+            crank_talk_error("Index is out of bounds.");
+        if(!crank_talk_oop_isSmallInteger(value))
+            crank_talk_error("Expected an integer value.");
+
+        variableByteData[index - 1] = crank_talk_oop_decodeSmallInteger(value);
+    }
+    else
+    {
+        size_t variableSlotSize = variableByteSize / sizeof(crank_talk_oop_t);
+        crank_talk_oop_t *variableSlotData = (crank_talk_oop_t *)variableByteData;
+        if(index < 1 || index > variableSlotSize)
+            crank_talk_error("Index is out of bounds.");
+        variableSlotData[index - 1] = value;
+    }
+
+    return value;
+}
+
 void
 crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context)
 {
@@ -203,10 +321,19 @@ crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "==", 2, crank_talk_ProtoObject_identityEquals_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "~~", 2, crank_talk_ProtoObject_identityNotEquals_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "identityHash", 2, crank_talk_ProtoObject_identityHash_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "initialize", 1, crank_talk_ProtoObject_initialize_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "yourself", 1, crank_talk_ProtoObject_yourself_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "=", 2, crank_talk_Object_equals_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "~=", 2, crank_talk_Object_notEquals_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "hash", 2, crank_talk_Object_hash_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "species", 1, crank_talk_Object_species_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "basicSize", 1, crank_talk_Object_basicSize_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "size", 1, crank_talk_Object_basicSize_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "basicAt:", 1, crank_talk_Object_basicAt_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "basicAt:put:", 2, crank_talk_Object_basicAtPut_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "at:", 1, crank_talk_Object_basicAt_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "at:put:", 2, crank_talk_Object_basicAtPut_primitive);
 }

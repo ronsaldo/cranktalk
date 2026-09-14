@@ -356,5 +356,72 @@ void analysisAndEvaluation_runTests(void)
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "([:x | [:y | x + y]] value: 42) value: 5");
         AssertEquals(47, crank_talk_oop_decodeSmallInteger(value));
     }
+
+    // Object basicNew
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "Object basicNew");
+        AssertEquals(context->roots.ObjectClass, (crank_talk_oop_t)crank_talk_oop_getClass(context, value));
+    }
+
+    // Object new
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "Object new");
+        AssertEquals(context->roots.ObjectClass, (crank_talk_oop_t)crank_talk_oop_getClass(context, value));
+    }
+
+    // Array basicNew: 2
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "Array basicNew: 2");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(value));
+    }
+
+    // Array new: 2
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "Array new: 2");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(value));
+    }
+
+    // Array basicSize
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "(Array basicNew: 2) basicSize");
+        AssertEquals(2, crank_talk_oop_decodeSmallInteger(value));
+    }
+
+    // Array size
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "(Array basicNew: 2) size");
+        AssertEquals(2, crank_talk_oop_decodeSmallInteger(value));
+    }
+
+    // Array basicAt:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "(Array basicNew: 2) basicAt: 1");
+        AssertEquals(crank_talk_oop_nil(), value);
+    }
+
+    // Array basicAt:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "(Array basicNew: 2) basicAt: 1 put: 42; basicAt: 1");
+        AssertEquals(42, crank_talk_oop_decodeSmallInteger(value));
+    }
+
+    // ByteArray basicNew: 2
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "ByteArray basicNew: 2");
+        AssertEquals(2, crank_talk_object_getSizeInBytes(value));
+    }
+
+    // ByteArray basicSize
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "(ByteArray basicNew: 2) basicSize");
+        AssertEquals(2, crank_talk_oop_decodeSmallInteger(value));
+    }
+
+    // ByteArray basicAt:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "(ByteArray basicNew: 2) basicAt: 1");
+        AssertEquals(0, crank_talk_oop_decodeSmallInteger(value));
+    }
+
     crank_talk_vm_destroyContext(context);
 }

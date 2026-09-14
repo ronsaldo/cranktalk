@@ -91,6 +91,8 @@ struct crank_talk_VMContextRoots_s
 
     crank_talk_oop_t ExternalAddressClass;
 
+    crank_talk_oop_t ShiftClassBuilderClass;
+
     // System environment
     crank_talk_oop_t systemEnvironment;
 
@@ -127,6 +129,11 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t identityEqualsSymbol;
     crank_talk_oop_t identityNotEqualsSymbol;
     crank_talk_oop_t selfSymbol;
+
+    crank_talk_oop_t basicNewSymbol;
+    crank_talk_oop_t basicNewWithSymbol;
+    crank_talk_oop_t environmentSymbol;
+    crank_talk_oop_t initializeSymbol;
 
     // Message send macro dictionary.
     crank_talk_oop_t messageSendMacroDictionary;
