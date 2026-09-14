@@ -285,5 +285,41 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
     }
 
+    // Block with whileTrue
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[| count | count := 1. [count := count + 1. count <= 10] whileTrue. count] value");
+        AssertEquals(11, crank_talk_oop_decodeSmallInteger(value));
+    }
+
+    // Block with whileTrue:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[| count | count := 1. [count <= 10] whileTrue: [count := count + 1]. count] value");
+        AssertEquals(11, crank_talk_oop_decodeSmallInteger(value));
+    }
+
+    // Block with whileFalse
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[| count | count := 1. [count := count + 1. count > 10] whileFalse. count] value");
+        AssertEquals(11, crank_talk_oop_decodeSmallInteger(value));
+    }
+
+    // Block with whileFalse:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[| count | count := 1. [count > 10] whileFalse: [count := count + 1]. count] value");
+        AssertEquals(11, crank_talk_oop_decodeSmallInteger(value));
+    }
+ 
+    // Block with whileNil:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[| count | [ count ] whileNil: [ count := 42 ]. count] value");
+        AssertEquals(42, crank_talk_oop_decodeSmallInteger(value));
+    }
+
+    // Block with whileNotNil:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[| count | count := 42. [ count ] whileNotNil: [ count := nil ]. count] value");
+        AssertEquals(crank_talk_oop_nil(), value);
+    }
+
     crank_talk_vm_destroyContext(context);
 }

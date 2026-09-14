@@ -119,7 +119,7 @@ crank_talk_BytecodeAssembler_labelOperand(crank_talk_VMContext_t *context, crank
     size_t pc = labelPosition + 2;
     if(crank_talk_oop_asBoolean(context, label->isDefined))
     {
-        size_t labelValue = crank_talk_oop_encodeSmallInteger(label->destinationValue);
+        size_t labelValue = crank_talk_oop_decodeSmallInteger(label->destinationValue);
         int16_t relativeOffset = (int16_t)(labelValue - pc);
         crank_talk_ByteStream_insertByte(context, assembler->byteStream, relativeOffset & 0xFF);
         crank_talk_ByteStream_insertByte(context, assembler->byteStream, (relativeOffset >> 8) & 0xFF);
