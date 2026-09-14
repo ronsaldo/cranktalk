@@ -339,5 +339,16 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(crank_talk_oop_nil(), value);
     }
 
+    // Block with doWhileTrue:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[| count | count := 1. [count := count + 1] doWhileTrue: [count <= 10]. count] value");
+        AssertEquals(11, crank_talk_oop_decodeSmallInteger(value));
+    }
+
+    // Block with doWhileFalse:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[| count | count := 1. [count := count + 1] doWhileFalse: [count > 10]. count] value");
+        AssertEquals(11, crank_talk_oop_decodeSmallInteger(value));
+    }
     crank_talk_vm_destroyContext(context);
 }
