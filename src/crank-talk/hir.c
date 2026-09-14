@@ -852,7 +852,7 @@ crank_talk_HIRSendInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *c
     size_t messageArgumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)sendInstruction->receiverWithArguments);
     if(crank_talk_oop_isKindOf(context, (crank_talk_oop_t)sendInstruction->selector, context->roots.HIRConstantLiteralValueClass))
     {
-        // TODO: Factore does cases in a dictionary.
+        // TODO: Refactor those cases in a dictionary.
         crank_talk_HIRConstantLiteralValue_t *selectorLiteralValue = (crank_talk_HIRConstantLiteralValue_t *)sendInstruction->selector;
         if(selectorLiteralValue->value == context->roots.classSymbol && messageArgumentCount == 1)
         {
