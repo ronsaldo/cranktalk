@@ -175,6 +175,36 @@ crank_talk_BlockClosure_whileNotNilWith_primitive(crank_talk_VMContext_t *contex
     return crank_talk_oop_nil();
 }
 
+static crank_talk_oop_t
+crank_talk_BlockClosure_doWhileTrueWith_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+
+    do
+    {
+        crank_talk_send0(context, context->roots.valueSymbol, arguments[0]);
+    } while (crank_talk_send0(context, context->roots.valueSymbol, arguments[1]) == context->roots.trueValue);
+
+    return crank_talk_oop_nil();
+}
+
+static crank_talk_oop_t
+crank_talk_BlockClosure_doWhileFalseWith_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+
+    do
+    {
+        crank_talk_send0(context, context->roots.valueSymbol, arguments[0]);
+    } while (crank_talk_send0(context, context->roots.valueSymbol, arguments[1]) == context->roots.falseValue);
+
+    return crank_talk_oop_nil();
+}
+
 void
 crank_talk_registerControlFlowPrimitives(crank_talk_VMContext_t* context)
 {
@@ -198,5 +228,7 @@ crank_talk_registerControlFlowPrimitives(crank_talk_VMContext_t* context)
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "whileNil:", 2, crank_talk_BlockClosure_whileNilWith_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "whileNotNil:", 2, crank_talk_BlockClosure_whileNotNilWith_primitive);
-    
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "doWhileTrue:", 2, crank_talk_BlockClosure_doWhileTrueWith_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "doWhileFalse:", 2, crank_talk_BlockClosure_doWhileFalseWith_primitive);
 }
