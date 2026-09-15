@@ -152,6 +152,8 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
 
     typedef struct crank_talk_ShiftClassBuilder_s crank_talk_ShiftClassBuilder_t;
 
+    typedef struct crank_talk_SmalltalkImage_s crank_talk_SmalltalkImage_t;
+
 typedef crank_talk_oop_t (*crank_talk_CompiledFunctionNativeEntryPoint_t)(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments);
 
 struct crank_talk_ObjectHeader_s {
@@ -692,6 +694,12 @@ struct crank_talk_ShiftClassBuilder_s
     crank_talk_Symbol_t *name;
     crank_talk_oop_t environment;
     crank_talk_Array_t *slots;
+};
+
+struct crank_talk_SmalltalkImage_s
+{
+    crank_talk_Object_t super;
+    crank_talk_SystemEnvironment_t *globals;
 };
 
 CRANK_TALK_INLINE double

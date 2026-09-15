@@ -480,5 +480,10 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(2, crank_talk_oop_decodeSmallInteger(value));
     }
 
+    // Smalltalk image garbage collection
+    {
+        crank_talk_analyzeAndEvaluateString(context, "[Smalltalk garbageCollect] value");
+    }
+
     crank_talk_vm_destroyContext(context);
 }

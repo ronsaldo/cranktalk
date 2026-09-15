@@ -206,6 +206,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     context->roots.ShiftClassBuilderClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_ShiftClassBuilder_t), CrankTalkGCObjectDataTypeBytes);
 
+    context->roots.SmalltalkImageClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_SmalltalkImage_t), CrankTalkGCObjectDataTypeBytes);
+
     // System environment
     context->roots.systemEnvironment = crank_talk_SystemEnvironment_create(context);
 
@@ -215,6 +217,14 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     // Symbol set
     context->roots.internedSymbolSet = crank_talk_IdentitySet_create(context);
+
+    // Create and bind the Smalltalk image.
+    {
+        context->roots.smalltalk = CrankAllocateValuesObjectWithClassName(context, SmalltalkImage);
+        crank_talk_SmalltalkImage_t *smalltalk = (crank_talk_SmalltalkImage_t *)context->roots.smalltalk;
+        smalltalk->globals = (crank_talk_SystemEnvironment_t*)context->roots.systemEnvironment;
+        crank_talk_SystemEnvironment_atPut(context, context->roots.systemEnvironment, crank_talk_Symbol_internWithCString(context, "Smalltalk"), context->roots.smalltalk);
+    }
 
     // Symbols
     context->roots.doesNotUnderstandSymbol = crank_talk_Symbol_internWithCString(context, "doesNotUnderstand:");
@@ -417,6 +427,10 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(ShiftClassBuilder, slots),
         NULL);
 
+    crank_talk_context_setClassTypeMetadata(context, context->roots.SmalltalkImageClass, "SmalltalkImage",
+        CrankTalkSlotDef(SmalltalkImage, globals),
+        NULL);
+
     // Tables
     crank_talk_Behavior_createClassTables(context, context->roots.ProtoObjectClass);
     crank_talk_Behavior_createClassTables(context, context->roots.ObjectClass);
@@ -491,6 +505,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_Behavior_createClassTables(context, context->roots.ExternalAddressClass);
 
     crank_talk_Behavior_createClassTables(context, context->roots.ShiftClassBuilderClass);
+
+    crank_talk_Behavior_createClassTables(context, context->roots.SmalltalkImageClass);
 }
 
 static void 

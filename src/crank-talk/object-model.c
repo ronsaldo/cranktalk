@@ -1,6 +1,7 @@
 #include "crank-talk/object-model.h"
 #include "crank-talk/context.h"
 #include "crank-talk/errors.h"
+#include "crank-talk/gc.h"
 #include "crank-talk/message.h"
 #include <stdlib.h>
 
@@ -314,6 +315,26 @@ crank_talk_Object_basicAtPut_primitive(crank_talk_VMContext_t *context, crank_ta
     return value;
 }
 
+static crank_talk_oop_t
+crank_talk_SmalltalkImage_garbageCollect_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+    crank_talk_gc_collect(context);
+    return arguments[0];
+}
+
+static crank_talk_oop_t
+crank_talk_SmalltalkImage_globals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+    crank_talk_SmalltalkImage_t *smalltalk = (crank_talk_SmalltalkImage_t *)arguments[0];
+    return (crank_talk_oop_t)smalltalk->globals;
+}
+
 void
 crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context)
 {
@@ -336,4 +357,7 @@ crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "basicAt:put:", 2, crank_talk_Object_basicAtPut_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "at:", 1, crank_talk_Object_basicAt_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "at:put:", 2, crank_talk_Object_basicAtPut_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmalltalkImageClass, "garbageCollect", 1, crank_talk_SmalltalkImage_garbageCollect_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmalltalkImageClass, "globals", 1, crank_talk_SmalltalkImage_globals_primitive);
 }

@@ -93,8 +93,11 @@ struct crank_talk_VMContextRoots_s
 
     crank_talk_oop_t ShiftClassBuilderClass;
 
+    crank_talk_oop_t SmalltalkImageClass;
+
     // System environment
     crank_talk_oop_t systemEnvironment;
+    crank_talk_oop_t smalltalk;
 
     // Boolean values
     crank_talk_oop_t falseValue;
