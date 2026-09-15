@@ -1,1 +1,1 @@
-Stdio stdout nextPutAll: 'Hello World'; nextPut: $@; print: 42; lf.
+thisContext loadFile: 'Runtime/package.st'.
