@@ -321,6 +321,16 @@ crank_talk_BytecodeAssembler_loadSlot(crank_talk_VMContext_t *context, crank_tal
 }
 
 CRANK_TALK_API void
+crank_talk_BytecodeAssembler_storeSlot(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t receiverValue, size_t slotIndex, crank_talk_BytecodeVectorOperand_t assignedValue, crank_talk_oop_t sourcePosition)
+{
+    assert(1 <= slotIndex && slotIndex <= 0xFFFF);
+    crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeStoreSlot, sourcePosition);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, receiverValue);
+    crank_talk_BytecodeAssembler_uint16Operand(context, assembler, (uint16_t)slotIndex);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, assignedValue);
+}
+
+CRANK_TALK_API void
 crank_talk_BytecodeAssembler_identityEquals(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t resultTemporary, crank_talk_BytecodeVectorOperand_t leftOperand, crank_talk_BytecodeVectorOperand_t rightOperand, crank_talk_oop_t sourcePosition)
 {
     crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeIdentityEquals, sourcePosition);
@@ -601,6 +611,15 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
             crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, slot);
         } break;
 
+        case CrankTalkOpcodeStoreSlot:
+        {
+            crank_talk_oop_t receiver = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
+            uint16_t slotIndex = crank_talk_BytecodeFunction_fetchUInt16(bytecodesSize, &activationRecord->pc, bytecodes);
+            crank_talk_oop_t value = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
+
+            crank_talk_oop_t *slots = crank_talk_oop_getSlotsData(receiver);
+            slots[slotIndex - 1] = value;
+        } break;
         // Three operands
         case CrankTalkOpcodeIdentityEquals:
         {
@@ -749,6 +768,14 @@ crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank
             crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
             printf(" slot %d", crank_talk_BytecodeFunction_fetchUInt16(bytecodesSize, &pc, bytecodes));
             printf(" -> ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            break;
+
+        case CrankTalkOpcodeStoreSlot:
+            printf(" receiver ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            printf(" slot %d", crank_talk_BytecodeFunction_fetchUInt16(bytecodesSize, &pc, bytecodes));
+            printf(" store ");
             crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
             break;
 

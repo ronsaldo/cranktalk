@@ -439,23 +439,29 @@ void analysisAndEvaluation_runTests(void)
 
     // MyClass method
     {
-        crank_talk_oop_t accessor = crank_talk_analyzeAndEvaluateString(context, "MyClass ![fortyTwo ^ 42]");
-        (void)accessor;
-        //crank_talk_Functional_dumpToConsole(context, accessor);
+        crank_talk_analyzeAndEvaluateString(context, "MyClass ![fortyTwo ^ 42]");
 
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "MyClass new fortyTwo");
         AssertEquals(42, crank_talk_oop_decodeSmallInteger(value));
     }
 
+    // MyClass setter
+    {
+        crank_talk_analyzeAndEvaluateString(context, "MyClass ![first: value first := value]");
+        crank_talk_analyzeAndEvaluateString(context, "MyClass ![second: value second := value]");
+        crank_talk_analyzeAndEvaluateString(context, "MyClass new first: 1; second: 2");
+    }
+
     // MyClass getter
     {
-        crank_talk_oop_t accessor = crank_talk_analyzeAndEvaluateString(context, "MyClass ![first ^ first]");
-        (void)accessor;
-        //crank_talk_Functional_dumpToConsole(context, accessor);
+        crank_talk_analyzeAndEvaluateString(context, "MyClass ![first ^ first]");
+        crank_talk_analyzeAndEvaluateString(context, "MyClass ![second ^ second]");
 
-        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "MyClass new first");
-        AssertEquals(crank_talk_oop_nil(), value);
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "MyClass new first: 1; second: 2; first");
+        AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
 
+        value = crank_talk_analyzeAndEvaluateString(context, "MyClass new first: 1; second: 2; second");
+        AssertEquals(2, crank_talk_oop_decodeSmallInteger(value));
     }
 
 

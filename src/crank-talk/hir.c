@@ -1089,6 +1089,10 @@ crank_talk_HIRSlotStoreInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext
     crank_talk_HIRSlotStoreInstruction_t *slotInstruction = (crank_talk_HIRSlotStoreInstruction_t*)self;
     crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
 
+    crank_talk_BytecodeVectorOperand_t receiverValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, slotInstruction->receiver, (crank_talk_oop_t)bytecodeAssembler);
+    crank_talk_BytecodeVectorOperand_t assignedValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, slotInstruction->value, (crank_talk_oop_t)bytecodeAssembler);
+
+    crank_talk_BytecodeAssembler_storeSlot(context, bytecodeAssembler, receiverValue, crank_talk_oop_decodeSmallInteger(slotInstruction->slotIndex), assignedValue, slotInstruction->value->sourcePosition);
     return self;
 }
 
