@@ -464,6 +464,12 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(2, crank_talk_oop_decodeSmallInteger(value));
     }
 
+    // MyClass myYourself
+    {
+        crank_talk_oop_t method = crank_talk_analyzeAndEvaluateString(context, "MyClass ![myYourself ^ self]");
+        crank_talk_Functional_dumpToConsole(context, method);
+    }
+
 
     crank_talk_vm_destroyContext(context);
 }
