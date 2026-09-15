@@ -353,6 +353,33 @@ crank_talk_HIRBuilder_send(crank_talk_VMContext_t *context, crank_talk_HIRBuilde
 }
 
 CRANK_TALK_API crank_talk_oop_t
+crank_talk_HIRBuilder_slotLoad(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *receiver, size_t slotIndex, crank_talk_oop_t sourcePosition)
+{
+    assert(slotIndex >= 1);
+    crank_talk_oop_t instructionValue = CrankAllocateValuesObjectWithClassName(context, HIRSlotLoadInstruction);
+    crank_talk_HIRSlotLoadInstruction_t* instruction = (crank_talk_HIRSlotLoadInstruction_t*)instructionValue;
+    instruction->super.super.super.sourcePosition = sourcePosition;
+    instruction->receiver = receiver;
+    instruction->slotIndex = crank_talk_oop_encodeSmallInteger(slotIndex);
+    crank_talk_HIRBuilder_addInstruction(builder, &instruction->super);
+    return instructionValue;
+}
+
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_HIRBuilder_slotStore(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *receiver, size_t slotIndex, crank_talk_HIRValue_t *value, crank_talk_oop_t sourcePosition)
+{
+    assert(slotIndex >= 1);
+    crank_talk_oop_t instructionValue = CrankAllocateValuesObjectWithClassName(context, HIRSlotStoreInstruction);
+    crank_talk_HIRSlotStoreInstruction_t* instruction = (crank_talk_HIRSlotStoreInstruction_t*)instructionValue;
+    instruction->super.super.super.sourcePosition = sourcePosition;
+    instruction->receiver = receiver;
+    instruction->slotIndex = crank_talk_oop_encodeSmallInteger(slotIndex);
+    instruction->value = value;
+    crank_talk_HIRBuilder_addInstruction(builder, &instruction->super);
+    return instructionValue;
+}
+
+CRANK_TALK_API crank_talk_oop_t
 crank_talk_HIRBuilder_unreachable(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_oop_t sourcePosition)
 {
     crank_talk_oop_t instructionValue = CrankAllocateValuesObjectWithClassName(context, HIRUnreachableInstruction);
@@ -590,6 +617,50 @@ crank_talk_HIRSendInstruction_fullPrintOn_primitive(crank_talk_VMContext_t *cont
 }
 
 static crank_talk_oop_t
+crank_talk_HIRSlotLoadInstruction_fullPrintOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+
+    crank_talk_HIRSlotLoadInstruction_t *instruction = (crank_talk_HIRSlotLoadInstruction_t*)receiver;
+
+    crank_talk_StringStream_print(context, stream, receiver);
+    crank_talk_StringStream_insertCString(context, stream, " := from: ");
+    crank_talk_StringStream_print(context, stream, (crank_talk_oop_t)instruction->receiver);
+
+    crank_talk_StringStream_insertCString(context, stream, " loadSlot: ");
+    crank_talk_StringStream_print(context, stream, instruction->slotIndex);
+
+    return receiver;
+}
+
+static crank_talk_oop_t
+crank_talk_HIRSlotStoreInstruction_fullPrintOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t stream = arguments[1];
+
+    crank_talk_HIRSlotStoreInstruction_t *instruction = (crank_talk_HIRSlotStoreInstruction_t*)receiver;
+
+    crank_talk_StringStream_insertCString(context, stream, "from: ");
+    crank_talk_StringStream_print(context, stream, (crank_talk_oop_t)instruction->receiver);
+
+    crank_talk_StringStream_insertCString(context, stream, " slot: ");
+    crank_talk_StringStream_print(context, stream, instruction->slotIndex);
+
+    crank_talk_StringStream_insertCString(context, stream, " store: ");
+    crank_talk_StringStream_print(context, stream, (crank_talk_oop_t)instruction->value);
+
+    return receiver;
+}
+
+static crank_talk_oop_t
 crank_talk_HIRUnreachableInstruction_fullPrintOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -751,6 +822,25 @@ crank_talk_HIRSendInstruction_hasResultValue(crank_talk_VMContext_t *context, cr
     (void)argumentCount;
     (void)arguments;
     return crank_talk_oop_fromBoolean(context, true);
+}
+
+static crank_talk_oop_t
+crank_talk_HIRSlotLoadInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    (void)arguments;
+    return crank_talk_oop_fromBoolean(context, true);
+}
+
+
+static crank_talk_oop_t
+crank_talk_HIRSlotStoreInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    (void)arguments;
+    return crank_talk_oop_fromBoolean(context, false);
 }
 
 static crank_talk_oop_t
@@ -970,6 +1060,39 @@ crank_talk_HIRSendInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *c
 }
 
 static crank_talk_oop_t
+crank_talk_HIRSlotLoadInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount == 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_HIRSlotLoadInstruction_t *slotInstruction = (crank_talk_HIRSlotLoadInstruction_t*)self;
+    crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
+
+    crank_talk_BytecodeVectorOperand_t receiverValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, slotInstruction->receiver, (crank_talk_oop_t)bytecodeAssembler);
+    crank_talk_BytecodeVectorOperand_t resultValue = crank_talk_oop_decodeSmallInteger(slotInstruction->super.super.bytecodeVectorIndex);
+
+    crank_talk_BytecodeAssembler_loadSlot(context, bytecodeAssembler, resultValue, receiverValue, crank_talk_oop_decodeSmallInteger(slotInstruction->slotIndex), slotInstruction->super.super.super.sourcePosition);
+
+    return self;
+}
+
+static crank_talk_oop_t
+crank_talk_HIRSlotStoreInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount == 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_HIRSlotStoreInstruction_t *slotInstruction = (crank_talk_HIRSlotStoreInstruction_t*)self;
+    crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
+
+    return self;
+}
+
+static crank_talk_oop_t
 crank_talk_HIRReturnInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)context;
@@ -1033,6 +1156,8 @@ crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRPhiSourceInstructionClass, "fullPrintOn:", 2, crank_talk_HIRPhiSourceInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRReturnInstructionClass, "fullPrintOn:", 2, crank_talk_HIRReturnInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRSendInstructionClass, "fullPrintOn:", 2, crank_talk_HIRSendInstruction_fullPrintOn_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRSlotLoadInstructionClass, "fullPrintOn:", 2, crank_talk_HIRSlotLoadInstruction_fullPrintOn_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRSlotStoreInstructionClass, "fullPrintOn:", 2, crank_talk_HIRSlotStoreInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRUnreachableInstructionClass, "fullPrintOn:", 2, crank_talk_HIRUnreachableInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableLoadInstructionClass, "fullPrintOn:", 2, crank_talk_HIRVariableLoadInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableStoreInstructionClass, "fullPrintOn:", 2, crank_talk_HIRVariableStoreInstruction_fullPrintOn_primitive);
@@ -1051,6 +1176,8 @@ crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRPhiSourceInstructionClass, "hasResultValue", 1, crank_talk_HIRPhiSourceInstruction_hasResultValue);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRReturnInstructionClass, "hasResultValue", 1, crank_talk_HIRReturnInstruction_hasResultValue);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRSendInstructionClass, "hasResultValue", 1, crank_talk_HIRSendInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRSlotLoadInstructionClass, "hasResultValue", 1, crank_talk_HIRSlotLoadInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRSlotStoreInstructionClass, "hasResultValue", 1, crank_talk_HIRSlotStoreInstruction_hasResultValue);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRUnreachableInstructionClass, "hasResultValue", 1, crank_talk_HIRUnreachableInstruction_hasResultValue);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableLoadInstructionClass, "hasResultValue", 1, crank_talk_HIRVariableLoadInstruction_hasResultValue);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableStoreInstructionClass, "hasResultValue", 1, crank_talk_HIRVariableStoreInstructionClass_hasResultValue);
@@ -1065,6 +1192,8 @@ crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRPhiInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRPhiInstruction_emitBytecodeAssemblyWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRPhiSourceInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRPhiSourceInstruction_emitBytecodeAssemblyWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRSendInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRSendInstruction_emitBytecodeAssemblyWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRSlotLoadInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRSlotLoadInstruction_emitBytecodeAssemblyWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRSlotStoreInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRSlotStoreInstruction_emitBytecodeAssemblyWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRReturnInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRReturnInstruction_emitBytecodeAssemblyWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableLoadInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRVariableLoadInstruction_emitBytecodeAssemblyWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableStoreInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRVariableStoreInstruction_emitBytecodeAssemblyWith);

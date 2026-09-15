@@ -31,6 +31,10 @@ CRANK_TALK_OPCODE(Move)
 CRANK_TALK_OPCODE(Class)
 CRANK_TALK_OPCODE(Not)
 
+CRANK_TALK_OPCODE(LoadSlot)
+
 // Three operands
 CRANK_TALK_OPCODE(IdentityEquals)
 CRANK_TALK_OPCODE(IdentityNotEquals)
+
+CRANK_TALK_OPCODE(StoreSlot)

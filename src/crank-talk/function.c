@@ -105,6 +105,7 @@ crank_talk_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, c
     // Create the function analysis environment.
     gcFrame.lexicalEnvironment = crank_talk_FunctionAnalysisEnvironment_create(context, compiledFunction->definitionEnvironment);
     crank_talk_FunctionAnalysisEnvironment_t *functionAnalysisEnvironment = (crank_talk_FunctionAnalysisEnvironment_t *)gcFrame.lexicalEnvironment;
+    functionAnalysisEnvironment->receiverClass = (crank_talk_Behavior_t*)compiledFunction->owner;
 
     // Arguments
     {

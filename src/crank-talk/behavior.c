@@ -102,7 +102,7 @@ crank_talk_Behavior_enumerateSlots(crank_talk_VMContext_t *context, crank_talk_o
     for(size_t i = 0; i < slotCount; ++i)
     {
         crank_talk_Slot_t *slot = (crank_talk_Slot_t *)slots[i];
-        slot->index = crank_talk_oop_encodeSmallInteger(i);
+        slot->index = crank_talk_oop_encodeSmallInteger(i + 1);
     }
 }
 
@@ -120,6 +120,23 @@ crank_talk_Behavior_lookupSelector(crank_talk_oop_t behaviorValue, crank_talk_oo
         }
 
         behavior = behavior->superclass;
+    }
+
+    return crank_talk_oop_nil();
+}
+
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_Behavior_lookupSlotNamed(crank_talk_oop_t behaviorValue, crank_talk_oop_t name)
+{
+    crank_talk_Behavior_t *behavior = (crank_talk_Behavior_t*)behaviorValue;
+    assert(behavior->allSlots);
+    size_t slotCount = crank_talk_object_getSizeInSlots(behavior->allSlots);
+    crank_talk_oop_t *slots = crank_talk_oop_getSlotsData(behavior->allSlots);
+    for(size_t i = 0; i < slotCount; ++i)
+    {
+        crank_talk_Slot_t *slot = (crank_talk_Slot_t *)slots[i];
+        if(slot->super.name == (crank_talk_Symbol_t*)name)
+            return (crank_talk_oop_t)slot;
     }
 
     return crank_talk_oop_nil();

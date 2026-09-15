@@ -311,6 +311,16 @@ crank_talk_BytecodeAssembler_move(crank_talk_VMContext_t *context, crank_talk_By
 }
 
 CRANK_TALK_API void
+crank_talk_BytecodeAssembler_loadSlot(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t resultTemporary, crank_talk_BytecodeVectorOperand_t receiverValue, size_t slotIndex, crank_talk_oop_t sourcePosition)
+{
+    assert(1 <= slotIndex && slotIndex <= 0xFFFF);
+    crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeLoadSlot, sourcePosition);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, receiverValue);
+    crank_talk_BytecodeAssembler_uint16Operand(context, assembler, (uint16_t)slotIndex);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, resultTemporary);
+}
+
+CRANK_TALK_API void
 crank_talk_BytecodeAssembler_identityEquals(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t resultTemporary, crank_talk_BytecodeVectorOperand_t leftOperand, crank_talk_BytecodeVectorOperand_t rightOperand, crank_talk_oop_t sourcePosition)
 {
     crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeIdentityEquals, sourcePosition);
@@ -582,6 +592,15 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
 
         } break;
 
+        case CrankTalkOpcodeLoadSlot:
+        {
+            crank_talk_oop_t receiver = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
+            uint16_t slotIndex = crank_talk_BytecodeFunction_fetchUInt16(bytecodesSize, &activationRecord->pc, bytecodes);
+            crank_talk_oop_t *slots = crank_talk_oop_getSlotsData(receiver);
+            crank_talk_oop_t slot = slots[slotIndex - 1];
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, slot);
+        } break;
+
         // Three operands
         case CrankTalkOpcodeIdentityEquals:
         {
@@ -721,6 +740,14 @@ crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank
         case CrankTalkOpcodeMove:
             printf(" ");
             crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            printf(" -> ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            break;
+
+        case CrankTalkOpcodeLoadSlot:
+            printf(" receiver ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            printf(" slot %d", crank_talk_BytecodeFunction_fetchUInt16(bytecodesSize, &pc, bytecodes));
             printf(" -> ");
             crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
             break;

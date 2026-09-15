@@ -65,7 +65,7 @@ crank_talk_context_setClassTypeMetadataVList(crank_talk_VMContext_t *context, cr
 
         assert(offset >= sizeof(crank_talk_ObjectHeader_t));
         slot->super.name = (crank_talk_Symbol_t*)crank_talk_Symbol_internWithCString(context, fieldName);
-        slot->index = crank_talk_oop_encodeSmallInteger((offset - sizeof(crank_talk_ObjectHeader_t)) / sizeof(crank_talk_oop_t));
+        slot->index = crank_talk_oop_encodeSmallInteger(1 + (offset - sizeof(crank_talk_ObjectHeader_t)) / sizeof(crank_talk_oop_t));
         crank_talk_OrderedCollection_add(context, slots, slotValue);
     }
 
@@ -281,6 +281,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     crank_talk_context_setClassTypeMetadata(context, context->roots.CompiledFunctionClass, "CompiledFunction",
         CrankTalkSlotDef(CompiledFunction, name),
+        CrankTalkSlotDef(CompiledFunction, owner),
         CrankTalkSlotDef(CompiledFunction, argumentCount),
         CrankTalkSlotDef(CompiledFunction, temporaryCount),
         CrankTalkSlotDef(CompiledFunction, nativeEntryPoint),
@@ -573,6 +574,7 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         NULL);
 
     context->roots.ParseTreeMethodDefinitionNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeMethodDefinitionNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeMethodDefinitionNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeMethodDefinitionNode, owner),
         CrankTalkSlotDef(ParseTreeMethodDefinitionNode, selector),
         CrankTalkSlotDef(ParseTreeMethodDefinitionNode, arguments),
         CrankTalkSlotDef(ParseTreeMethodDefinitionNode, body),
@@ -619,6 +621,7 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
     context->roots.FunctionAnalysisEnvironmentClass = crank_talk_context_createClassAndMetaclass(context, "FunctionAnalysisEnvironment", context->roots.LexicalEnvironmentClass, sizeof(crank_talk_FunctionAnalysisEnvironment_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(FunctionAnalysisEnvironment, captureSymbolTable),
         CrankTalkSlotDef(FunctionAnalysisEnvironment, captureList),
+        CrankTalkSlotDef(FunctionAnalysisEnvironment, receiverClass),
         NULL);
 
     // HIR
@@ -691,6 +694,15 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
     context->roots.HIRSendInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRSendInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRSendInstruction_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRSendInstruction, selector),
         CrankTalkSlotDef(HIRSendInstruction, receiverWithArguments),
+        NULL);
+    context->roots.HIRSlotLoadInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRSlotLoadInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRSlotLoadInstruction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRSlotLoadInstruction, receiver),
+        CrankTalkSlotDef(HIRSlotLoadInstruction, slotIndex),
+        NULL);
+    context->roots.HIRSlotStoreInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRSlotStoreInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRSlotStoreInstruction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRSlotStoreInstruction, receiver),
+        CrankTalkSlotDef(HIRSlotStoreInstruction, slotIndex),
+        CrankTalkSlotDef(HIRSlotStoreInstruction, value),
         NULL);
     context->roots.HIRUnreachableInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRUnreachableInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRUnreachableInstruction_t), CrankTalkGCObjectDataTypeOops, NULL);
 

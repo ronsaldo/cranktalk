@@ -447,5 +447,17 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(42, crank_talk_oop_decodeSmallInteger(value));
     }
 
+    // MyClass getter
+    {
+        crank_talk_oop_t accessor = crank_talk_analyzeAndEvaluateString(context, "MyClass ![first ^ first]");
+        (void)accessor;
+        //crank_talk_Functional_dumpToConsole(context, accessor);
+
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "MyClass new first");
+        AssertEquals(crank_talk_oop_nil(), value);
+
+    }
+
+
     crank_talk_vm_destroyContext(context);
 }

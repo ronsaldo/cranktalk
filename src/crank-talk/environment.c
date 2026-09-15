@@ -1,4 +1,5 @@
 #include "crank-talk/environment.h"
+#include "crank-talk/behavior.h"
 #include "crank-talk/context.h"
 #include "crank-talk/dictionary.h"
 #include "crank-talk/hir.h"
@@ -130,6 +131,13 @@ crank_talk_FunctionAnalysisEnvironment_lookupSymbolRecursively(crank_talk_VMCont
     binding = crank_talk_IdentityDictionary_associationAtOrNil(environment->captureSymbolTable, symbol);
     if(!crank_talk_oop_isNil(binding))
         return binding;
+
+    if(environment->receiverClass)
+    {
+        crank_talk_oop_t slot = crank_talk_Behavior_lookupSlotNamed((crank_talk_oop_t)environment->receiverClass, symbol);
+        if(slot)
+            return slot;
+    }
 
     binding = crank_talk_Environment_lookupSymbolRecursively(context, environment->super.parent, symbol);
     if(crank_talk_oop_isNil(binding))

@@ -403,6 +403,7 @@ struct crank_talk_Metaclass_s {
 struct crank_talk_CompiledFunction_s {
     crank_talk_Object_t super;
     crank_talk_oop_t name;
+    crank_talk_oop_t owner;
     crank_talk_oop_t argumentCount;
     crank_talk_oop_t temporaryCount;
     crank_talk_ExternalAddress_t *nativeEntryPoint;

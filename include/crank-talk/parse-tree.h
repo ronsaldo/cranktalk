@@ -168,6 +168,7 @@ struct crank_talk_ParseTreeAddMethodNode_s
 struct crank_talk_ParseTreeMethodDefinitionNode_s
 {
     crank_talk_ParseTreeNode_t super;
+    crank_talk_oop_t owner;
     crank_talk_Symbol_t *selector;
     crank_talk_Array_t *arguments;
     crank_talk_ParseTreeNode_t *body;

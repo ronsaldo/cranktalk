@@ -430,8 +430,17 @@ crank_talk_ParseTreeAddMethodNode_analyzeAndEvaluateWith(crank_talk_VMContext_t 
 
     // Evaluate the owner.
     gcFrame.owner = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->owner, evaluationContextValue);
+    
+    // Is the owner a behavior
+    if(!crank_talk_oop_isKindOf(context, gcFrame.owner, context->roots.BehaviorClass))
+        crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->owner->sourcePosition, "Expected a behavior.");
 
-    // TODO: Set the owner in the method node.
+    // Set the owner in the method node.
+    if(crank_talk_oop_isKindOf(context, (crank_talk_oop_t)node->method, context->roots.ParseTreeMethodDefinitionNodeClass))
+    {
+        crank_talk_ParseTreeMethodDefinitionNode_t *methodNode = (crank_talk_ParseTreeMethodDefinitionNode_t *)node->method;
+        methodNode->owner = gcFrame.owner;
+    }
 
     // Evaluate the method
     gcFrame.method = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->method, evaluationContextValue);
@@ -467,6 +476,7 @@ crank_talk_ParseTreeMethodDefinitionNode_analyzeAndEvaluateWith(crank_talk_VMCon
     gcFrame.compiledFunctionValue = CrankAllocateValuesObjectWithClassName(context, CompiledFunction);
     crank_talk_CompiledFunction_t *compiledFunction = (crank_talk_CompiledFunction_t*)gcFrame.compiledFunctionValue;
     compiledFunction->name = (crank_talk_oop_t)node->selector;
+    compiledFunction->owner = node->owner;
     compiledFunction->argumentCount = crank_talk_oop_encodeSmallInteger(crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments));
     compiledFunction->isBlock = crank_talk_oop_fromBoolean(context, false);
     compiledFunction->definitionEnvironment = evaluationContext->lexicalEnvironment;
