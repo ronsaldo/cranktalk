@@ -1,4 +1,5 @@
 #include "crank-talk/message.h"
+#include "crank-talk/array.h"
 #include "crank-talk/behavior.h"
 #include "crank-talk/context.h"
 #include "crank-talk/dictionary.h"
@@ -41,59 +42,45 @@ CRANK_TALK_API crank_talk_oop_t
 crank_talk_sendWithClass(crank_talk_VMContext_t *context, crank_talk_oop_t receiverClass, crank_talk_oop_t selector, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     assert(argumentCount >= 1);
+    crank_talk_oop_t receiver = arguments[0];
     crank_talk_oop_t foundMethod = crank_talk_Behavior_lookupSelector(receiverClass, selector);
 
     if(crank_talk_oop_isNil(foundMethod))
     {
-        /*if(crank_talk_Value_equals(selector, context->roots.doesNotUnderstandSymbol))
+        if(selector == context->roots.doesNotUnderstandSymbol)
         {
             assert(argumentCount == 2);
-            crank_talk_Message_t *sentMessage = (crank_talk_Message_t *)arguments[1].value.gc;
-            if(crank_talk_Value_isKindOf(context, receiverType, context->roots.NominalTypeClass))
+            crank_talk_Message_t *sentMessage = (crank_talk_Message_t *)arguments[1];
+            if(crank_talk_oop_isKindOf(context, receiverClass, context->roots.ClassClass))
             {
-                crank_talk_NominalType_t *nominalType = (crank_talk_NominalType_t*)receiverType.value.gc;
-                if(!crank_talk_Value_isNil(nominalType->name))
+                crank_talk_Class_t *clazz = (crank_talk_Class_t*)receiverClass;
+                if(clazz->name)
                 {
-                    fprintf(stderr, "Message not understood #" SYSMEL_VM_STRING_FORMAT " by " SYSMEL_VM_STRING_FORMAT "\n",
-                        SYSMEL_VM_STRING_FORMAT_ARG(sentMessage->selector),
-                        SYSMEL_VM_STRING_FORMAT_ARG(nominalType->name)
+                    fprintf(stderr, "Message not understood #" CRANK_TALK_STRING_FORMAT " by " CRANK_TALK_STRING_FORMAT "\n",
+                        CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)sentMessage->selector),
+                        CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)clazz->name)
                     );
                     abort();
                 }
             }
 
-            fprintf(stderr, "Message not understood #" SYSMEL_VM_STRING_FORMAT "\n", SYSMEL_VM_STRING_FORMAT_ARG(sentMessage->selector));
+            fprintf(stderr, "Message not understood #" CRANK_TALK_STRING_FORMAT "\n", CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)sentMessage->selector));
             abort();
         }
 
         // Create the message arguments
         crank_talk_oop_t messageArgumentsValue = crank_talk_Array_create(context, argumentCount - 1);
-        crank_talk_oop_t *messageArguments = crank_talk_Value_getValuesData(messageArgumentsValue);
+        crank_talk_oop_t *messageArguments = crank_talk_oop_getSlotsData(messageArgumentsValue);
         for(size_t i = 1; i < argumentCount; ++i)
             messageArguments[i - 1] = arguments[i];
 
-        crank_talk_oop_t messageValue = SysmelAllocateValuesObjectWithClassName(context, Message);
-        crank_talk_Message_t *message = (crank_talk_Message_t *)messageValue.value.gc;
-        message->selector = selector;
-        message->arguments = messageArgumentsValue;
-        message->lookupClass = receiverType;
+        crank_talk_oop_t messageValue = CrankAllocateValuesObjectWithClassName(context, Message);
+        crank_talk_Message_t *message = (crank_talk_Message_t *)messageValue;
+        message->selector = (crank_talk_Symbol_t*)selector;
+        message->arguments = (crank_talk_Array_t*) messageArgumentsValue;
+        message->lookupClass = (crank_talk_Behavior_t*)receiverClass;
 
         return crank_talk_send1(context, context->roots.doesNotUnderstandSymbol, receiver, messageValue);
-        */
-        if(crank_talk_oop_isKindOf(context, receiverClass, context->roots.ClassClass))
-        {
-            crank_talk_Class_t *clazz = (crank_talk_Class_t *)receiverClass;
-            if(clazz->name)
-            {
-                crank_talk_errorPrintf(context, "Message not understood #" CRANK_TALK_STRING_FORMAT " by " CRANK_TALK_STRING_FORMAT,
-                    CRANK_TALK_STRING_FORMAT_ARG(selector),
-                    CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)clazz->name)
-                );
-            }
-        }
-
-
-        crank_talk_errorPrintf(context, "Message not understood #" CRANK_TALK_STRING_FORMAT ".", CRANK_TALK_STRING_FORMAT_ARG(selector));
     }
 
     return crank_talk_apply(context, foundMethod, argumentCount, arguments);
