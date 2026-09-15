@@ -208,6 +208,9 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     context->roots.SmalltalkImageClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_SmalltalkImage_t), CrankTalkGCObjectDataTypeBytes);
 
+    context->roots.ContextClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_Context_t), CrankTalkGCObjectDataTypeBytes);
+    context->roots.ScriptContextClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ContextClass, sizeof(crank_talk_ScriptContext_t), CrankTalkGCObjectDataTypeBytes);
+
     // System environment
     context->roots.systemEnvironment = crank_talk_SystemEnvironment_create(context);
 
@@ -431,6 +434,11 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(SmalltalkImage, globals),
         NULL);
 
+    crank_talk_context_setClassTypeMetadata(context, context->roots.ContextClass, "Context", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.ScriptContextClass, "ScriptContext",
+        CrankTalkSlotDef(ScriptContext, lexicalEnvironment),
+        NULL);
+
     // Tables
     crank_talk_Behavior_createClassTables(context, context->roots.ProtoObjectClass);
     crank_talk_Behavior_createClassTables(context, context->roots.ObjectClass);
@@ -507,6 +515,9 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_Behavior_createClassTables(context, context->roots.ShiftClassBuilderClass);
 
     crank_talk_Behavior_createClassTables(context, context->roots.SmalltalkImageClass);
+
+    crank_talk_Behavior_createClassTables(context, context->roots.ContextClass);
+    crank_talk_Behavior_createClassTables(context, context->roots.ScriptContextClass);
 }
 
 static void 

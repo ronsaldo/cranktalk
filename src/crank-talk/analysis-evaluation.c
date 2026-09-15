@@ -201,6 +201,51 @@ crank_talk_ParseTreeTrueReference_analyzeAndEvaluateWith(crank_talk_VMContext_t 
 }
 
 static crank_talk_oop_t
+crank_talk_ParseTreeSelfReference_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+
+    crank_talk_ParseTreeSelfReferenceNode_t *node = (crank_talk_ParseTreeSelfReferenceNode_t*)arguments[0];
+
+    crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->super.super.sourcePosition, "Invalid context for self.");
+    abort();
+}
+
+static crank_talk_oop_t
+crank_talk_ParseTreeSuperReference_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+
+    crank_talk_ParseTreeSuperReferenceNode_t *node = (crank_talk_ParseTreeSuperReferenceNode_t*)arguments[0];
+
+    crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->super.super.sourcePosition, "Invalid context for super.");
+    abort();
+}
+
+
+static crank_talk_oop_t
+crank_talk_ParseTreeThisContextReference_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+
+    //crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t evaluationContextValue = arguments[1];
+
+    crank_talk_AnalysisAndEvaluationContext_t *evaluationContext = (crank_talk_AnalysisAndEvaluationContext_t*)evaluationContextValue;
+
+    crank_talk_oop_t scriptContextValue = CrankAllocateValuesObjectWithClassName(context, ScriptContext);
+    crank_talk_ScriptContext_t *scriptContext = (crank_talk_ScriptContext_t *)scriptContextValue;
+    scriptContext->lexicalEnvironment = evaluationContext->lexicalEnvironment;
+    return scriptContextValue;
+}
+
+static crank_talk_oop_t
 crank_talk_ParseTreeSequenceNodeWithLocals_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -649,6 +694,10 @@ crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* conte
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeNilReference_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeFalseReference_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeTrueReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSelfReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSelfReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSuperReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSuperReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeThisContextReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeThisContextReference_analyzeAndEvaluateWith);
+    
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeCascadedMessageNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeCascadedMessageNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageCascadeNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeMessageCascadeNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeMessageSendNode_analyzeAndEvaluateWith);

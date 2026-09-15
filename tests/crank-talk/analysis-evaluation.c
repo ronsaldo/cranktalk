@@ -485,5 +485,19 @@ void analysisAndEvaluation_runTests(void)
         crank_talk_analyzeAndEvaluateString(context, "[Smalltalk garbageCollect] value");
     }
 
+    //// Non-local return test
+    //{
+    //    crank_talk_analyzeAndEvaluateString(context, "MyClass ![methodWithNonLocalReturn [^ 3 ] value. ^ 2]");
+
+    //    crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "MyClass new methodWithNonLocalReturn");
+    //    AssertEquals(3, crank_talk_oop_decodeSmallInteger(value));
+    //}
+
+    // Script context
+    {
+        crank_talk_oop_t scriptContext = crank_talk_analyzeAndEvaluateString(context, "thisContext");
+        Assert(crank_talk_oop_isKindOf(context, scriptContext, context->roots.ScriptContextClass));
+    }
+
     crank_talk_vm_destroyContext(context);
 }

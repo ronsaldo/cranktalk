@@ -94,6 +94,9 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t ShiftClassBuilderClass;
 
     crank_talk_oop_t SmalltalkImageClass;
+    
+    crank_talk_oop_t ContextClass;
+    crank_talk_oop_t ScriptContextClass;
 
     // System environment
     crank_talk_oop_t systemEnvironment;
