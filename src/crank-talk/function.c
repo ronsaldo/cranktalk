@@ -16,8 +16,7 @@
 CRANK_TALK_API crank_talk_CompiledFunction_t*
 crank_talk_CompiledFunction_createForPrimitive(crank_talk_VMContext_t *context, crank_talk_oop_t name, size_t argumentCount, crank_talk_CompiledFunctionNativeEntryPoint_t entryPoint)
 {
-    crank_talk_ExternalAddress_t *entryPointAddress = (crank_talk_ExternalAddress_t*)CrankAllocateBytesObjectWithClassName(context, ExternalAddress);
-    entryPointAddress->address = entryPoint;
+    crank_talk_ExternalAddress_t *entryPointAddress = (crank_talk_ExternalAddress_t*)crank_talk_ExternalAddress_make(context, entryPoint);
 
     crank_talk_CompiledFunction_t *primitiveFunction = (crank_talk_CompiledFunction_t*)CrankAllocateValuesObjectWithClassName(context, CompiledFunction);
     primitiveFunction->name = name;
@@ -106,6 +105,7 @@ crank_talk_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, c
     gcFrame.lexicalEnvironment = crank_talk_FunctionAnalysisEnvironment_create(context, compiledFunction->definitionEnvironment);
     crank_talk_FunctionAnalysisEnvironment_t *functionAnalysisEnvironment = (crank_talk_FunctionAnalysisEnvironment_t *)gcFrame.lexicalEnvironment;
     functionAnalysisEnvironment->receiverClass = (crank_talk_Behavior_t*)compiledFunction->owner;
+    functionAnalysisEnvironment->isInnerBlock = compiledFunction->isInnerBlock;
 
     // Arguments
     {

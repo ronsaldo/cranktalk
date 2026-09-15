@@ -108,6 +108,7 @@ crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *con
     crank_talk_CompiledFunction_t *compiledFunction = (crank_talk_CompiledFunction_t*)gcFrame.compiledFunctionValue;
     compiledFunction->argumentCount = crank_talk_oop_encodeSmallInteger(crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments));
     compiledFunction->isBlock = crank_talk_oop_fromBoolean(context, true);
+    compiledFunction->isInnerBlock = crank_talk_oop_fromBoolean(context, false);
     compiledFunction->definitionEnvironment = evaluationContext->lexicalEnvironment;
     compiledFunction->definitionArguments = (crank_talk_Array_t*)node->arguments;
     compiledFunction->definitionBody = (crank_talk_oop_t)node->body;
@@ -524,6 +525,7 @@ crank_talk_ParseTreeMethodDefinitionNode_analyzeAndEvaluateWith(crank_talk_VMCon
     compiledFunction->owner = node->owner;
     compiledFunction->argumentCount = crank_talk_oop_encodeSmallInteger(crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments));
     compiledFunction->isBlock = crank_talk_oop_fromBoolean(context, false);
+    compiledFunction->isInnerBlock = crank_talk_oop_fromBoolean(context, false);
     compiledFunction->definitionEnvironment = evaluationContext->lexicalEnvironment;
     compiledFunction->definitionArguments = (crank_talk_Array_t*)node->arguments;
     compiledFunction->definitionBody = (crank_talk_oop_t)node->body;

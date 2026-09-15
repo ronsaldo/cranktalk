@@ -79,6 +79,12 @@ crank_talk_Environment_lookupReceiverClassRecursively(crank_talk_VMContext_t *co
     return crank_talk_send0(context, context->roots.lookupReceiverClassRecursively, environment);
 }
 
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_Environment_lookupIsInnerBlockRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t environment)
+{
+    return crank_talk_send0(context, context->roots.lookupIsInnerBlockRecursively, environment);
+}
+
 static crank_talk_oop_t
 crank_talk_EmptyEnvironment_lookupSymbolRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
@@ -205,6 +211,41 @@ crank_talk_FunctionAnalysisEnvironment_lookupReceiverClassRecursively(crank_talk
     return crank_talk_Environment_lookupReceiverClassRecursively(context, environment->super.parent);
 }
 
+//crank_talk_createAndSetPrimitiveMethod(context, context->roots.EmptyEnvironmentClass, "lookupIsInnerBlockRecursively", 1, crank_talk_EmptyEnvironment_lookupIsInnerBlockRecursively);
+//crank_talk_createAndSetPrimitiveMethod(context, context->roots.LexicalEnvironmentClass, "lookupIsInnerBlockRecursively", 1, crank_talk_LexicalEnvironment_lookupIsInnerBlockRecursively);
+//crank_talk_createAndSetPrimitiveMethod(context, context->roots.FunctionAnalysisEnvironmentClass, "lookupIsInnerBlockRecursively", 1,  crank_talk_FunctionAnalysisEnvironment_lookupIsInnerBlockRecursively);
+
+static crank_talk_oop_t
+crank_talk_EmptyEnvironment_lookupIsInnerBlockRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    (void)arguments;
+    assert(argumentCount >= 1);
+    return context->roots.falseValue;
+}
+
+static crank_talk_oop_t
+crank_talk_LexicalEnvironment_lookupIsInnerBlockRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+    crank_talk_LexicalEnvironment_t *environment = (crank_talk_LexicalEnvironment_t*)arguments[0];
+
+    return crank_talk_Environment_lookupIsInnerBlockRecursively(context, environment->parent);
+}
+
+static crank_talk_oop_t
+crank_talk_FunctionAnalysisEnvironment_lookupIsInnerBlockRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+    crank_talk_FunctionAnalysisEnvironment_t *environment = (crank_talk_FunctionAnalysisEnvironment_t*)arguments[0];
+    return environment->isInnerBlock;
+}
+
 void
 crank_talk_registerEnvironmentPrimitives(crank_talk_VMContext_t* context)
 {
@@ -216,4 +257,8 @@ crank_talk_registerEnvironmentPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.EmptyEnvironmentClass, "lookupReceiverClassRecursively", 1, crank_talk_EmptyEnvironment_lookupReceiverClassRecursively);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.LexicalEnvironmentClass, "lookupReceiverClassRecursively", 1, crank_talk_LexicalEnvironment_lookupReceiverClassRecursively);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FunctionAnalysisEnvironmentClass, "lookupReceiverClassRecursively", 1,  crank_talk_FunctionAnalysisEnvironment_lookupReceiverClassRecursively);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.EmptyEnvironmentClass, "lookupIsInnerBlockRecursively", 1, crank_talk_EmptyEnvironment_lookupIsInnerBlockRecursively);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.LexicalEnvironmentClass, "lookupIsInnerBlockRecursively", 1, crank_talk_LexicalEnvironment_lookupIsInnerBlockRecursively);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FunctionAnalysisEnvironmentClass, "lookupIsInnerBlockRecursively", 1,  crank_talk_FunctionAnalysisEnvironment_lookupIsInnerBlockRecursively);
 }

@@ -1,4 +1,5 @@
 #include "crank-talk/stack-frame.h"
+#include "crank-talk/errors.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -30,6 +31,17 @@ crank_talk_stackFrame_popRecord(crank_talk_stackFrameRecord_t *record)
 
     crank_talk_stackFrame_activeRecord = record->previous;
     assert(!crank_talk_stackFrame_activeRecord || crank_talk_stackFrame_activeRecord->type < CrankTalkStackFrameRecordCount);
+}
+
+CRANK_TALK_API void
+crank_talk_stackFrame_unwindAndJumpToBytecodeMethod(crank_talk_VMContext_t *context, crank_talk_stackFrameBytecodeFunctionActivationRecord_t *targetRecord)
+{
+    while(crank_talk_stackFrame_activeRecord && crank_talk_stackFrame_activeRecord != &targetRecord->super)
+        crank_talk_stackFrame_popRecord(crank_talk_stackFrame_activeRecord);
+
+    if(!crank_talk_stackFrame_activeRecord)
+        crank_talk_errorPrintf(context, "Failed to unwind to record %p\n", targetRecord);
+    _longjmp(targetRecord->jmpbuffer, 42);
 }
 
 CRANK_TALK_API void

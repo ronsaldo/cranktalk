@@ -151,6 +151,7 @@ crank_talk_ParseTreeBlockNode_analyzeAndBuildWith(crank_talk_VMContext_t *contex
     crank_talk_CompiledFunction_t *compiledFunction = (crank_talk_CompiledFunction_t*)gcFrame.compiledFunctionValue;
     compiledFunction->argumentCount = crank_talk_oop_encodeSmallInteger(crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments));
     compiledFunction->isBlock = crank_talk_oop_fromBoolean(context, true);
+    compiledFunction->isInnerBlock = crank_talk_oop_fromBoolean(context, true);
     compiledFunction->definitionEnvironment = buildContext->builder->lexicalEnvironment;
     compiledFunction->definitionArguments = (crank_talk_Array_t*)node->arguments;
     compiledFunction->definitionBody = (crank_talk_oop_t)node->body;
@@ -158,9 +159,9 @@ crank_talk_ParseTreeBlockNode_analyzeAndBuildWith(crank_talk_VMContext_t *contex
 
     crank_talk_HIRFunction_t *hirFunction = (crank_talk_HIRFunction_t *)compiledFunction->hirFunction;
     size_t captureCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)hirFunction->captures);
-    if(captureCount == 0)
+    if(captureCount == 0 && false)
     {
-        // FIXME: Create a closure with the captured values.
+        // FIXME: create a captureless block closure if it does not have a non-local return
         // Create the captureless block closure
         gcFrame.blockClosureValue = CrankAllocateValuesObjectWithClassName(context, BlockClosure);
         crank_talk_BlockClosure_t *blockClosure = (crank_talk_BlockClosure_t *)gcFrame.blockClosureValue;
@@ -517,8 +518,13 @@ crank_talk_ParseTreeReturnNode_analyzeAndBuildWith(crank_talk_VMContext_t *conte
     
     crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)buildContextValue;
 
+    crank_talk_oop_t isInnerBlock = crank_talk_Environment_lookupIsInnerBlockRecursively(context, buildContext->builder->lexicalEnvironment);
+
     crank_talk_HIRValue_t *resultValue = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->expression, buildContextValue);
-    crank_talk_HIRBuilder_return(context, buildContext->builder, resultValue, (crank_talk_oop_t)node->super.sourcePosition);
+    if(isInnerBlock == context->roots.trueValue)
+        crank_talk_HIRBuilder_nonLocalReturn(context, buildContext->builder, resultValue, (crank_talk_oop_t)node->super.sourcePosition);
+    else
+        crank_talk_HIRBuilder_return(context, buildContext->builder, resultValue, (crank_talk_oop_t)node->super.sourcePosition);
     return (crank_talk_oop_t)resultValue;
 }
 

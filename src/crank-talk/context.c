@@ -252,6 +252,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     context->roots.lookupSymbolRecursively = crank_talk_Symbol_internWithCString(context, "lookupSymbolRecursively:");
     context->roots.lookupReceiverClassRecursively = crank_talk_Symbol_internWithCString(context, "lookupReceiverClassRecursively");
+    context->roots.lookupIsInnerBlockRecursively = crank_talk_Symbol_internWithCString(context, "lookupIsInnerBlockRecursively");
 
     context->roots.hasResultValueSymbol = crank_talk_Symbol_internWithCString(context, "hasResultValue");
     context->roots.isTerminatorSymbol = crank_talk_Symbol_internWithCString(context, "isTerminator");
@@ -308,6 +309,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(CompiledFunction, bytecode),
         CrankTalkSlotDef(CompiledFunction, literalVector),
         CrankTalkSlotDef(CompiledFunction, isBlock),
+        CrankTalkSlotDef(CompiledFunction, isInnerBlock),
         CrankTalkSlotDef(CompiledFunction, definitionEnvironment),
         CrankTalkSlotDef(CompiledFunction, definitionArguments),
         CrankTalkSlotDef(CompiledFunction, definitionBody),
@@ -663,6 +665,7 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(FunctionAnalysisEnvironment, captureSymbolTable),
         CrankTalkSlotDef(FunctionAnalysisEnvironment, captureList),
         CrankTalkSlotDef(FunctionAnalysisEnvironment, receiverClass),
+        CrankTalkSlotDef(FunctionAnalysisEnvironment, isInnerBlock),
         NULL);
 
     // HIR
@@ -729,6 +732,9 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(HIRPhiSourceInstruction, value),
         NULL);
 
+    context->roots.HIRNonLocalReturnInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRNonLocalReturnInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRNonLocalReturnInstruction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRNonLocalReturnInstruction, resultValue),
+        NULL);
     context->roots.HIRReturnInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRReturnInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRReturnInstruction_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRReturnInstruction, resultValue),
         NULL);

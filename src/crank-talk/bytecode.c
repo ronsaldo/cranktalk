@@ -232,6 +232,13 @@ crank_talk_BytecodeAssembler_return(crank_talk_VMContext_t *context, crank_talk_
 }
 
 CRANK_TALK_API void
+crank_talk_BytecodeAssembler_nonLocalReturn(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t resultValue, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeNonLocalReturn, sourcePosition);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, resultValue);
+}
+
+CRANK_TALK_API void
 crank_talk_BytecodeAssembler_callArgument(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t argumentValue, crank_talk_oop_t sourcePosition)
 {
     crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeCallArgument, sourcePosition);
@@ -487,6 +494,16 @@ crank_talk_vm_BytecodeFunction_ensureMappedContext(crank_talk_VMContext_t *conte
     return mappedContextValue;
 }
 
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_vm_BytecodeFunction_getValidOuterContext(crank_talk_VMContext_t *context, crank_talk_stackFrameBytecodeFunctionActivationRecord_t *activationRecord)
+{
+    if(activationRecord->outerContext)
+        return activationRecord->outerContext;
+    else
+        return crank_talk_vm_BytecodeFunction_ensureMappedContext(context, activationRecord);
+}
+
+
 CRANK_TALK_API void
 crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContext_t *context, crank_talk_stackFrameBytecodeFunctionActivationRecord_t *activationRecord)
 {
@@ -534,6 +551,7 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
             crank_talk_BlockClosure_t *blockClosure = (crank_talk_BlockClosure_t *)blockClosureValue;
             blockClosure->function = (crank_talk_CompiledFunction_t*)function;
             blockClosure->captureVector = (crank_talk_Array_t*)crank_talk_Array_create(context, captureCount);
+            blockClosure->outerContext = (crank_talk_MethodContext_t*)crank_talk_vm_BytecodeFunction_getValidOuterContext(context, activationRecord);
 
             activationRecord->arrayInConstruction = blockClosure->captureVector;
             activationRecord->arrayInConstructionSize = 0;
@@ -560,7 +578,28 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
             crank_talk_gc_safepoint(context);
             return;
         } break;
+        case CrankTalkOpcodeNonLocalReturn:
+        {
+            activationRecord->result = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
+            if(activationRecord->outerContext)
+            {
+                crank_talk_MethodContext_t *method = (crank_talk_MethodContext_t*)activationRecord->outerContext;
+                if(!method->super.stackContextPointer)
+                    crank_talk_error("Cannot perform non-local return into a dead context.");
+                
+                // Set the result in the target context.
+                crank_talk_stackFrameBytecodeFunctionActivationRecord_t *targetRecord = ((crank_talk_ExternalAddress_t*)method->super.stackContextPointer)->address;
+                targetRecord->result = activationRecord->result;
 
+                // Unwind and jump to the target context.
+                crank_talk_stackFrame_unwindAndJumpToBytecodeMethod(context, targetRecord);
+                abort();
+            }
+             
+            // Perform a local return
+            crank_talk_gc_safepoint(context);
+            return;
+        } break;
         case CrankTalkOpcodeCallArgument:
         {
             assert(activationRecord->calloutArgumentCount < CRANK_TALK_MAX_CALL_ARGUMENT_COUNT);
@@ -752,6 +791,7 @@ crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank
             printf(" %04x -> %04x", offset, destinationPC);
         }   break;
         case CrankTalkOpcodeReturn:
+        case CrankTalkOpcodeNonLocalReturn:
             printf(" ");
             crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
             break;

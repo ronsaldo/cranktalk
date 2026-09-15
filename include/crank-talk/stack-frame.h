@@ -84,6 +84,8 @@ CRANK_TALK_API crank_talk_stackFrameRecord_t *crank_talk_stackFrame_getActiveRec
 CRANK_TALK_API void crank_talk_stackFrame_pushRecord(crank_talk_stackFrameRecord_t *record);
 CRANK_TALK_API void crank_talk_stackFrame_popRecord(crank_talk_stackFrameRecord_t *record);
 
+CRANK_TALK_API void crank_talk_stackFrame_unwindAndJumpToBytecodeMethod(crank_talk_VMContext_t *context, crank_talk_stackFrameBytecodeFunctionActivationRecord_t *targetRecord);
+
 CRANK_TALK_API void crank_talk_stackFrame_iterateGCRootsInRecordWith(crank_talk_stackFrameRecord_t *record, void *userdata, crank_talk_GCRootIterationFunction_t iterationFunction);
 CRANK_TALK_API void crank_talk_stackFrame_iterateGCRootsInStackWith(crank_talk_stackFrameRecord_t *stackBottomRecord, void *userdata, crank_talk_GCRootIterationFunction_t iterationFunction);
 

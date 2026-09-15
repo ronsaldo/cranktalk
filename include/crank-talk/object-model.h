@@ -418,6 +418,7 @@ struct crank_talk_CompiledFunction_s {
     crank_talk_Array_t *literalVector;
 
     crank_talk_oop_t isBlock;
+    crank_talk_oop_t isInnerBlock;
     crank_talk_oop_t definitionEnvironment;
     crank_talk_Array_t *definitionArguments;
     crank_talk_oop_t definitionBody;

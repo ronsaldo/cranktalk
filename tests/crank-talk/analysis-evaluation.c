@@ -508,5 +508,31 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(crank_talk_oop_nil(), methodContext->super.stackContextPointer);
     }
 
+    // Top-level block
+    {
+        crank_talk_oop_t blockValue = crank_talk_analyzeAndEvaluateString(context, "[]");
+        Assert(crank_talk_oop_isKindOf(context, blockValue, context->roots.BlockClosureClass));
+
+        crank_talk_BlockClosure_t *blockClosure = (crank_talk_BlockClosure_t *)blockValue;
+        AssertEquals(crank_talk_oop_nil(), blockClosure->outerContext);
+    }
+
+    // Top-level block in block
+    {
+        crank_talk_oop_t blockValue = crank_talk_analyzeAndEvaluateString(context, "[[]] value");
+        Assert(crank_talk_oop_isKindOf(context, blockValue, context->roots.BlockClosureClass));
+
+        crank_talk_BlockClosure_t *blockClosure = (crank_talk_BlockClosure_t *)blockValue;
+        Assert(crank_talk_oop_nil() != blockClosure->outerContext);
+    }
+
+    // Top-level block with non-local return
+    {
+        //crank_talk_oop_t blockValue = crank_talk_analyzeAndEvaluateString(context, "[[^42]] value");
+        //crank_talk_Functional_dumpToConsole(context, blockValue);
+
+        crank_talk_oop_t blockResult = crank_talk_analyzeAndEvaluateString(context, "[[^42] value . 2] value");
+        AssertEquals(42, crank_talk_oop_decodeSmallInteger(blockResult));
+    }
     crank_talk_vm_destroyContext(context);
 }
