@@ -28,6 +28,7 @@ void crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerHIRPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerParseTreePrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerScriptPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context);
 
 static void
@@ -791,6 +792,7 @@ crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
     crank_talk_registerHIRPrimitives(context);
     crank_talk_registerObjectPrimitives(context);
     crank_talk_registerParseTreePrimitives(context);
+    crank_talk_registerScriptPrimitives(context);
     crank_talk_registerStringPrimitives(context);
 }
 

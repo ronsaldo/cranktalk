@@ -63,10 +63,10 @@ crank_talk_analyzeAndEvaluateFileNamed(crank_talk_VMContext_t *context, crank_ta
 
     // Read the file.
     crank_talk_oop_t sourceCodeText = crank_talk_String_allocateWithSize(context, fileSize);
-    if(fread(crank_talk_oop_getBytesData(sourceCodeText), fileSize, 1, file) != 1)
+    if(fileSize > 0 && fread(crank_talk_oop_getBytesData(sourceCodeText), fileSize, 1, file) != 1)
     {
         fclose(file);
-        crank_talk_errorPrintf(context, "Failed to read the content offile "CRANK_TALK_STRING_FORMAT"\n", CRANK_TALK_STRING_FORMAT_ARG(absolutePathString));
+        crank_talk_errorPrintf(context, "Failed to read the content offile "CRANK_TALK_STRING_FORMAT"", CRANK_TALK_STRING_FORMAT_ARG(absolutePathString));
     }
     fclose(file);
     

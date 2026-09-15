@@ -25,6 +25,7 @@ set(CrankTalk_Sources
     parse-tree.c
     parser.c
     scanner.c
+    script.c
     set.c
     source-position.c
     stack-frame.c
