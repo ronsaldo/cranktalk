@@ -8,12 +8,14 @@
 #include "crank-talk/environment.h"
 #include "crank-talk/gc.h"
 #include "crank-talk/hir.h"
+#include "crank-talk/io.h"
 #include "crank-talk/ordered-collection.h"
 #include "crank-talk/parse-tree.h"
 #include "crank-talk/set.h"
 #include "crank-talk/string.h"
 #include <stdarg.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define CrankTalkSlotDef(clazz, fieldName) #fieldName, offsetof(crank_talk_ ## clazz ##_t, fieldName)
 
@@ -26,6 +28,7 @@ void crank_talk_registerFunctionalPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerMacrosPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerHIRPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerIOPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerParseTreePrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerScriptPrimitives(crank_talk_VMContext_t* context);
@@ -779,6 +782,28 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
 }
 
 static void 
+crank_talk_context_createIODefinitions(crank_talk_VMContext_t* context)
+{
+    context->roots.StdioClass = crank_talk_context_createClassAndMetaclass(context, "Stdio", context->roots.ObjectClass, sizeof(crank_talk_Stdio_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.BinaryFileStreamClass = crank_talk_context_createClassAndMetaclass(context, "BinaryFileStream", context->roots.ObjectClass, sizeof(crank_talk_BinaryFileStream_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(BinaryFileStream, handle),
+        NULL);
+
+    {
+        context->roots.stdinStream = CrankAllocateValuesObjectWithClassName(context, BinaryFileStream);
+        ((crank_talk_BinaryFileStream_t*)context->roots.stdinStream)->handle = crank_talk_ExternalAddress_make(context, stdin);
+    }
+    {
+        context->roots.stdoutStream = CrankAllocateValuesObjectWithClassName(context, BinaryFileStream);
+        ((crank_talk_BinaryFileStream_t*)context->roots.stdoutStream)->handle = crank_talk_ExternalAddress_make(context, stdout);
+    }
+    {
+        context->roots.stderrStream = CrankAllocateValuesObjectWithClassName(context, BinaryFileStream);
+        ((crank_talk_BinaryFileStream_t*)context->roots.stderrStream)->handle = crank_talk_ExternalAddress_make(context, stderr);
+    }
+}
+
+static void 
 crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_registerAnalysisAndBuildPrimitives(context);
@@ -790,6 +815,7 @@ crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
     crank_talk_registerMacrosPrimitives(context);
     crank_talk_registerNumbersPrimitives(context);
     crank_talk_registerHIRPrimitives(context);
+    crank_talk_registerIOPrimitives(context);
     crank_talk_registerObjectPrimitives(context);
     crank_talk_registerParseTreePrimitives(context);
     crank_talk_registerScriptPrimitives(context);
@@ -804,6 +830,7 @@ crank_talk_vm_createContext(void)
     crank_talk_dynarray_initialize(&context->markingStack, sizeof(crank_talk_oop_t), 1<<17);
     crank_talk_context_createCoreDefinitions(context);
     crank_talk_context_createFrontEndDefinitions(context);
+    crank_talk_context_createIODefinitions(context);
     crank_talk_registerPrimitives(context);
     crank_talk_gc_collect(context);
     return context;

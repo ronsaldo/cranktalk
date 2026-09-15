@@ -733,4 +733,6 @@ CRANK_TALK_API crank_talk_Behavior_t *crank_talk_oop_getClass(crank_talk_VMConte
 
 CRANK_TALK_API bool crank_talk_oop_isKindOf(crank_talk_VMContext_t *context, crank_talk_oop_t value, crank_talk_oop_t behavior);
 
+CRANK_TALK_API crank_talk_oop_t crank_talk_ExternalAddress_make(crank_talk_VMContext_t *context, void *pointer);
+
 #endif //CRANK_TALK_OBJECT_MODEL_H

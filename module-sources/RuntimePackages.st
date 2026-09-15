@@ -1,1 +1,1 @@
-Stdio stdout nextPutAll: 'Hello World'; lf.
+Stdio stdout nextPutAll: 'Hello World'; nextPut: $@; print: 42; lf.

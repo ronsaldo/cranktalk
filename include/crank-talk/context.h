@@ -225,7 +225,14 @@ struct crank_talk_VMContextRoots_s
     // Bytecode assembler
     crank_talk_oop_t BytecodeAssemblerClass;
     crank_talk_oop_t BytecodeLabelClass;
+
+    // IO
+    crank_talk_oop_t StdioClass;
+    crank_talk_oop_t BinaryFileStreamClass;
     
+    crank_talk_oop_t stdinStream;
+    crank_talk_oop_t stdoutStream;
+    crank_talk_oop_t stderrStream;
 };
 
 struct crank_talk_VMContext_s

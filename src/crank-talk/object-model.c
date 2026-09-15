@@ -86,6 +86,14 @@ crank_talk_oop_isKindOf(crank_talk_VMContext_t *context, crank_talk_oop_t value,
     return value == behavior || sysmel_vm_Behavior_isDirectSubtype(valueClass, behavior);
 }
 
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_ExternalAddress_make(crank_talk_VMContext_t *context, void *pointer)
+{
+    crank_talk_ExternalAddress_t *entryPointAddress = (crank_talk_ExternalAddress_t*)CrankAllocateBytesObjectWithClassName(context, ExternalAddress);
+    entryPointAddress->address = pointer;
+    return (crank_talk_oop_t)entryPointAddress;
+}
+
 static crank_talk_oop_t
 crank_talk_ProtoObject_class_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
