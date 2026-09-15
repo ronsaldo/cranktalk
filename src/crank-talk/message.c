@@ -8,6 +8,16 @@
 #include <stdio.h>
 
 CRANK_TALK_API void
+crank_talk_Behavior_withSelectorSymbolSetMethod(crank_talk_VMContext_t *context, crank_talk_oop_t behaviorValue, crank_talk_oop_t selector, crank_talk_oop_t method)
+{
+    crank_talk_Behavior_t *behavior = (crank_talk_Behavior_t*)behaviorValue;
+    if(!behavior->methodDictionary)
+        behavior->methodDictionary = (crank_talk_MethodDictionary_t*)crank_talk_MethodDictionary_create(context);
+    
+    crank_talk_MethodDictionary_atPut(context, (crank_talk_oop_t)behavior->methodDictionary, selector, method);
+}
+
+CRANK_TALK_API void
 crank_talk_Behavior_withSelectorSetMethod(crank_talk_VMContext_t *context, crank_talk_oop_t behaviorValue, const char *selector, crank_talk_oop_t method)
 {
     crank_talk_Behavior_t *behavior = (crank_talk_Behavior_t*)behaviorValue;

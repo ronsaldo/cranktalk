@@ -4,7 +4,7 @@
 #include "object-model.h"
 #include "function.h"
 
-//CRANK_TALK_API void crank_talk_withSelectorSetMethod(crank_talk_VMContext_t *context, crank_talk_oop_t owner, crank_talk_oop_t selector, crank_talk_oop_t method);
+CRANK_TALK_API void crank_talk_Behavior_withSelectorSymbolSetMethod(crank_talk_VMContext_t *context, crank_talk_oop_t behavior, crank_talk_oop_t selector, crank_talk_oop_t method);
 CRANK_TALK_API void crank_talk_Behavior_withSelectorSetMethod(crank_talk_VMContext_t *context, crank_talk_oop_t behavior, const char *selector, crank_talk_oop_t method);
 CRANK_TALK_API void crank_talk_createAndSetPrimitiveMethod(crank_talk_VMContext_t *context, crank_talk_oop_t behavior, const char *selector, size_t argumentCount, crank_talk_CompiledFunctionNativeEntryPoint_t entryPoint);
 

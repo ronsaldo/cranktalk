@@ -411,6 +411,40 @@ crank_talk_ParseTreeReturnNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *co
     abort();
 }
 
+static crank_talk_oop_t
+crank_talk_ParseTreeAddMethodNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t evaluationContextValue = arguments[1];
+
+    crank_talk_ParseTreeAddMethodNode_t *node = (crank_talk_ParseTreeAddMethodNode_t*)self;
+
+    struct {
+        crank_talk_oop_t owner;
+        crank_talk_oop_t method;
+    } gcFrame = {};
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    // Evaluate the owner.
+    gcFrame.owner = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->owner, evaluationContextValue);
+
+    // TODO: Set the owner in the method node.
+
+    // Evaluate the method
+    gcFrame.method = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->method, evaluationContextValue);
+    crank_talk_CompiledFunction_t *method = (crank_talk_CompiledFunction_t *)gcFrame.method;
+
+    // Add the method to the owner.
+    assert(crank_talk_oop_isKindOf(context, gcFrame.owner, context->roots.BehaviorClass));
+    crank_talk_Behavior_withSelectorSymbolSetMethod(context, gcFrame.owner, method->name, gcFrame.method);
+
+    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+
+    return (crank_talk_oop_t)gcFrame.method;
+}
 
 static crank_talk_oop_t
 crank_talk_ParseTreeMethodDefinitionNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
@@ -611,6 +645,7 @@ crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* conte
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSequenceNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeArrayNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeArrayNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeReturnNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeReturnNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeAddMethodNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeAddMethodNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMethodDefinitionNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeMethodDefinitionNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeVariableDefinitionNode_analyzeAndEvaluateWith);
 

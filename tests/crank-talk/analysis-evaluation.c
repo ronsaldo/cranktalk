@@ -437,17 +437,15 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(2, crank_talk_object_getSizeInSlots(myValue));
     }
 
-    // Method
-    //{
-    //    crank_talk_oop_t method = crank_talk_analyzeAndEvaluateString(context, "![fortyTwo ^ 42]");
-    //    crank_talk_Functional_dumpToConsole(context, method);
-    //}
+    // MyClass method
+    {
+        crank_talk_oop_t accessor = crank_talk_analyzeAndEvaluateString(context, "MyClass ![fortyTwo ^ 42]");
+        (void)accessor;
+        //crank_talk_Functional_dumpToConsole(context, accessor);
 
-    // MyClass accessor
-    //{
-    //    crank_talk_oop_t accessor = crank_talk_analyzeAndEvaluateString(context, "MyClass ![fortyTwo ^ 42]");
-    //    crank_talk_Functional_dumpToConsole(context, accessor);
-    //}
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "MyClass new fortyTwo");
+        AssertEquals(42, crank_talk_oop_decodeSmallInteger(value));
+    }
 
     crank_talk_vm_destroyContext(context);
 }
