@@ -43,6 +43,7 @@ crank_talk_BytecodeAssembler_create(crank_talk_VMContext_t *context)
     assembler->byteStream = crank_talk_ByteStream_create(context);
     assembler->literals = crank_talk_OrderedCollection_create(context);
     assembler->temporaryCount = crank_talk_oop_encodeSmallInteger(0);
+    assembler->sourcePositions = crank_talk_OrderedCollection_create(context);
     return assembler;
 }
 
@@ -52,6 +53,7 @@ crank_talk_BytecodeAssembler_finishBuildingInFunction(crank_talk_VMContext_t *co
     compiledFunction->literalVector = (crank_talk_Array_t*)crank_talk_OrderedCollection_asArray(context, assembler->literals);
     compiledFunction->temporaryCount = assembler->temporaryCount;
     compiledFunction->bytecode = (crank_talk_ByteArray_t*)crank_talk_ByteStream_asByteArray(context, assembler->byteStream);
+    compiledFunction->sourcePositions = (crank_talk_Array_t*)crank_talk_OrderedCollection_asArray(context, assembler->sourcePositions);
 }
 
 CRANK_TALK_API crank_talk_BytecodeLabel_t *
@@ -100,9 +102,26 @@ crank_talk_BytecodeAssembler_newTemporary(crank_talk_VMContext_t *context, crank
     return (crank_talk_BytecodeVectorOperand_t)((temporaryCount << CrankTalkOperandVectorBits) | CrankTalkOperandVectorTemporary);
 }
 
+static void
+crank_talk_BytecodeAssembler_setSourcePosition(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_oop_t sourcePosition)
+{
+    size_t opcodePosition = crank_talk_ByteStream_getSize(assembler->byteStream);
+    size_t sourcePositionsSize = crank_talk_OrderedCollection_getSize(assembler->sourcePositions);
+    if(sourcePositionsSize > 0)
+    {
+        crank_talk_oop_t lastSourcePosition = crank_talk_OrderedCollection_at(context, assembler->sourcePositions, sourcePositionsSize);
+        if(lastSourcePosition == sourcePosition)
+            return;
+    }
+
+    crank_talk_OrderedCollection_add(context, assembler->sourcePositions, crank_talk_oop_encodeSmallInteger(opcodePosition));
+    crank_talk_OrderedCollection_add(context, assembler->sourcePositions, sourcePosition);
+}
+
 CRANK_TALK_API void
 crank_talk_BytecodeAssembler_opcode(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_Opcode_t opcode, crank_talk_oop_t sourcePosition)
 {
+    crank_talk_BytecodeAssembler_setSourcePosition(context, assembler, sourcePosition);
     crank_talk_ByteStream_insertByte(context, assembler->byteStream, (uint8_t)opcode);
 }
 

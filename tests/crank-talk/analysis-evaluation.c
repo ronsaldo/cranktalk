@@ -528,11 +528,15 @@ void analysisAndEvaluation_runTests(void)
 
     // Top-level block with non-local return
     {
-        //crank_talk_oop_t blockValue = crank_talk_analyzeAndEvaluateString(context, "[[^42]] value");
-        //crank_talk_Functional_dumpToConsole(context, blockValue);
-
         crank_talk_oop_t blockResult = crank_talk_analyzeAndEvaluateString(context, "[[^42] value . 2] value");
         AssertEquals(42, crank_talk_oop_decodeSmallInteger(blockResult));
     }
+
+    // Print stack trace
+    {
+        crank_talk_analyzeAndEvaluateString(context, "MyClass ![printStackTrace Smalltalk printStackTrace]");
+        crank_talk_analyzeAndEvaluateString(context, "MyClass new printStackTrace");
+    }
+
     crank_talk_vm_destroyContext(context);
 }

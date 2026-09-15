@@ -36,7 +36,7 @@ struct crank_talk_BytecodeAssembler_s
     crank_talk_oop_t byteStream;
     crank_talk_oop_t literals;
     crank_talk_oop_t temporaryCount;
-    crank_talk_oop_t currentSourcePosition;
+    crank_talk_oop_t sourcePositions;
 };
 
 struct crank_talk_BytecodeLabel_s

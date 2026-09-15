@@ -89,5 +89,6 @@ CRANK_TALK_API void crank_talk_stackFrame_unwindAndJumpToBytecodeMethod(crank_ta
 CRANK_TALK_API void crank_talk_stackFrame_iterateGCRootsInRecordWith(crank_talk_stackFrameRecord_t *record, void *userdata, crank_talk_GCRootIterationFunction_t iterationFunction);
 CRANK_TALK_API void crank_talk_stackFrame_iterateGCRootsInStackWith(crank_talk_stackFrameRecord_t *stackBottomRecord, void *userdata, crank_talk_GCRootIterationFunction_t iterationFunction);
 
+CRANK_TALK_API void crank_talk_stackFrame_printStackTrace(crank_talk_VMContext_t *context);
 
 #endif

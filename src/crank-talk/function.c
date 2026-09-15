@@ -265,6 +265,27 @@ crank_talk_CompiledFunction_ensureAnalysis(crank_talk_VMContext_t *context, cran
     crank_talk_CompiledFunction_ensureBytecodeGenerationAnalysis(context, compiledFunction);
 }
 
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_CompiledFunction_getSourcePositionAtPC(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction, size_t pc)
+{
+    if(!compiledFunction->sourcePositions)
+        return crank_talk_oop_nil();
+
+    // TODO: Perform a lower bound binary search.
+    size_t sourcePositionCounts = crank_talk_object_getSizeInSlots((crank_talk_oop_t)compiledFunction->sourcePositions) / 2;
+    crank_talk_oop_t bestFound = crank_talk_oop_nil();
+    for(size_t i = 0; i < sourcePositionCounts; ++i)
+    {
+        size_t positionPC = crank_talk_oop_decodeSmallInteger(compiledFunction->sourcePositions->elements[i*2]);
+        if(positionPC <= pc)
+            bestFound = compiledFunction->sourcePositions->elements[i*2 + 1];
+        else
+            break;
+    }
+    
+    return bestFound;
+}
+
 static void
 crank_talk_CompiledFunction_dumpToConsole(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction)
 {

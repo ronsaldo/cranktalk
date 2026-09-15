@@ -32,6 +32,7 @@ void crank_talk_registerIOPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerParseTreePrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerScriptPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerSourcePositionPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context);
 
 static void
@@ -308,6 +309,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(CompiledFunction, nativeEntryPoint),
         CrankTalkSlotDef(CompiledFunction, bytecode),
         CrankTalkSlotDef(CompiledFunction, literalVector),
+        CrankTalkSlotDef(CompiledFunction, sourcePositions),
         CrankTalkSlotDef(CompiledFunction, isBlock),
         CrankTalkSlotDef(CompiledFunction, isInnerBlock),
         CrankTalkSlotDef(CompiledFunction, definitionEnvironment),
@@ -788,7 +790,7 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(BytecodeAssembler, byteStream),
         CrankTalkSlotDef(BytecodeAssembler, literals),
         CrankTalkSlotDef(BytecodeAssembler, temporaryCount),
-        CrankTalkSlotDef(BytecodeAssembler, currentSourcePosition),
+        CrankTalkSlotDef(BytecodeAssembler, sourcePositions),
         NULL);
     context->roots.BytecodeLabelClass = crank_talk_context_createClassAndMetaclass(context, "BytecodeAssembler", context->roots.ObjectClass, sizeof(crank_talk_AnalysisAndBuildContext_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(BytecodeLabel, isDefined),
@@ -835,6 +837,7 @@ crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
     crank_talk_registerObjectPrimitives(context);
     crank_talk_registerParseTreePrimitives(context);
     crank_talk_registerScriptPrimitives(context);
+    crank_talk_registerSourcePositionPrimitives(context);
     crank_talk_registerStringPrimitives(context);
 }
 

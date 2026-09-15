@@ -343,6 +343,16 @@ crank_talk_SmalltalkImage_globals_primitive(crank_talk_VMContext_t *context, cra
     return (crank_talk_oop_t)smalltalk->globals;
 }
 
+static crank_talk_oop_t
+crank_talk_SmalltalkImage_printStackTrace_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+    crank_talk_stackFrame_printStackTrace(context);
+    return arguments[0];
+}
+
 void
 crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context)
 {
@@ -368,4 +378,5 @@ crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context)
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmalltalkImageClass, "garbageCollect", 1, crank_talk_SmalltalkImage_garbageCollect_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmalltalkImageClass, "globals", 1, crank_talk_SmalltalkImage_globals_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmalltalkImageClass, "printStackTrace", 1, crank_talk_SmalltalkImage_printStackTrace_primitive);
 }

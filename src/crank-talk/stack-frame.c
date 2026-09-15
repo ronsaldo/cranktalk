@@ -1,7 +1,10 @@
 #include "crank-talk/stack-frame.h"
 #include "crank-talk/errors.h"
+#include "crank-talk/function.h"
+#include "crank-talk/string.h"
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 CRANK_TALK_THREAD_LOCAL crank_talk_stackFrameRecord_t *
 crank_talk_stackFrame_activeRecord;
@@ -104,4 +107,31 @@ crank_talk_stackFrame_iterateGCRootsInStackWith(crank_talk_stackFrameRecord_t *s
 {
     for(crank_talk_stackFrameRecord_t *record = stackBottomRecord; record; record = record->previous)
         crank_talk_stackFrame_iterateGCRootsInRecordWith(record, userdata, iterationFunction);
+}
+
+CRANK_TALK_API void
+crank_talk_stackFrame_printStackTrace(crank_talk_VMContext_t *context)
+{
+    crank_talk_stackFrameRecord_t *record = crank_talk_stackFrame_activeRecord;
+    while (record)
+    {
+        if(record->type == CrankTalkStackFrameRecordBytecodeFunctionActivationRecord)
+        {
+            crank_talk_stackFrameBytecodeFunctionActivationRecord_t* activationRecord = (crank_talk_stackFrameBytecodeFunctionActivationRecord_t*)record;
+            crank_talk_CompiledFunction_t *function = (crank_talk_CompiledFunction_t*)activationRecord->function;
+
+            crank_talk_oop_t sourcePosition = crank_talk_CompiledFunction_getSourcePositionAtPC(context, function, activationRecord->pc);
+            if(sourcePosition)
+            {
+                crank_talk_oop_t sourcePositionString = crank_talk_oop_printString(context, sourcePosition);
+                printf(CRANK_TALK_STRING_FORMAT ": ", CRANK_TALK_STRING_FORMAT_ARG(sourcePositionString));
+            }
+
+            if(function->name)
+                printf(CRANK_TALK_STRING_FORMAT, CRANK_TALK_STRING_FORMAT_ARG(function->name));
+            printf("\n");
+        }
+
+        record = record->previous;
+    }
 }
