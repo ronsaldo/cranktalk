@@ -349,6 +349,23 @@ crank_talk_ParseTreeSelfReferenceNode_analyzeAndBuildWith(crank_talk_VMContext_t
 }
 
 static crank_talk_oop_t
+crank_talk_ParseTreeSuperReferenceNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_ParseTreeNode_t *node = (crank_talk_ParseTreeNode_t*)arguments[0];
+    crank_talk_oop_t buildContextValue = arguments[1];
+    crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t*)buildContextValue;
+
+    crank_talk_oop_t foundBinding = crank_talk_Environment_lookupReceiverRecursively(context, buildContext->builder->lexicalEnvironment);
+    if(!foundBinding)
+        crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->sourcePosition, "self is not defined in this context.");
+    assert(crank_talk_oop_isKindOf(context, foundBinding, context->roots.HIRVariableClass));
+    return ((crank_talk_HIRVariable_t*)foundBinding)->value;
+}
+
+static crank_talk_oop_t
 crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     assert(argumentCount >= 2);
@@ -415,6 +432,8 @@ crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith(crank_talk_VMContext_t *
         return (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndBuild(context, expandedMacro, buildContextValue);
     }
 
+    bool isSuperSend = crank_talk_isParseTreeSuperReferenceNode(context, (crank_talk_oop_t)node->receiver);
+
     gcFrame.receiver = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->receiver, buildContextValue);
     size_t messageArgumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments);
     gcFrame.argumentsWithReceiver = (crank_talk_Array_t*)crank_talk_Array_create(context, 1 + messageArgumentCount);
@@ -422,8 +441,21 @@ crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith(crank_talk_VMContext_t *
     for(size_t i = 0; i < messageArgumentCount; ++i)
         gcFrame.argumentsWithReceiver->elements[i + 1] = (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndBuild(context, node->arguments->elements[i], buildContextValue);
 
-    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-    return crank_talk_HIRBuilder_send(context, buildContext->builder, gcFrame.selector, gcFrame.argumentsWithReceiver, (crank_talk_oop_t)node->super.sourcePosition);
+    if(isSuperSend)
+    {
+        crank_talk_oop_t receiverClasss = crank_talk_Environment_lookupReceiverClassRecursively(context, buildContext->builder->lexicalEnvironment);
+        crank_talk_HIRValue_t *receiverClassValue = (crank_talk_HIRValue_t *)crank_talk_HIRConstantLiteralValue_create(context, receiverClasss, (crank_talk_oop_t)node->super.sourcePosition);
+        if(!receiverClasss)
+            crank_talk_error("super is not properly defined in this context.");
+        CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+
+        return crank_talk_HIRBuilder_superSend(context, buildContext->builder, receiverClassValue, gcFrame.selector, gcFrame.argumentsWithReceiver, (crank_talk_oop_t)node->super.sourcePosition);
+    }
+    else
+    {
+        CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+        return crank_talk_HIRBuilder_send(context, buildContext->builder, gcFrame.selector, gcFrame.argumentsWithReceiver, (crank_talk_oop_t)node->super.sourcePosition);
+    }
 }
 
 static crank_talk_oop_t
@@ -734,6 +766,7 @@ crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeFalseReferenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeTrueReferenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSelfReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeSelfReferenceNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSuperReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeSuperReferenceNode_analyzeAndBuildWith);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageCascadeNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith);

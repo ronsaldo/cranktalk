@@ -466,10 +466,19 @@ void analysisAndEvaluation_runTests(void)
 
     // MyClass myYourself
     {
-        crank_talk_oop_t method = crank_talk_analyzeAndEvaluateString(context, "MyClass ![myYourself ^ self]");
-        crank_talk_Functional_dumpToConsole(context, method);
+        crank_talk_analyzeAndEvaluateString(context, "MyClass ![myYourself ^ self]");
     }
 
+    // MyClass initialize
+    {
+        crank_talk_analyzeAndEvaluateString(context, "MyClass ![initialize super initialize. first := 1. second := 2]");
+
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "MyClass new first");
+        AssertEquals(1, crank_talk_oop_decodeSmallInteger(value));
+
+        value = crank_talk_analyzeAndEvaluateString(context, "MyClass new second");
+        AssertEquals(2, crank_talk_oop_decodeSmallInteger(value));
+    }
 
     crank_talk_vm_destroyContext(context);
 }

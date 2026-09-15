@@ -115,6 +115,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t analyzeAndBuildIdentifierReferenceWithSymbol;
     crank_talk_oop_t analyzeAndBuildAssignmentWithValueWithSymbol;
     crank_talk_oop_t lookupSymbolRecursively;
+    crank_talk_oop_t lookupReceiverClassRecursively;
 
     crank_talk_oop_t hasResultValueSymbol;
     crank_talk_oop_t isTerminatorSymbol;
@@ -202,6 +203,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t HIRPhiSourceInstructionClass;
     crank_talk_oop_t HIRReturnInstructionClass;
     crank_talk_oop_t HIRSendInstructionClass;
+    crank_talk_oop_t HIRSuperSendInstructionClass;
     crank_talk_oop_t HIRSlotLoadInstructionClass;
     crank_talk_oop_t HIRSlotStoreInstructionClass;
     crank_talk_oop_t HIRUnreachableInstructionClass;

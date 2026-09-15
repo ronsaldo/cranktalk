@@ -51,6 +51,7 @@ CRANK_TALK_API crank_talk_oop_t crank_talk_FunctionAnalysisEnvironment_create(cr
 
 CRANK_TALK_API crank_talk_oop_t crank_talk_Environment_lookupSymbolRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t environment, crank_talk_oop_t symbol);
 CRANK_TALK_API crank_talk_oop_t crank_talk_Environment_lookupReceiverRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t environment);
+CRANK_TALK_API crank_talk_oop_t crank_talk_Environment_lookupReceiverClassRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t environment);
 
 
 #endif //CRANK_TALK_ENVIRONMENT_H

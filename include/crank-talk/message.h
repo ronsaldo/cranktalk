@@ -8,6 +8,8 @@ CRANK_TALK_API void crank_talk_Behavior_withSelectorSymbolSetMethod(crank_talk_V
 CRANK_TALK_API void crank_talk_Behavior_withSelectorSetMethod(crank_talk_VMContext_t *context, crank_talk_oop_t behavior, const char *selector, crank_talk_oop_t method);
 CRANK_TALK_API void crank_talk_createAndSetPrimitiveMethod(crank_talk_VMContext_t *context, crank_talk_oop_t behavior, const char *selector, size_t argumentCount, crank_talk_CompiledFunctionNativeEntryPoint_t entryPoint);
 
+CRANK_TALK_API crank_talk_oop_t crank_talk_sendWithClass(crank_talk_VMContext_t *context, crank_talk_oop_t lookupClass, crank_talk_oop_t selector, size_t argumentCount, crank_talk_oop_t *arguments);
+CRANK_TALK_API crank_talk_oop_t crank_talk_superSend(crank_talk_VMContext_t *context, crank_talk_oop_t receiverClass, crank_talk_oop_t selector, size_t argumentCount, crank_talk_oop_t *arguments);
 CRANK_TALK_API crank_talk_oop_t crank_talk_send(crank_talk_VMContext_t *context, crank_talk_oop_t selector, size_t argumentCount, crank_talk_oop_t *arguments);
 
 CRANK_TALK_INLINE crank_talk_oop_t

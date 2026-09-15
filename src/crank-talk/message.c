@@ -5,6 +5,7 @@
 #include "crank-talk/errors.h"
 #include "crank-talk/function.h"
 #include "crank-talk/string.h"
+#include <stdlib.h>
 #include <stdio.h>
 
 CRANK_TALK_API void
@@ -37,11 +38,9 @@ crank_talk_createAndSetPrimitiveMethod(crank_talk_VMContext_t *context, crank_ta
 }
 
 CRANK_TALK_API crank_talk_oop_t
-crank_talk_send(crank_talk_VMContext_t *context, crank_talk_oop_t selector, size_t argumentCount, crank_talk_oop_t *arguments)
+crank_talk_sendWithClass(crank_talk_VMContext_t *context, crank_talk_oop_t receiverClass, crank_talk_oop_t selector, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     assert(argumentCount >= 1);
-    crank_talk_oop_t receiver = arguments[0];
-    crank_talk_oop_t receiverClass = (crank_talk_oop_t)crank_talk_oop_getClass(context, receiver);
     crank_talk_oop_t foundMethod = crank_talk_Behavior_lookupSelector(receiverClass, selector);
 
     if(crank_talk_oop_isNil(foundMethod))
@@ -98,4 +97,26 @@ crank_talk_send(crank_talk_VMContext_t *context, crank_talk_oop_t selector, size
     }
 
     return crank_talk_apply(context, foundMethod, argumentCount, arguments);
+}
+
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_superSend(crank_talk_VMContext_t *context, crank_talk_oop_t receiverClass, crank_talk_oop_t selector, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    if(!receiverClass)
+        crank_talk_error("Expected a receiver class.");
+
+    crank_talk_Behavior_t *behavior = (crank_talk_Behavior_t *)receiverClass;
+    if(!behavior->superclass)
+        crank_talk_error("Expected a behavior with a superclass.");
+
+    return crank_talk_sendWithClass(context, (crank_talk_oop_t)behavior->superclass, selector, argumentCount, arguments);
+}
+
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_send(crank_talk_VMContext_t *context, crank_talk_oop_t selector, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    assert(argumentCount >= 1);
+    crank_talk_oop_t receiver = arguments[0];
+    crank_talk_oop_t receiverClass = (crank_talk_oop_t)crank_talk_oop_getClass(context, receiver);
+    return crank_talk_sendWithClass(context, receiverClass, selector, argumentCount, arguments);
 }

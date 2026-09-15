@@ -247,6 +247,15 @@ crank_talk_BytecodeAssembler_sendMessage(crank_talk_VMContext_t *context, crank_
 }
 
 CRANK_TALK_API void
+crank_talk_BytecodeAssembler_superSendMessage(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t resultTemporary, crank_talk_BytecodeVectorOperand_t lookupClass, crank_talk_BytecodeVectorOperand_t selectorValue, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeSuperSendMessage, sourcePosition);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, lookupClass);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, selectorValue);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, resultTemporary);
+}
+
+CRANK_TALK_API void
 crank_talk_BytecodeAssembler_pushClosureCapture(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t captureValue, crank_talk_oop_t sourcePosition)
 {
     crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodePushClosureCapture, sourcePosition);
@@ -538,7 +547,14 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
             activationRecord->calloutArgumentCount = 0;
             crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, result);
         } break;
-
+        case CrankTalkOpcodeSuperSendMessage:
+        {
+            crank_talk_oop_t lookupClass = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
+            crank_talk_oop_t selector = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
+            crank_talk_oop_t result = crank_talk_superSend(context, lookupClass, selector, activationRecord->calloutArgumentCount, activationRecord->calloutArguments);
+            activationRecord->calloutArgumentCount = 0;
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, result);
+        } break;
         case CrankTalkOpcodePushClosureCapture:
             activationRecord->arrayInConstruction->elements[activationRecord->arrayInConstructionSize++] = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
             break;
@@ -713,6 +729,15 @@ crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank
             break;
         
         case CrankTalkOpcodeSendMessage:
+            printf(" ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            printf(" -> ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            break;
+
+        case CrankTalkOpcodeSuperSendMessage:
+            printf(" ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
             printf(" ");
             crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
             printf(" -> ");

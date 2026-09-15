@@ -232,6 +232,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.analyzeAndBuildAssignmentWithValueWithSymbol = crank_talk_Symbol_internWithCString(context, "analyzeAndBuildAssignment:withValue:with:");
 
     context->roots.lookupSymbolRecursively = crank_talk_Symbol_internWithCString(context, "lookupSymbolRecursively:");
+    context->roots.lookupReceiverClassRecursively = crank_talk_Symbol_internWithCString(context, "lookupReceiverClassRecursively");
 
     context->roots.hasResultValueSymbol = crank_talk_Symbol_internWithCString(context, "hasResultValue");
     context->roots.isTerminatorSymbol = crank_talk_Symbol_internWithCString(context, "isTerminator");
@@ -694,6 +695,11 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
     context->roots.HIRSendInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRSendInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRSendInstruction_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRSendInstruction, selector),
         CrankTalkSlotDef(HIRSendInstruction, receiverWithArguments),
+        NULL);
+    context->roots.HIRSuperSendInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRSuperSendInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRSuperSendInstruction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRSuperSendInstruction, lookupClass),
+        CrankTalkSlotDef(HIRSuperSendInstruction, selector),
+        CrankTalkSlotDef(HIRSuperSendInstruction, receiverWithArguments),
         NULL);
     context->roots.HIRSlotLoadInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRSlotLoadInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRSlotLoadInstruction_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRSlotLoadInstruction, receiver),

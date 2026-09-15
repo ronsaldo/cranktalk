@@ -17,6 +17,7 @@ CRANK_TALK_OPCODE(Return)
 
 CRANK_TALK_OPCODE(CallArgument)
 CRANK_TALK_OPCODE(SendMessage)
+CRANK_TALK_OPCODE(SuperSendMessage)
 
 CRANK_TALK_OPCODE(PushClosureCapture)
 CRANK_TALK_OPCODE(FinishClosure)

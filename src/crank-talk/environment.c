@@ -73,6 +73,12 @@ crank_talk_Environment_lookupReceiverRecursively(crank_talk_VMContext_t *context
     return crank_talk_Environment_lookupSymbolRecursively(context, environment, context->roots.selfSymbol);
 }
 
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_Environment_lookupReceiverClassRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t environment)
+{
+    return crank_talk_send0(context, context->roots.lookupReceiverClassRecursively, environment);
+}
+
 static crank_talk_oop_t
 crank_talk_EmptyEnvironment_lookupSymbolRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
@@ -165,6 +171,40 @@ crank_talk_FunctionAnalysisEnvironment_lookupSymbolRecursively(crank_talk_VMCont
     return binding;
 }
 
+static crank_talk_oop_t
+crank_talk_EmptyEnvironment_lookupReceiverClassRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    (void)arguments;
+    assert(argumentCount >= 1);
+    return crank_talk_oop_nil();
+}
+
+static crank_talk_oop_t
+crank_talk_LexicalEnvironment_lookupReceiverClassRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+    crank_talk_LexicalEnvironment_t *environment = (crank_talk_LexicalEnvironment_t*)arguments[0];
+
+    return crank_talk_Environment_lookupReceiverClassRecursively(context, environment->parent);
+}
+
+static crank_talk_oop_t
+crank_talk_FunctionAnalysisEnvironment_lookupReceiverClassRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+    crank_talk_FunctionAnalysisEnvironment_t *environment = (crank_talk_FunctionAnalysisEnvironment_t*)arguments[0];
+
+    if(environment->receiverClass)
+        return (crank_talk_oop_t)environment->receiverClass;
+    return crank_talk_Environment_lookupReceiverClassRecursively(context, environment->super.parent);
+}
+
 void
 crank_talk_registerEnvironmentPrimitives(crank_talk_VMContext_t* context)
 {
@@ -172,4 +212,8 @@ crank_talk_registerEnvironmentPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SystemEnvironmentEnvironmentClass, "lookupSymbolRecursively:", 2, crank_talk_SystemEnvironmentEnvironment_lookupSymbolRecursively);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.LexicalEnvironmentClass, "lookupSymbolRecursively:", 2,  crank_talk_LexicalEnvironment_lookupSymbolRecursively);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FunctionAnalysisEnvironmentClass, "lookupSymbolRecursively:", 2,  crank_talk_FunctionAnalysisEnvironment_lookupSymbolRecursively);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.EmptyEnvironmentClass, "lookupReceiverClassRecursively", 1, crank_talk_EmptyEnvironment_lookupReceiverClassRecursively);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.LexicalEnvironmentClass, "lookupReceiverClassRecursively", 1, crank_talk_LexicalEnvironment_lookupReceiverClassRecursively);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FunctionAnalysisEnvironmentClass, "lookupReceiverClassRecursively", 1,  crank_talk_FunctionAnalysisEnvironment_lookupReceiverClassRecursively);
 }
