@@ -23,6 +23,11 @@ CRANK_TALK_API void
 crank_talk_stackFrame_popRecord(crank_talk_stackFrameRecord_t *record)
 {
     assert(record->type < CrankTalkStackFrameRecordCount);
+    if(record->mappedContext) {
+        crank_talk_StackContext_t *mappedContext = (crank_talk_StackContext_t *)record->mappedContext;
+        mappedContext->stackContextPointer = crank_talk_oop_nil();
+    }
+
     crank_talk_stackFrame_activeRecord = record->previous;
     assert(!crank_talk_stackFrame_activeRecord || crank_talk_stackFrame_activeRecord->type < CrankTalkStackFrameRecordCount);
 }
@@ -35,6 +40,7 @@ crank_talk_stackFrame_iterateGCRootsInRecordWith(crank_talk_stackFrameRecord_t *
     case CrankTalkStackFrameRecordGCRoots:
     {
         crank_talk_stackFrameGCRootsRecord_t *rootsRecord = (crank_talk_stackFrameGCRootsRecord_t*)record;
+        iterationFunction(userdata, &rootsRecord->super.mappedContext);
 
         // Oop roots.
         for(size_t i = 0; i < rootsRecord->rootCount; ++i)
@@ -45,6 +51,7 @@ crank_talk_stackFrame_iterateGCRootsInRecordWith(crank_talk_stackFrameRecord_t *
     case CrankTalkStackFrameRecordApplicationArguments:
     {
         crank_talk_stackFrameApplicationArgumentsRecord_t *applicationRecord = (crank_talk_stackFrameApplicationArgumentsRecord_t*)record;
+        iterationFunction(userdata, &applicationRecord->super.mappedContext);
         iterationFunction(userdata, &applicationRecord->functional);
         iterationFunction(userdata, &applicationRecord->blockClosure);
         for(size_t i = 0; i <applicationRecord->argumentCount; ++i)
@@ -55,9 +62,13 @@ crank_talk_stackFrame_iterateGCRootsInRecordWith(crank_talk_stackFrameRecord_t *
     case CrankTalkStackFrameRecordBytecodeFunctionActivationRecord:
     {
         crank_talk_stackFrameBytecodeFunctionActivationRecord_t *activationRecord = (crank_talk_stackFrameBytecodeFunctionActivationRecord_t*)record;
+        iterationFunction(userdata, &activationRecord->super.mappedContext);
+
         iterationFunction(userdata, &activationRecord->function);
         iterationFunction(userdata, &activationRecord->bytecode);
 
+        iterationFunction(userdata, &activationRecord->blockClosureOrNil);
+        iterationFunction(userdata, &activationRecord->outerContext);
         iterationFunction(userdata, &activationRecord->captureVector);
         iterationFunction(userdata, &activationRecord->literalVector);
 

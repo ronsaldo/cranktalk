@@ -213,6 +213,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.SmalltalkImageClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_SmalltalkImage_t), CrankTalkGCObjectDataTypeBytes);
 
     context->roots.ContextClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_Context_t), CrankTalkGCObjectDataTypeBytes);
+    context->roots.StackContextClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ContextClass, sizeof(crank_talk_StackContext_t), CrankTalkGCObjectDataTypeBytes);
+    context->roots.MethodContextClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.StackContextClass, sizeof(crank_talk_MethodContext_t), CrankTalkGCObjectDataTypeBytes);
     context->roots.ScriptContextClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ContextClass, sizeof(crank_talk_ScriptContext_t), CrankTalkGCObjectDataTypeBytes);
 
     // System environment
@@ -314,6 +316,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_context_setClassTypeMetadata(context, context->roots.BlockClosureClass, "BlockClosure",
         CrankTalkSlotDef(BlockClosure, function),
         CrankTalkSlotDef(BlockClosure, captureVector),
+        CrankTalkSlotDef(BlockClosure, outerContext),
         NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.MessageClass, "Message",
         CrankTalkSlotDef(Message, selector),
@@ -439,6 +442,10 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         NULL);
 
     crank_talk_context_setClassTypeMetadata(context, context->roots.ContextClass, "Context", NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.StackContextClass, "StackContext",
+        CrankTalkSlotDef(StackContext, stackContextPointer),
+        NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.MethodContextClass, "MethodContext", NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.ScriptContextClass, "ScriptContext",
         CrankTalkSlotDef(ScriptContext, lexicalEnvironment),
         NULL);
@@ -521,6 +528,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_Behavior_createClassTables(context, context->roots.SmalltalkImageClass);
 
     crank_talk_Behavior_createClassTables(context, context->roots.ContextClass);
+    crank_talk_Behavior_createClassTables(context, context->roots.StackContextClass);
+    crank_talk_Behavior_createClassTables(context, context->roots.MethodContextClass);
     crank_talk_Behavior_createClassTables(context, context->roots.ScriptContextClass);
 }
 
@@ -741,6 +750,7 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(HIRSlotStoreInstruction, slotIndex),
         CrankTalkSlotDef(HIRSlotStoreInstruction, value),
         NULL);
+    context->roots.HIRThisContextInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRThisContextInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRThisContextInstruction_t), CrankTalkGCObjectDataTypeOops, NULL);
     context->roots.HIRUnreachableInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRUnreachableInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRUnreachableInstruction_t), CrankTalkGCObjectDataTypeOops, NULL);
 
     context->roots.HIRVariableLoadInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRVariableLoadInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRVariableLoadInstruction_t), CrankTalkGCObjectDataTypeOops,

@@ -155,6 +155,8 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
     typedef struct crank_talk_SmalltalkImage_s crank_talk_SmalltalkImage_t;
 
     typedef struct crank_talk_Context_s crank_talk_Context_t;
+        typedef struct crank_talk_StackContext_s crank_talk_StackContext_t;
+            typedef struct crank_talk_MethodContext_s crank_talk_MethodContext_t;
     typedef struct crank_talk_ScriptContext_s crank_talk_ScriptContext_t;
 
 typedef crank_talk_oop_t (*crank_talk_CompiledFunctionNativeEntryPoint_t)(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments);
@@ -427,6 +429,7 @@ struct crank_talk_BlockClosure_s {
     crank_talk_Object_t super;
     crank_talk_CompiledFunction_t *function;
     crank_talk_Array_t *captureVector;
+    crank_talk_MethodContext_t *outerContext;
 };
 
 struct crank_talk_Message_s {
@@ -708,6 +711,17 @@ struct crank_talk_SmalltalkImage_s
 struct crank_talk_Context_s
 {
     crank_talk_Object_t super;
+};
+
+struct crank_talk_StackContext_s
+{
+    crank_talk_Context_t super;
+    crank_talk_oop_t stackContextPointer;
+};
+
+struct crank_talk_MethodContext_s
+{
+    crank_talk_StackContext_t super;
 };
 
 struct crank_talk_ScriptContext_s

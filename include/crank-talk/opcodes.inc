@@ -22,6 +22,8 @@ CRANK_TALK_OPCODE(SuperSendMessage)
 CRANK_TALK_OPCODE(PushClosureCapture)
 CRANK_TALK_OPCODE(FinishClosure)
 
+CRANK_TALK_OPCODE(ThisContext)
+
 // Two operands
 CRANK_TALK_OPCODE(JumpIfTrue)
 CRANK_TALK_OPCODE(JumpIfFalse)

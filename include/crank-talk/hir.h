@@ -25,6 +25,7 @@ typedef struct crank_talk_HIRFunctionLocal_s crank_talk_HIRFunctionLocal_t;
         typedef struct crank_talk_HIRSuperSendInstruction_s crank_talk_HIRSuperSendInstruction_t;
         typedef struct crank_talk_HIRSlotLoadInstruction_s crank_talk_HIRSlotLoadInstruction_t;
         typedef struct crank_talk_HIRSlotStoreInstruction_s crank_talk_HIRSlotStoreInstruction_t;
+        typedef struct crank_talk_HIRThisContextInstruction_s crank_talk_HIRThisContextInstruction_t;
         typedef struct crank_talk_HIRUnreachableInstruction_s crank_talk_HIRUnreachableInstruction_t;
         typedef struct crank_talk_HIRVariableLoadInstruction_s crank_talk_HIRVariableLoadInstruction_t;
         typedef struct crank_talk_HIRVariableStoreInstruction_s crank_talk_HIRVariableStoreInstruction_t;
@@ -177,6 +178,11 @@ struct crank_talk_HIRSlotStoreInstruction_s
     crank_talk_HIRValue_t *value;
 };
 
+struct crank_talk_HIRThisContextInstruction_s
+{
+    crank_talk_HIRInstruction_t super;
+};
+
 struct crank_talk_HIRUnreachableInstruction_s
 {
     crank_talk_HIRInstruction_t super;
@@ -235,6 +241,7 @@ CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_send(crank_talk_VMContext_
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_superSend(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *lookupClass, crank_talk_HIRValue_t *selector, crank_talk_Array_t *receiverWithArguments, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_slotLoad(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *receiver, size_t slotIndex, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_slotStore(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *receiver, size_t slotIndex, crank_talk_HIRValue_t *value, crank_talk_oop_t sourcePosition);
+CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_thisContext(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_unreachable(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_variableLoad(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *variable, crank_talk_oop_t sourcePosition);
 CRANK_TALK_API crank_talk_oop_t crank_talk_HIRBuilder_variableStore(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_HIRValue_t *variable, crank_talk_HIRValue_t *value, crank_talk_oop_t sourcePosition);

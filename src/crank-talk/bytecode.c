@@ -287,6 +287,13 @@ crank_talk_BytecodeAssembler_class(crank_talk_VMContext_t *context, crank_talk_B
 }
 
 CRANK_TALK_API void
+crank_talk_BytecodeAssembler_thisContext(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t resultTemporary, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeThisContext, sourcePosition);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, resultTemporary);
+}
+
+CRANK_TALK_API void
 crank_talk_BytecodeAssembler_jumpIfTrue(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t condition, crank_talk_BytecodeLabel_t *destinationLabel, crank_talk_oop_t sourcePosition)
 {
     crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeJumpIfTrue, sourcePosition);
@@ -396,7 +403,11 @@ crank_talk_vm_BytecodeFunction_apply(crank_talk_VMContext_t *context, crank_talk
 
     activationRecord.literalVector = (crank_talk_oop_t)compiledFunction->literalVector;
     if(closureValue)
+    {
+        activationRecord.blockClosureOrNil = (crank_talk_oop_t)closureValue;
         activationRecord.captureVector = (crank_talk_oop_t)closureValue->captureVector;
+        activationRecord.outerContext = (crank_talk_oop_t)closureValue->outerContext;
+    }
 
     activationRecord.argumentCount = argumentCount;
     activationRecord.arguments = arguments;
@@ -459,6 +470,21 @@ crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(crank_talk_stackFrameBytec
         crank_talk_error("Expected a valid temporary vector.");
     if(vectorIndex != 0)
         activationRecord->temporaries[vectorIndex - 1] = value;
+}
+
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_vm_BytecodeFunction_ensureMappedContext(crank_talk_VMContext_t *context, crank_talk_stackFrameBytecodeFunctionActivationRecord_t *activationRecord)
+{
+    if(activationRecord->super.mappedContext)
+        return activationRecord->super.mappedContext;
+
+    // Create a new mapped context.
+    crank_talk_oop_t mappedContextValue = CrankAllocateValuesObjectWithClassName(context, MethodContext);
+    crank_talk_MethodContext_t *mappedContext = (crank_talk_MethodContext_t *)mappedContextValue;
+    mappedContext->super.stackContextPointer = crank_talk_ExternalAddress_make(context, activationRecord);
+
+    activationRecord->super.mappedContext = mappedContextValue;
+    return mappedContextValue;
 }
 
 CRANK_TALK_API void
@@ -578,6 +604,12 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
             crank_talk_oop_t operand = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
             crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, (crank_talk_oop_t)crank_talk_oop_getClass(context, operand));
         } break;
+
+        case CrankTalkOpcodeThisContext:
+        {
+            crank_talk_oop_t mappedContext = crank_talk_vm_BytecodeFunction_ensureMappedContext(context, activationRecord);
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, mappedContext);
+        }   break;
 
         // Two operands
         case CrankTalkOpcodeJumpIfFalse:
@@ -762,6 +794,13 @@ crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank
             printf(" -> ");
             crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
         }   break;
+
+        case CrankTalkOpcodeThisContext:
+        {
+            printf(" -> ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+        }   break;
+
         // Two operands
         case CrankTalkOpcodeJumpIfTrue:
         case CrankTalkOpcodeJumpIfFalse:

@@ -499,5 +499,14 @@ void analysisAndEvaluation_runTests(void)
         Assert(crank_talk_oop_isKindOf(context, scriptContext, context->roots.ScriptContextClass));
     }
 
+    // Top-level block context
+    {
+        crank_talk_oop_t blockContextValue = crank_talk_analyzeAndEvaluateString(context, "[thisContext] value");
+        Assert(crank_talk_oop_isKindOf(context, blockContextValue, context->roots.MethodContextClass));
+
+        crank_talk_MethodContext_t *methodContext = (crank_talk_MethodContext_t *)blockContextValue;
+        AssertEquals(crank_talk_oop_nil(), methodContext->super.stackContextPointer);
+    }
+
     crank_talk_vm_destroyContext(context);
 }

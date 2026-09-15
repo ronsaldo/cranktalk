@@ -20,6 +20,7 @@ typedef struct crank_talk_stackFrameRecord_s
 {
     struct crank_talk_stackFrameRecord_s *previous;
     crank_talk_stackFrameRecordType_t type;
+    crank_talk_oop_t mappedContext;
 } crank_talk_stackFrameRecord_t;
 
 typedef struct crank_talk_stackFrameGCRootsRecord_s
@@ -44,6 +45,8 @@ typedef struct crank_talk_stackFrameBytecodeFunctionActivationRecord_s
     crank_talk_oop_t function;
     crank_talk_oop_t bytecode;
 
+    crank_talk_oop_t blockClosureOrNil;
+    crank_talk_oop_t outerContext;
     crank_talk_oop_t captureVector;
     crank_talk_oop_t literalVector;
 

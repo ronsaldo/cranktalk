@@ -366,6 +366,19 @@ crank_talk_ParseTreeSuperReferenceNode_analyzeAndBuildWith(crank_talk_VMContext_
 }
 
 static crank_talk_oop_t
+crank_talk_ParseTreeThisContextReferenceNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_ParseTreeNode_t *node = (crank_talk_ParseTreeNode_t*)arguments[0];
+    crank_talk_oop_t buildContextValue = arguments[1];
+    crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t*)buildContextValue;
+
+    return crank_talk_HIRBuilder_thisContext(context, buildContext->builder, (crank_talk_oop_t)node->sourcePosition);
+}
+
+static crank_talk_oop_t
 crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     assert(argumentCount >= 2);
@@ -767,6 +780,7 @@ crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeTrueReferenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSelfReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeSelfReferenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSuperReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeSuperReferenceNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeThisContextReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeThisContextReferenceNode_analyzeAndBuildWith);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageCascadeNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith);

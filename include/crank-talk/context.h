@@ -96,6 +96,8 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t SmalltalkImageClass;
     
     crank_talk_oop_t ContextClass;
+    crank_talk_oop_t StackContextClass;
+    crank_talk_oop_t MethodContextClass;
     crank_talk_oop_t ScriptContextClass;
 
     // System environment
@@ -212,6 +214,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t HIRSuperSendInstructionClass;
     crank_talk_oop_t HIRSlotLoadInstructionClass;
     crank_talk_oop_t HIRSlotStoreInstructionClass;
+    crank_talk_oop_t HIRThisContextInstructionClass;
     crank_talk_oop_t HIRUnreachableInstructionClass;
     crank_talk_oop_t HIRVariableLoadInstructionClass;
     crank_talk_oop_t HIRVariableStoreInstructionClass;
