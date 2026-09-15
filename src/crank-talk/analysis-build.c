@@ -398,6 +398,19 @@ crank_talk_ParseTreeSequenceNodeWithLocals_analyzeAndBuildWith(crank_talk_VMCont
     return (crank_talk_oop_t)gcFrame.result;
 }
 
+static crank_talk_oop_t
+crank_talk_ParseTreeReturnNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    assert(argumentCount >= 2);
+    crank_talk_ParseTreeReturnNode_t *node = (crank_talk_ParseTreeReturnNode_t*)arguments[0];
+    crank_talk_oop_t buildContextValue = arguments[1];
+    
+    crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)buildContextValue;
+
+    crank_talk_HIRValue_t *resultValue = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->expression, buildContextValue);
+    crank_talk_HIRBuilder_return(context, buildContext->builder, resultValue, (crank_talk_oop_t)node->super.sourcePosition);
+    return (crank_talk_oop_t)resultValue;
+}
 
 static crank_talk_oop_t
 crank_talk_ParseTreeSequenceNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
@@ -656,6 +669,7 @@ crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageCascadeNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeReturnNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeReturnNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeSequenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeVariableDefinitionNode_analyzeAndBuildWith);
 
