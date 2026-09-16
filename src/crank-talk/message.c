@@ -90,11 +90,11 @@ CRANK_TALK_API crank_talk_oop_t
 crank_talk_superSend(crank_talk_VMContext_t *context, crank_talk_oop_t receiverClass, crank_talk_oop_t selector, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     if(!receiverClass)
-        crank_talk_error("Expected a receiver class.");
+        crank_talk_error(context, "Expected a receiver class.");
 
     crank_talk_Behavior_t *behavior = (crank_talk_Behavior_t *)receiverClass;
     if(!behavior->superclass)
-        crank_talk_error("Expected a behavior with a superclass.");
+        crank_talk_error(context, "Expected a behavior with a superclass.");
 
     return crank_talk_sendWithClass(context, (crank_talk_oop_t)behavior->superclass, selector, argumentCount, arguments);
 }

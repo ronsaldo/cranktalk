@@ -532,7 +532,7 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(42, crank_talk_oop_decodeSmallInteger(blockResult));
     }
 
-    // Print stack trace
+    // Print the stack trace
     {
         crank_talk_analyzeAndEvaluateString(context, "MyClass ![printStackTrace Smalltalk printStackTrace]");
         crank_talk_analyzeAndEvaluateString(context, "MyClass new printStackTrace");

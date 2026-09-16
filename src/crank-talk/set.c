@@ -123,7 +123,7 @@ crank_talk_IdentitySet_insert(crank_talk_VMContext_t *context, crank_talk_oop_t 
         crank_talk_IdentitySet_increaseCapacity(context, set);
         elementIndex = crank_talk_IdentitySet_scanFor(set, element);
         if(elementIndex < 0)
-            crank_talk_error("Set is out of memory");
+            crank_talk_error(context, "Set is out of memory");
     }
 
     crank_talk_oop_t *storageValues = set->super.super.storage->elements;

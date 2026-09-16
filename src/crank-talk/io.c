@@ -45,7 +45,7 @@ crank_talk_BinaryFileStream_nextPut(crank_talk_VMContext_t *context, crank_talk_
     crank_talk_oop_t self = arguments[0];
     crank_talk_oop_t character = arguments[1];
     if(!crank_talk_oop_isCharacter(character) && !crank_talk_oop_isSmallInteger(character))
-        crank_talk_error("Expected a character or a small integer for nextPut:");
+        crank_talk_error(context, "Expected a character or a small integer for nextPut:");
 
     crank_talk_BinaryFileStream_t *stream = (crank_talk_BinaryFileStream_t *)self;
     FILE *file = ((crank_talk_ExternalAddress_t*)stream->handle)->address;
@@ -80,7 +80,7 @@ crank_talk_BinaryFileStream_nextPutAll(crank_talk_VMContext_t *context, crank_ta
     size_t bytesSize = crank_talk_object_getSizeInBytes(bytesObject);
     uint8_t *bytesData = crank_talk_oop_getBytesData(bytesObject);
     if(fwrite(bytesData, bytesSize, 1, file) != 1)
-        crank_talk_error("Failed to write in file.");
+        crank_talk_error(context, "Failed to write in file.");
 
     return self;
 }
@@ -103,7 +103,7 @@ crank_talk_BinaryFileStream_print(crank_talk_VMContext_t *context, crank_talk_oo
     size_t bytesSize = crank_talk_object_getSizeInBytes(bytesObject);
     uint8_t *bytesData = crank_talk_oop_getBytesData(bytesObject);
     if(fwrite(bytesData, bytesSize, 1, file) != 1)
-        crank_talk_error("Failed to write in file.");
+        crank_talk_error(context, "Failed to write in file.");
 
     return self;
 }

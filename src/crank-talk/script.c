@@ -18,7 +18,7 @@ crank_talk_ScriptContext_loadFile_primitive(crank_talk_VMContext_t *context, cra
     crank_talk_oop_t path = arguments[1];
 
     if(!crank_talk_oop_isKindOf(context, path, context->roots.StringClass))
-        crank_talk_error("Expected a string with path for loading the script.");
+        crank_talk_error(context, "Expected a string with path for loading the script.");
 
     // Find the script directory.
     crank_talk_oop_t directoryBinding = crank_talk_Environment_lookupSymbolRecursively(context, scriptContext->lexicalEnvironment, crank_talk_Symbol_internWithCString(context, "__FileDir__"));

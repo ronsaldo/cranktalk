@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 CRANK_TALK_API void
-crank_talk_error(const char *message)
+crank_talk_error(crank_talk_VMContext_t *context, const char *message)
 {
     fprintf(stderr, "Error: %s\n", message);
     abort();
@@ -24,7 +24,7 @@ crank_talk_errorPrintf(crank_talk_VMContext_t *context, const char *format, ...)
     vsnprintf(buffer, sizeof(buffer), format, valist);
     va_end(valist);
 
-    crank_talk_error(buffer);
+    crank_talk_error(context, buffer);
 }
 
 CRANK_TALK_API void

@@ -19,7 +19,7 @@ crank_talk_analyzeAndEvaluateSourceCode(crank_talk_VMContext_t *context, crank_t
     crank_talk_oop_t tokensValue = crank_talk_CrankTalk_scanSourceCode(context, sourceCodeValue);
     crank_talk_oop_t ast = crank_talk_parseScannedTokens(context, tokensValue);
     if(!crank_talk_ParseTree_checkAndPrintErrors(context, (crank_talk_ParseTreeNode_t*)ast))
-        crank_talk_error("AST has parse errors.");
+        crank_talk_error(context, "AST has parse errors.");
 
     crank_talk_oop_t evaluationContext = crank_talk_createTopLevelAnalysisAndEvaluationContext(context, sourceCodeValue);
     return crank_talk_ParseTreeAnalyzeAndEvaluate(context, ast, evaluationContext);

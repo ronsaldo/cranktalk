@@ -200,7 +200,7 @@ crank_talk_Object_notEquals_primitive(crank_talk_VMContext_t *context, crank_tal
     }
     else
     {
-        crank_talk_error("Expected a boolean result for ~=.");
+        crank_talk_error(context, "Expected a boolean result for ~=.");
         abort();
     }
 }
@@ -248,9 +248,9 @@ crank_talk_Object_basicAt_primitive(crank_talk_VMContext_t *context, crank_talk_
     crank_talk_oop_t indexValue = arguments[1];
 
     if(!crank_talk_oop_isNonNullPointer(self))
-        crank_talk_error("Expected a non-immediate object.");
+        crank_talk_error(context, "Expected a non-immediate object.");
     if(!crank_talk_oop_isSmallInteger(indexValue))
-        crank_talk_error("Expected a small integer index.");
+        crank_talk_error(context, "Expected a small integer index.");
 
     size_t index = crank_talk_oop_decodeSmallInteger(indexValue);
 
@@ -264,7 +264,7 @@ crank_talk_Object_basicAt_primitive(crank_talk_VMContext_t *context, crank_talk_
     if(header->dataType == CrankTalkGCObjectDataTypeBytes)
     {
         if(index < 1 || index > variableByteSize)
-            crank_talk_error("Index is out of bounds.");
+            crank_talk_error(context, "Index is out of bounds.");
         return crank_talk_oop_encodeSmallInteger(variableByteData[index - 1]);
     }
     else
@@ -272,7 +272,7 @@ crank_talk_Object_basicAt_primitive(crank_talk_VMContext_t *context, crank_talk_
         size_t variableSlotSize = variableByteSize / sizeof(crank_talk_oop_t);
         crank_talk_oop_t *variableSlotData = (crank_talk_oop_t *)variableByteData;
         if(index < 1 || index > variableSlotSize)
-            crank_talk_error("Index is out of bounds.");
+            crank_talk_error(context, "Index is out of bounds.");
         return variableSlotData[index - 1];
     }
 }
@@ -289,9 +289,9 @@ crank_talk_Object_basicAtPut_primitive(crank_talk_VMContext_t *context, crank_ta
     crank_talk_oop_t value = arguments[2];
 
     if(!crank_talk_oop_isNonNullPointer(self))
-        crank_talk_error("Expected a non-immediate object.");
+        crank_talk_error(context, "Expected a non-immediate object.");
     if(!crank_talk_oop_isSmallInteger(indexValue))
-        crank_talk_error("Expected a small integer index.");
+        crank_talk_error(context, "Expected a small integer index.");
 
     size_t index = crank_talk_oop_decodeSmallInteger(indexValue);
 
@@ -305,9 +305,9 @@ crank_talk_Object_basicAtPut_primitive(crank_talk_VMContext_t *context, crank_ta
     if(header->dataType == CrankTalkGCObjectDataTypeBytes)
     {
         if(index < 1 || index > variableByteSize)
-            crank_talk_error("Index is out of bounds.");
+            crank_talk_error(context, "Index is out of bounds.");
         if(!crank_talk_oop_isSmallInteger(value))
-            crank_talk_error("Expected an integer value.");
+            crank_talk_error(context, "Expected an integer value.");
 
         variableByteData[index - 1] = crank_talk_oop_decodeSmallInteger(value);
     }
@@ -316,7 +316,7 @@ crank_talk_Object_basicAtPut_primitive(crank_talk_VMContext_t *context, crank_ta
         size_t variableSlotSize = variableByteSize / sizeof(crank_talk_oop_t);
         crank_talk_oop_t *variableSlotData = (crank_talk_oop_t *)variableByteData;
         if(index < 1 || index > variableSlotSize)
-            crank_talk_error("Index is out of bounds.");
+            crank_talk_error(context, "Index is out of bounds.");
         variableSlotData[index - 1] = value;
     }
 

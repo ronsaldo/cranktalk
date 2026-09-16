@@ -86,7 +86,7 @@ void crank_talk_IdentityDictionary_atPut(crank_talk_VMContext_t *context, crank_
         crank_talk_IdentityDictionary_increaseCapacity(context, dictionary);
         elementIndex = crank_talk_IdentityDictionary_scanFor(dictionary, key);
         if(elementIndex < 0)
-            crank_talk_error("Identity dictionary is out of memory.");
+            crank_talk_error(context, "Identity dictionary is out of memory.");
     }
 
     crank_talk_oop_t *storageValues = dictionary->super.super.storage->elements;
@@ -122,7 +122,7 @@ crank_talk_IdentityDictionary_associationAtPut(crank_talk_VMContext_t *context, 
         crank_talk_IdentityDictionary_increaseCapacity(context, dictionary);
         elementIndex = crank_talk_IdentityDictionary_scanFor(dictionary, key);
         if(elementIndex < 0)
-            crank_talk_error("Identity dictionary is out of memory.");
+            crank_talk_error(context, "Identity dictionary is out of memory.");
     }
 
     crank_talk_oop_t *storageValues = dictionary->super.super.storage->elements;
@@ -148,7 +148,7 @@ CRANK_TALK_API
 void crank_talk_IdentityDictionary_localAtPut(crank_talk_VMContext_t *context, crank_talk_oop_t dictionaryValue, crank_talk_oop_t key, crank_talk_oop_t value)
 {
     if(!crank_talk_oop_isKindOf(context, key, context->roots.SymbolClass))
-        crank_talk_error("Symbol table expects the keys to be symbols.");
+        crank_talk_error(context, "Symbol table expects the keys to be symbols.");
 
     crank_talk_oop_t newLocalVariableValue = CrankAllocateValuesObjectWithClassName(context, LocalVariable);
     crank_talk_LocalVariable_t *newLocalVariable = (crank_talk_LocalVariable_t *)newLocalVariableValue;
@@ -161,7 +161,7 @@ CRANK_TALK_API void
 crank_talk_IdentityDictionary_hirVariableAtPut(crank_talk_VMContext_t *context, crank_talk_oop_t dictionaryValue, crank_talk_oop_t key, crank_talk_oop_t value)
 {
     if(!crank_talk_oop_isKindOf(context, key, context->roots.SymbolClass))
-        crank_talk_error("Symbol table expects the keys to be symbols.");
+        crank_talk_error(context, "Symbol table expects the keys to be symbols.");
 
     crank_talk_oop_t newLocalVariableValue = CrankAllocateValuesObjectWithClassName(context, HIRVariable);
     crank_talk_HIRVariable_t *newLocalVariable = (crank_talk_HIRVariable_t *)newLocalVariableValue;
@@ -193,16 +193,16 @@ crank_talk_IdentityDictionary_associationAtOrNil(crank_talk_oop_t dictionaryValu
 }
 
 CRANK_TALK_API crank_talk_oop_t
-crank_talk_IdentityDictionary_at(crank_talk_oop_t dictionaryValue, crank_talk_oop_t key)
+crank_talk_IdentityDictionary_at(crank_talk_VMContext_t *context, crank_talk_oop_t dictionaryValue, crank_talk_oop_t key)
 {
     crank_talk_IdentityDictionary_t *dictionary = (crank_talk_IdentityDictionary_t*)dictionaryValue;
     intptr_t elementIndex = crank_talk_IdentityDictionary_scanFor(dictionary, key);
     if(elementIndex < 0)
-        crank_talk_error("Key is not found in identity dictionary.");
+        crank_talk_error(context, "Key is not found in identity dictionary.");
 
     crank_talk_oop_t associationValue = dictionary->super.super.storage->elements[elementIndex];
     if(crank_talk_oop_isNil(associationValue))
-        crank_talk_error("Key is not found in identity dictionary.");
+        crank_talk_error(context, "Key is not found in identity dictionary.");
 
     crank_talk_Association_t *association = (crank_talk_Association_t*)associationValue;
     return association->value;
@@ -221,7 +221,7 @@ CRANK_TALK_API void
 crank_talk_SystemEnvironment_atPut(crank_talk_VMContext_t *context, crank_talk_oop_t dictionaryValue, crank_talk_oop_t key, crank_talk_oop_t value)
 {
     if(!crank_talk_oop_isKindOf(context, key, context->roots.SymbolClass))
-        crank_talk_error("System environment expects the keys to be symbols.");
+        crank_talk_error(context, "System environment expects the keys to be symbols.");
     
     crank_talk_oop_t newGlobalVariableValue = CrankAllocateValuesObjectWithClassName(context, GlobalVariable);
     crank_talk_GlobalVariable_t *newGlobalVariable = (crank_talk_GlobalVariable_t *)newGlobalVariableValue;
@@ -325,7 +325,7 @@ crank_talk_MethodDictionary_atPut(crank_talk_VMContext_t *context, crank_talk_oo
         crank_talk_MethodDictionary_increaseCapacity(context, dict);
         elementIndex = crank_talk_MethodDictionary_scanFor(dict, key);
         if(elementIndex < 0)
-            crank_talk_error("Method dictionary is out of memory");
+            crank_talk_error(context, "Method dictionary is out of memory");
     }
     
     crank_talk_oop_t *storageElements = dict->super.super.storage->elements;

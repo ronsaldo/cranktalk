@@ -440,7 +440,7 @@ crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith(crank_talk_VMContext_t *
     // Is this a macro message send?
     if(crank_talk_IdentityDictionary_includesKey(context->roots.messageSendMacroDictionary, gcFrame.selectorValue))
     {
-        crank_talk_oop_t messageMacro = crank_talk_IdentityDictionary_at(context->roots.messageSendMacroDictionary, gcFrame.selectorValue);
+        crank_talk_oop_t messageMacro = crank_talk_IdentityDictionary_at(context, context->roots.messageSendMacroDictionary, gcFrame.selectorValue);
         crank_talk_oop_t expandedMacro = crank_talk_apply1(context, messageMacro, arguments[0]);
         CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
         return (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndBuild(context, expandedMacro, buildContextValue);
@@ -460,7 +460,7 @@ crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith(crank_talk_VMContext_t *
         crank_talk_oop_t receiverClasss = crank_talk_Environment_lookupReceiverClassRecursively(context, buildContext->builder->lexicalEnvironment);
         crank_talk_HIRValue_t *receiverClassValue = (crank_talk_HIRValue_t *)crank_talk_HIRConstantLiteralValue_create(context, receiverClasss, (crank_talk_oop_t)node->super.sourcePosition);
         if(!receiverClasss)
-            crank_talk_error("super is not properly defined in this context.");
+            crank_talk_error(context, "super is not properly defined in this context.");
         CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
 
         return crank_talk_HIRBuilder_superSend(context, buildContext->builder, receiverClassValue, gcFrame.selector, gcFrame.argumentsWithReceiver, (crank_talk_oop_t)node->super.sourcePosition);

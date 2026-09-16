@@ -370,7 +370,7 @@ crank_talk_ParseTreeMessageSendNode_analyzeAndEvaluateWith(crank_talk_VMContext_
     // Is this a macro message send?
     if(crank_talk_IdentityDictionary_includesKey(context->roots.messageSendMacroDictionary, gcFrame.selector))
     {
-        crank_talk_oop_t messageMacro = crank_talk_IdentityDictionary_at(context->roots.messageSendMacroDictionary, gcFrame.selector);
+        crank_talk_oop_t messageMacro = crank_talk_IdentityDictionary_at(context, context->roots.messageSendMacroDictionary, gcFrame.selector);
         crank_talk_oop_t expandedMacro = crank_talk_apply1(context, messageMacro, arguments[0]);
         CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
         return (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndEvaluate(context, expandedMacro, evaluationContext);

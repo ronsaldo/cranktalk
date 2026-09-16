@@ -6,6 +6,7 @@
 #include "crank-talk/bytecode.h"
 #include "crank-talk/dictionary.h"
 #include "crank-talk/environment.h"
+#include "crank-talk/errors.h"
 #include "crank-talk/gc.h"
 #include "crank-talk/hir.h"
 #include "crank-talk/io.h"
@@ -822,6 +823,18 @@ crank_talk_context_createIODefinitions(crank_talk_VMContext_t* context)
 }
 
 static void 
+crank_talk_context_createExceptionsDefinitions(crank_talk_VMContext_t* context)
+{
+    context->roots.ExceptionClass = crank_talk_context_createClassAndMetaclass(context, "Exception", context->roots.ObjectClass, sizeof(crank_talk_Exception_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(Exception, messageText),
+        NULL);
+    context->roots.ErrorClass = crank_talk_context_createClassAndMetaclass(context, "Error", context->roots.ExceptionClass, sizeof(crank_talk_Error_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.MessageNotUnderstoodClass = crank_talk_context_createClassAndMetaclass(context, "MessageNotUnderstood", context->roots.ErrorClass, sizeof(crank_talk_MessageNotUnderstood_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(MessageNotUnderstood, message),
+        NULL);
+}
+
+static void 
 crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_registerAnalysisAndBuildPrimitives(context);
@@ -850,6 +863,7 @@ crank_talk_vm_createContext(void)
     crank_talk_context_createCoreDefinitions(context);
     crank_talk_context_createFrontEndDefinitions(context);
     crank_talk_context_createIODefinitions(context);
+    crank_talk_context_createExceptionsDefinitions(context);
     crank_talk_registerPrimitives(context);
     crank_talk_gc_collect(context);
     return context;

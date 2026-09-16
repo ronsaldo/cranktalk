@@ -162,7 +162,7 @@ crank_talk_Behavior_basicNewWith_primitive(crank_talk_VMContext_t *context, cran
     assert(argumentCount > 1);
     crank_talk_Behavior_t *behavior = (crank_talk_Behavior_t *)arguments[0];
     if(!crank_talk_oop_isSmallInteger(arguments[1]))
-        crank_talk_error("Expected a small integer size.");
+        crank_talk_error(context, "Expected a small integer size.");
     
     size_t variableSize = crank_talk_oop_decodeSmallInteger(arguments[1]);
     size_t instanceSize = crank_talk_oop_decodeSmallInteger(behavior->instanceSize);
@@ -234,7 +234,7 @@ crank_talk_Behavior_makeClassBuilder_primitive(crank_talk_VMContext_t *context, 
     crank_talk_oop_t self = arguments[0];
     crank_talk_oop_t subclassName = arguments[1];
     if(!crank_talk_oop_isKindOf(context, subclassName, context->roots.SymbolClass))
-        crank_talk_error("Expected a symbol for the class name.");
+        crank_talk_error(context, "Expected a symbol for the class name.");
 
     crank_talk_oop_t environment = crank_talk_send0(context, context->roots.environmentSymbol, self);
 
@@ -258,7 +258,7 @@ crank_talk_ShiftClassBuilder_slots_primitive(crank_talk_VMContext_t *context, cr
 
     crank_talk_ShiftClassBuilder_t *classBuilder = (crank_talk_ShiftClassBuilder_t *)self;
     if(!crank_talk_oop_isKindOf(context, slotDefinitions, context->roots.ArrayClass))
-        crank_talk_error("Expected an array with the slots.");
+        crank_talk_error(context, "Expected an array with the slots.");
 
     size_t slotCount = crank_talk_object_getSizeInSlots(slotDefinitions);
     crank_talk_oop_t *slotDefinitionValues = crank_talk_oop_getSlotsData(slotDefinitions);

@@ -238,6 +238,11 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t stdinStream;
     crank_talk_oop_t stdoutStream;
     crank_talk_oop_t stderrStream;
+
+    // Exceptions
+    crank_talk_oop_t ExceptionClass;
+    crank_talk_oop_t ErrorClass;
+    crank_talk_oop_t MessageNotUnderstoodClass;
 };
 
 struct crank_talk_VMContext_s

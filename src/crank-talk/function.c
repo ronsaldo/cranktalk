@@ -29,7 +29,7 @@ crank_talk_oop_t
 crank_talk_CompiledFunction_apply(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *function, crank_talk_BlockClosure_t *closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     if(!crank_talk_oop_isNonNullPointer((crank_talk_oop_t)function))
-        crank_talk_error("Expected a valid function.");
+        crank_talk_error(context, "Expected a valid function.");
 
     crank_talk_stackFrameApplicationArgumentsRecord_t rootsRecord = {
         .super.type = CrankTalkStackFrameRecordApplicationArguments,
@@ -70,7 +70,7 @@ crank_talk_apply(crank_talk_VMContext_t *context, crank_talk_oop_t function, siz
         return crank_talk_CompiledFunction_apply(context, blockClosure->function, blockClosure, argumentCount, arguments);
     }
 
-    crank_talk_error("TODO: non functional application.");
+    crank_talk_error(context, "TODO: non functional application.");
     abort();
 }
 
@@ -310,7 +310,7 @@ crank_talk_Functional_dumpToConsole(crank_talk_VMContext_t *context, crank_talk_
     else if(crank_talk_oop_isKindOf(context, functional, context->roots.BlockClosureClass))
         crank_talk_BlockClosure_dumpToConsole(context, (crank_talk_BlockClosure_t*)functional);
     else
-        crank_talk_error("Expected a functional for dumping.");
+        crank_talk_error(context, "Expected a functional for dumping.");
 }
 
 static crank_talk_oop_t

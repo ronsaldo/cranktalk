@@ -176,8 +176,8 @@ crank_talk_BytecodeAssembler_putLabel(crank_talk_VMContext_t *context, crank_tal
         assert(pendingLocationPC <= byteStreamSize);
 
         int16_t relativeOffset = (int16_t)(destinationValue - pendingLocationPC);
-        crank_talk_ByteStream_atPut(assembler->byteStream, pendingLocation + 1, relativeOffset & 0xFF);
-        crank_talk_ByteStream_atPut(assembler->byteStream, pendingLocation + 2, (relativeOffset >> 8) & 0xFF);
+        crank_talk_ByteStream_atPut(context, assembler->byteStream, pendingLocation + 1, relativeOffset & 0xFF);
+        crank_talk_ByteStream_atPut(context, assembler->byteStream, pendingLocation + 2, (relativeOffset >> 8) & 0xFF);
     }
 }
 
@@ -485,7 +485,7 @@ crank_talk_BytecodeFunction_fetchVectorOperand(crank_talk_stackFrameBytecodeFunc
 }
 
 CRANK_TALK_INLINE void
-crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(crank_talk_stackFrameBytecodeFunctionActivationRecord_t *activationRecord, crank_talk_oop_t value)
+crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(crank_talk_VMContext_t *context, crank_talk_stackFrameBytecodeFunctionActivationRecord_t *activationRecord, crank_talk_oop_t value)
 {
     size_t bytecodesSize = crank_talk_object_getSizeInBytes(activationRecord->bytecode);
     uint8_t *bytecodes = crank_talk_oop_getBytesData(activationRecord->bytecode);
@@ -493,7 +493,7 @@ crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(crank_talk_stackFrameBytec
     crank_talk_OperandVectorName_t vectorName = vectorOperand & CrankTalkOperandVectorBitMask;
     uint32_t vectorIndex = vectorOperand >> CrankTalkOperandVectorBits;
     if((vectorName != CrankTalkOperandVectorTemporary) || (vectorIndex > activationRecord->temporaryCount))
-        crank_talk_error("Expected a valid temporary vector.");
+        crank_talk_error(context, "Expected a valid temporary vector.");
     if(vectorIndex != 0)
         activationRecord->temporaries[vectorIndex - 1] = value;
 }
@@ -542,19 +542,19 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
         case CrankTalkOpcodeNop:
             break;
         case CrankTalkOpcodeBooleanExpected:
-            crank_talk_error("Boolean value is expected.");
+            crank_talk_error(context, "Boolean value is expected.");
             break;
         case CrankTalkOpcodeBreakpoint:
-            crank_talk_error("TODO: breakpoint");
+            crank_talk_error(context, "TODO: breakpoint");
             break;
         case CrankTalkOpcodeUnreachable:
-            crank_talk_error("Unreachable reached");
+            crank_talk_error(context, "Unreachable reached");
             break;
 
         case CrankTalkOpcodeAlloca:
         {
             crank_talk_oop_t localVariableValue = CrankAllocateValuesObjectWithClassName(context, LocalVariable);
-            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, localVariableValue);
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, localVariableValue);
         } break;
 
         case CrankTalkOpcodeBeginSend:
@@ -582,7 +582,7 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
         {
             crank_talk_oop_t variable = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
             crank_talk_LiteralVariable_t *literalVariable = (crank_talk_LiteralVariable_t *)variable;
-            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, literalVariable->value);
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, literalVariable->value);
         } break;
         case CrankTalkOpcodeJump:
         {
@@ -604,7 +604,7 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
             {
                 crank_talk_MethodContext_t *method = (crank_talk_MethodContext_t*)activationRecord->outerContext;
                 if(!method->super.stackContextPointer)
-                    crank_talk_error("Cannot perform non-local return into a dead context.");
+                    crank_talk_error(context, "Cannot perform non-local return into a dead context.");
                 
                 // Set the result in the target context.
                 crank_talk_stackFrameBytecodeFunctionActivationRecord_t *targetRecord = ((crank_talk_ExternalAddress_t*)method->super.stackContextPointer)->address;
@@ -629,7 +629,7 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
             crank_talk_oop_t selector = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
             crank_talk_oop_t result = crank_talk_send(context, selector, activationRecord->calloutArgumentCount, activationRecord->calloutArguments);
             activationRecord->calloutArgumentCount = 0;
-            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, result);
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, result);
         } break;
         case CrankTalkOpcodeSuperSendMessage:
         {
@@ -637,36 +637,36 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
             crank_talk_oop_t selector = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
             crank_talk_oop_t result = crank_talk_superSend(context, lookupClass, selector, activationRecord->calloutArgumentCount, activationRecord->calloutArguments);
             activationRecord->calloutArgumentCount = 0;
-            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, result);
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, result);
         } break;
         case CrankTalkOpcodePushClosureCapture:
             activationRecord->arrayInConstruction->elements[activationRecord->arrayInConstructionSize++] = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
             break;
 
         case CrankTalkOpcodeFinishClosure:
-            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, activationRecord->closureInConstruction);
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, activationRecord->closureInConstruction);
             break;
 
         case CrankTalkOpcodeNot:
         {
             crank_talk_oop_t operand = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
             if(operand == context->roots.trueValue)
-                crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, context->roots.falseValue);
+                crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, context->roots.falseValue);
             else if(operand == context->roots.falseValue)
-                crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, context->roots.trueValue);
+                crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, context->roots.trueValue);
             else
-                crank_talk_error("Expected a boolean value for not.");
+                crank_talk_error(context, "Expected a boolean value for not.");
         } break;
         case CrankTalkOpcodeClass:
         {
             crank_talk_oop_t operand = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
-            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, (crank_talk_oop_t)crank_talk_oop_getClass(context, operand));
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, (crank_talk_oop_t)crank_talk_oop_getClass(context, operand));
         } break;
 
         case CrankTalkOpcodeThisContext:
         {
             crank_talk_oop_t mappedContext = crank_talk_vm_BytecodeFunction_ensureMappedContext(context, activationRecord);
-            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, mappedContext);
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, mappedContext);
         }   break;
 
         // Two operands
@@ -704,7 +704,7 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
         case CrankTalkOpcodeMove:
         {
             crank_talk_oop_t valueToMove = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
-            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, valueToMove);
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, valueToMove);
 
         } break;
 
@@ -714,7 +714,7 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
             uint16_t slotIndex = crank_talk_BytecodeFunction_fetchUInt16(bytecodesSize, &activationRecord->pc, bytecodes);
             crank_talk_oop_t *slots = crank_talk_oop_getSlotsData(receiver);
             crank_talk_oop_t slot = slots[slotIndex - 1];
-            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, slot);
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, slot);
         } break;
 
         case CrankTalkOpcodeStoreSlot:
@@ -732,14 +732,14 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
             crank_talk_oop_t leftOperand = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
             crank_talk_oop_t rightOperand = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
             crank_talk_oop_t result = (leftOperand == rightOperand) ? context->roots.trueValue : context->roots.falseValue;
-            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, result);
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, result);
         } break;
         case CrankTalkOpcodeIdentityNotEquals:
         {
             crank_talk_oop_t leftOperand = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
             crank_talk_oop_t rightOperand = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
             crank_talk_oop_t result = (leftOperand != rightOperand) ? context->roots.trueValue : context->roots.falseValue;
-            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(activationRecord, result);
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, result);
         } break;
         // Unsupported opcode
         default:

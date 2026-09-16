@@ -38,12 +38,12 @@ crank_talk_ByteStream_increaseCapacity(crank_talk_VMContext_t *context, crank_ta
 
 
 CRANK_TALK_API void
-crank_talk_ByteStream_atPut(crank_talk_oop_t stream, size_t position, uint8_t byte)
+crank_talk_ByteStream_atPut(crank_talk_VMContext_t *context, crank_talk_oop_t stream, size_t position, uint8_t byte)
 {
     crank_talk_ByteStream_t *stringStream = (crank_talk_ByteStream_t*)stream;
     size_t size = crank_talk_oop_decodeSmallInteger(stringStream->size);
     if(position < 1 || position > size)
-        crank_talk_error("Byte stream index is out of bounds");
+        crank_talk_error(context, "Byte stream index is out of bounds");
 
     crank_talk_ByteArray_t *storage = (crank_talk_ByteArray_t*)stringStream->storage;
     storage->elements[position - 1] = byte;
