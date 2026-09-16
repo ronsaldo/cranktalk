@@ -33,8 +33,23 @@ crank_talk_Exception_signal(crank_talk_VMContext_t *context, crank_talk_Exceptio
     crank_talk_stackFrameOnDoRecord_t *handlingContext = crank_talk_StackFrame_findHandlerForType(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, (crank_talk_oop_t)exception));
     if(handlingContext)
     {
-        crank_talk_oop_t doResult = crank_talk_send0(context, context->roots.valueSymbol, handlingContext->exceptionAction);
-        handlingContext->result = doResult;
+        crank_talk_BlockClosure_t *actionBlock = (crank_talk_BlockClosure_t *)handlingContext->exceptionAction;
+        size_t actionBlockArgumentCount = crank_talk_oop_decodeSmallInteger(actionBlock->function->argumentCount);
+        if(actionBlockArgumentCount == 0)
+        {
+            crank_talk_oop_t doResult = crank_talk_send0(context, context->roots.valueSymbol, handlingContext->exceptionAction);
+            handlingContext->result = doResult;
+        }
+        else if(actionBlockArgumentCount == 1)
+        {
+            crank_talk_oop_t doResult = crank_talk_send1(context, context->roots.valueSymbol, handlingContext->exceptionAction, (crank_talk_oop_t)exception);
+            handlingContext->result = doResult;
+        }
+        else
+        {
+            fprintf(stderr, "Expected a block closure with at most one argument for on:do:.");
+            abort();
+        }
         crank_talk_stackFrame_unwindAndJumpToOnDoBlock(context, handlingContext);
         abort();
     }

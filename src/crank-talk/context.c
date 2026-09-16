@@ -263,6 +263,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.emitBytecodeAssemblyWithSymbol = crank_talk_Symbol_internWithCString(context, "emitBytecodeAssemblyWith:");
 
     context->roots.valueSymbol = crank_talk_Symbol_internWithCString(context, "value");
+    context->roots.valueWithSymbol = crank_talk_Symbol_internWithCString(context, "value:");
 
     context->roots.classSymbol = crank_talk_Symbol_internWithCString(context, "class");
     context->roots.notSymbol = crank_talk_Symbol_internWithCString(context, "not");

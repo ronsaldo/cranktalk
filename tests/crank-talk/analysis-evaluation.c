@@ -536,8 +536,10 @@ void analysisAndEvaluation_runTests(void)
     {
         crank_talk_oop_t result = crank_talk_analyzeAndEvaluateString(context, "[Error new signal: 'An error'. 2] on: Error do: [42]");
         AssertEquals(42, crank_talk_oop_decodeSmallInteger(result));
-    }
 
+        result = crank_talk_analyzeAndEvaluateString(context, "[Error new signal: 'An error'. 2] on: Error do: [:e | e]");
+        Assert(crank_talk_oop_isKindOf(context, result, context->roots.ErrorClass));
+    }
 
     crank_talk_vm_destroyContext(context);
 }

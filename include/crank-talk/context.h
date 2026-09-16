@@ -132,6 +132,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t emitBytecodeAssemblyWithSymbol;
 
     crank_talk_oop_t valueSymbol;
+    crank_talk_oop_t valueWithSymbol;
 
     crank_talk_oop_t classSymbol;
     crank_talk_oop_t notSymbol;
