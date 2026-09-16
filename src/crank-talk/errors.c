@@ -8,10 +8,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+crank_talk_stackFrameOnDoRecord_t *
+crank_talk_StackFrame_findHandlerForType(crank_talk_VMContext_t *context, crank_talk_oop_t exceptionType)
+{
+    crank_talk_stackFrameRecord_t *currentRecord = crank_talk_stackFrame_getActiveRecord();
+    while(currentRecord)
+    {
+        if(currentRecord->type == CrankTalkStackFrameRecordOnDoRecord)
+        {
+            crank_talk_stackFrameOnDoRecord_t *onDoRecord = (crank_talk_stackFrameOnDoRecord_t*)currentRecord;
+            if(sysmel_vm_Behavior_isDirectSubtype(exceptionType, onDoRecord->exceptionClass))
+                return onDoRecord;
+        }
+
+        currentRecord = currentRecord->previous;
+    }
+
+    return NULL;
+}
+
 CRANK_TALK_API void
 crank_talk_Exception_signal(crank_talk_VMContext_t *context, crank_talk_Exception_t *exception)
 {
-    printf("TODO: signal exception: " CRANK_TALK_STRING_FORMAT"\n", CRANK_TALK_STRING_FORMAT_ARG(exception->messageText));
+    crank_talk_stackFrameOnDoRecord_t *handlingContext = crank_talk_StackFrame_findHandlerForType(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, (crank_talk_oop_t)exception));
+    if(handlingContext)
+    {
+        crank_talk_oop_t doResult = crank_talk_send0(context, context->roots.valueSymbol, handlingContext->exceptionAction);
+        handlingContext->result = doResult;
+        crank_talk_stackFrame_unwindAndJumpToOnDoBlock(context, handlingContext);
+        abort();
+    }
+
+    printf("UnhandledException: " CRANK_TALK_STRING_FORMAT"\n", CRANK_TALK_STRING_FORMAT_ARG(exception->messageText));
     crank_talk_stackFrame_printStackTrace(context);
     abort();
 }
@@ -82,6 +110,12 @@ crank_talk_BlockClosure_onDo_primitive(crank_talk_VMContext_t *context, crank_ta
     crank_talk_oop_t exceptionClass = arguments[1];
     crank_talk_oop_t exceptionAction = arguments[2];
 
+    if(!crank_talk_oop_isKindOf(context, exceptionClass, context->roots.BehaviorClass))
+        crank_talk_error(context, "Expected a behavior for on:do:");
+
+    if(!crank_talk_oop_isKindOf(context, exceptionAction, context->roots.BlockClosureClass))
+        crank_talk_error(context, "Expected a block closure for on:do:");
+
     crank_talk_stackFrameOnDoRecord_t onDoRecord = {
         .super.type = CrankTalkStackFrameRecordOnDoRecord,
         .exceptionClass = exceptionClass,
@@ -103,9 +137,22 @@ crank_talk_BlockClosure_ensure_primitive(crank_talk_VMContext_t *context, crank_
 {
     (void)closure;
     (void)argumentCount;
-    assert(argumentCount >= 1);
+    assert(argumentCount >= 2);
 
-    abort();
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t ensureBlock = arguments[1];
+
+    crank_talk_stackFrameEnsureRecord_t ensureRecord = {
+        .super.type = CrankTalkStackFrameRecordEnsureRecord,
+        .ensureBlock = ensureBlock,
+    };
+
+    crank_talk_stackFrame_pushRecord(&ensureRecord.super);
+
+    crank_talk_oop_t result = crank_talk_send0(context, context->roots.valueSymbol, self);
+
+    crank_talk_stackFrame_popRecord(&ensureRecord.super);
+    return result;
 }
 
 static crank_talk_oop_t

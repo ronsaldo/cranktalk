@@ -747,6 +747,7 @@ CRANK_TALK_API crank_talk_oop_t crank_talk_oop_fromBoolean(crank_talk_VMContext_
 CRANK_TALK_API crank_talk_oop_t crank_talk_oop_fromFloat(crank_talk_VMContext_t *context, double value);
 CRANK_TALK_API crank_talk_Behavior_t *crank_talk_oop_getClass(crank_talk_VMContext_t *context, crank_talk_oop_t value);
 
+CRANK_TALK_API bool sysmel_vm_Behavior_isDirectSubtype(crank_talk_oop_t type, crank_talk_oop_t supertype);
 CRANK_TALK_API bool crank_talk_oop_isKindOf(crank_talk_VMContext_t *context, crank_talk_oop_t value, crank_talk_oop_t behavior);
 
 CRANK_TALK_API crank_talk_oop_t crank_talk_ExternalAddress_make(crank_talk_VMContext_t *context, void *pointer);

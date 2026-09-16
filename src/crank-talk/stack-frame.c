@@ -64,7 +64,26 @@ crank_talk_stackFrame_unwindAndJumpToBytecodeMethod(crank_talk_VMContext_t *cont
         crank_talk_stackFrame_unwindPopRecord(context, crank_talk_stackFrame_activeRecord);
 
     if(!crank_talk_stackFrame_activeRecord)
-        crank_talk_errorPrintf(context, "Failed to unwind to record %p\n", targetRecord);
+    {
+        fprintf(stderr, "Failed to unwind to record %p\n", targetRecord);
+        abort();
+    }
+
+    _longjmp(targetRecord->jmpbuffer, 42);
+}
+
+CRANK_TALK_API void
+crank_talk_stackFrame_unwindAndJumpToOnDoBlock(crank_talk_VMContext_t *context, crank_talk_stackFrameOnDoRecord_t *targetRecord)
+{
+    while(crank_talk_stackFrame_activeRecord && crank_talk_stackFrame_activeRecord != &targetRecord->super)
+        crank_talk_stackFrame_unwindPopRecord(context, crank_talk_stackFrame_activeRecord);
+
+    if(!crank_talk_stackFrame_activeRecord)
+    {
+        fprintf(stderr, "Failed to unwind to record %p\n", targetRecord);
+        abort();
+    }
+        
     _longjmp(targetRecord->jmpbuffer, 42);
 }
 
