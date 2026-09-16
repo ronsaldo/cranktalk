@@ -124,7 +124,7 @@ crank_talk_Float_equals_primitive(crank_talk_VMContext_t *context, crank_talk_oo
 
     double value = crank_talk_oop_asFloat(self);
     double operandValue = crank_talk_oop_numberAsFloat(operand);
-    return crank_talk_oop_fromFloat(context, crank_talk_oop_fromBoolean(context, value == operandValue));
+    return  crank_talk_oop_fromBoolean(context, value == operandValue);
 }
 
 static crank_talk_oop_t
@@ -139,7 +139,7 @@ crank_talk_Float_notEquals_primitive(crank_talk_VMContext_t *context, crank_talk
 
     double value = crank_talk_oop_asFloat(self);
     double operandValue = crank_talk_oop_numberAsFloat(operand);
-    return crank_talk_oop_fromFloat(context, crank_talk_oop_fromBoolean(context, value != operandValue));
+    return crank_talk_oop_fromBoolean(context, value != operandValue);
 }
 
 static crank_talk_oop_t
@@ -154,7 +154,7 @@ crank_talk_Float_lessThan_primitive(crank_talk_VMContext_t *context, crank_talk_
 
     double value = crank_talk_oop_asFloat(self);
     double operandValue = crank_talk_oop_numberAsFloat(operand);
-    return crank_talk_oop_fromFloat(context, crank_talk_oop_fromBoolean(context, value < operandValue));
+    return crank_talk_oop_fromBoolean(context, value < operandValue);
 }
 
 static crank_talk_oop_t
@@ -169,7 +169,7 @@ crank_talk_Float_lessOrEquals_primitive(crank_talk_VMContext_t *context, crank_t
 
     double value = crank_talk_oop_asFloat(self);
     double operandValue = crank_talk_oop_numberAsFloat(operand);
-    return crank_talk_oop_fromFloat(context, crank_talk_oop_fromBoolean(context, value <= operandValue));
+    return crank_talk_oop_fromBoolean(context, value <= operandValue);
 }
 
 static crank_talk_oop_t
@@ -184,7 +184,7 @@ crank_talk_Float_greaterThan_primitive(crank_talk_VMContext_t *context, crank_ta
 
     double value = crank_talk_oop_asFloat(self);
     double operandValue = crank_talk_oop_numberAsFloat(operand);
-    return crank_talk_oop_fromFloat(context, crank_talk_oop_fromBoolean(context, value > operandValue));
+    return crank_talk_oop_fromBoolean(context, value > operandValue);
 }
 
 static crank_talk_oop_t
@@ -199,7 +199,7 @@ crank_talk_Float_greaterOrEquals_primitive(crank_talk_VMContext_t *context, cran
 
     double value = crank_talk_oop_asFloat(self);
     double operandValue = crank_talk_oop_numberAsFloat(operand);
-    return crank_talk_oop_fromFloat(context, crank_talk_oop_fromBoolean(context, value >= operandValue));
+    return crank_talk_oop_fromBoolean(context, value >= operandValue);
 }
 
 static crank_talk_oop_t
@@ -275,6 +275,7 @@ crank_talk_SmallInteger_printOn_primitive(crank_talk_VMContext_t *context, crank
 static crank_talk_oop_t
 crank_talk_SmallInteger_negated_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 1);
@@ -288,6 +289,7 @@ crank_talk_SmallInteger_negated_primitive(crank_talk_VMContext_t *context, crank
 static crank_talk_oop_t
 crank_talk_SmallInteger_add_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 1);
@@ -303,6 +305,7 @@ crank_talk_SmallInteger_add_primitive(crank_talk_VMContext_t *context, crank_tal
 static crank_talk_oop_t
 crank_talk_SmallInteger_minus_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 1);
@@ -318,6 +321,7 @@ crank_talk_SmallInteger_minus_primitive(crank_talk_VMContext_t *context, crank_t
 static crank_talk_oop_t
 crank_talk_SmallInteger_times_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 1);
@@ -333,6 +337,7 @@ crank_talk_SmallInteger_times_primitive(crank_talk_VMContext_t *context, crank_t
 static crank_talk_oop_t
 crank_talk_SmallInteger_divide_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 1);

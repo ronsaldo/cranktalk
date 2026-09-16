@@ -30,8 +30,8 @@ crank_talk_heap_allocateObject(crank_talk_heap_t *heap, size_t objectSize, crank
     size_t allocationSize = sizeof(crank_talk_ObjectHeader_t) + objectSize;
     crank_talk_ObjectHeader_t *objectHeader = calloc(1, allocationSize);
     objectHeader->byteSize = objectSize;
-    objectHeader->identityHash = heap->identityHashSeed;
-    objectHeader->gcColor = heap->gcWhiteColor;
+    objectHeader->identityHash = (uint32_t)heap->identityHashSeed;
+    objectHeader->gcColor = (uint8_t)heap->gcWhiteColor;
     objectHeader->dataType = dataType;
     heap->identityHashSeed = crank_talk_hashMultiply(heap->identityHashSeed);
 

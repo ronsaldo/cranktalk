@@ -12,7 +12,7 @@ crank_talk_gc_markPointer(crank_talk_VMContext_t *context, crank_talk_ObjectHead
     if(!isWhite)
         return;
 
-    pointer->gcColor = context->heap.gcGrayColor;
+    pointer->gcColor = (uint8_t)context->heap.gcGrayColor;
     crank_talk_dynarray_add(&context->markingStack, &pointer);
 }
 
@@ -39,7 +39,7 @@ crank_talk_gc_markObjectContent(crank_talk_VMContext_t *context, crank_talk_Obje
         for(size_t i = 0; i < valueCount; ++i)
             crank_talk_gc_markOop(context, objectValues + i);
     }
-    objectPointer->gcColor = context->heap.gcBlackColor;
+    objectPointer->gcColor = (uint8_t)context->heap.gcBlackColor;
 }
 
 static void

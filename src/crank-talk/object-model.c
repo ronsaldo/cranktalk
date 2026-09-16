@@ -11,7 +11,7 @@ crank_talk_oop_numberAsFloat(crank_talk_oop_t oop)
     if(crank_talk_oop_isSmallFloat(oop))
         return crank_talk_oop_decodeSmallFloat(oop);
     else if(crank_talk_oop_isSmallInteger(oop))
-        return crank_talk_oop_decodeSmallInteger(oop);
+        return (double)crank_talk_oop_decodeSmallInteger(oop);
     return ((crank_talk_BoxedFloat_t*)oop)->value;
 }
 
@@ -309,7 +309,7 @@ crank_talk_Object_basicAtPut_primitive(crank_talk_VMContext_t *context, crank_ta
         if(!crank_talk_oop_isSmallInteger(value))
             crank_talk_error(context, "Expected an integer value.");
 
-        variableByteData[index - 1] = crank_talk_oop_decodeSmallInteger(value);
+        variableByteData[index - 1] = (uint8_t)crank_talk_oop_decodeSmallInteger(value);
     }
     else
     {
@@ -336,6 +336,7 @@ crank_talk_SmalltalkImage_garbageCollect_primitive(crank_talk_VMContext_t *conte
 static crank_talk_oop_t
 crank_talk_SmalltalkImage_globals_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 1);

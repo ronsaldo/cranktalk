@@ -451,7 +451,7 @@ CRANK_TALK_API uint16_t
 crank_talk_HIRValue_getBytecodeAssemblyOperandWith(crank_talk_VMContext_t *context, crank_talk_HIRValue_t *value, crank_talk_oop_t bytecodeAssembler)
 {
     crank_talk_oop_t operand = crank_talk_send1(context, context->roots.getBytecodeAssemblyOperandWithSymbol, (crank_talk_oop_t)value, bytecodeAssembler);
-    return crank_talk_oop_decodeSmallInteger(operand);
+    return (uint16_t)crank_talk_oop_decodeSmallInteger(operand);
 }
 
 CRANK_TALK_API void
@@ -1016,7 +1016,7 @@ crank_talk_HIRAllocaInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t 
     crank_talk_HIRAllocaInstruction_t *allocaInstruction = (crank_talk_HIRAllocaInstruction_t*)self;
     crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
 
-    crank_talk_BytecodeAssembler_alloca(context, bytecodeAssembler, crank_talk_oop_decodeSmallInteger(allocaInstruction->super.super.bytecodeVectorIndex), allocaInstruction->super.super.super.sourcePosition);
+    crank_talk_BytecodeAssembler_alloca(context, bytecodeAssembler, (crank_talk_BytecodeVectorOperand_t)crank_talk_oop_decodeSmallInteger(allocaInstruction->super.super.bytecodeVectorIndex), allocaInstruction->super.super.super.sourcePosition);
     return self;
 }
 
@@ -1074,7 +1074,7 @@ crank_talk_HIRMakeClosureInstruction_emitBytecodeAssemblyWith(crank_talk_VMConte
         crank_talk_BytecodeAssembler_pushClosureCapture(context, bytecodeAssembler, capturedValue, instruction->super.super.super.sourcePosition);
     }
 
-    crank_talk_BytecodeAssembler_finishClosure(context, bytecodeAssembler, crank_talk_oop_decodeSmallInteger(instruction->super.super.bytecodeVectorIndex), instruction->super.super.super.sourcePosition);
+    crank_talk_BytecodeAssembler_finishClosure(context, bytecodeAssembler, (crank_talk_BytecodeVectorOperand_t)crank_talk_oop_decodeSmallInteger(instruction->super.super.bytecodeVectorIndex), instruction->super.super.super.sourcePosition);
     return self;
 }
 
@@ -1129,14 +1129,14 @@ crank_talk_HIRSendInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *c
         if(selectorLiteralValue->value == context->roots.classSymbol && messageArgumentCount == 1)
         {
             uint16_t operand = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, (crank_talk_HIRValue_t*)sendInstruction->receiverWithArguments->elements[0], (crank_talk_oop_t)bytecodeAssembler);  
-            uint16_t result = crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex);
+            uint16_t result = (uint16_t)crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex);
             crank_talk_BytecodeAssembler_class(context, bytecodeAssembler, result, operand, sendInstruction->super.super.super.sourcePosition);
             return self;
         }
         else if(selectorLiteralValue->value == context->roots.notSymbol && messageArgumentCount == 1)
         {
             uint16_t operand = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, (crank_talk_HIRValue_t*)sendInstruction->receiverWithArguments->elements[0], (crank_talk_oop_t)bytecodeAssembler);  
-            uint16_t result = crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex);
+            uint16_t result = (uint16_t)crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex);
             crank_talk_BytecodeAssembler_not(context, bytecodeAssembler, result, operand, sendInstruction->super.super.super.sourcePosition);
             return self;
         }
@@ -1144,7 +1144,7 @@ crank_talk_HIRSendInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *c
         {
             uint16_t leftOperand = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, (crank_talk_HIRValue_t*)sendInstruction->receiverWithArguments->elements[0], (crank_talk_oop_t)bytecodeAssembler);
             uint16_t rightOperand = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, (crank_talk_HIRValue_t*)sendInstruction->receiverWithArguments->elements[1], (crank_talk_oop_t)bytecodeAssembler);
-            uint16_t result = crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex);
+            uint16_t result = (uint16_t)crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex);
             crank_talk_BytecodeAssembler_identityEquals(context, bytecodeAssembler, result, leftOperand, rightOperand, sendInstruction->super.super.super.sourcePosition);
             return self;
         }
@@ -1152,7 +1152,7 @@ crank_talk_HIRSendInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *c
         {
             uint16_t leftOperand = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, (crank_talk_HIRValue_t*)sendInstruction->receiverWithArguments->elements[0], (crank_talk_oop_t)bytecodeAssembler);
             uint16_t rightOperand = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, (crank_talk_HIRValue_t*)sendInstruction->receiverWithArguments->elements[1], (crank_talk_oop_t)bytecodeAssembler);
-            uint16_t result = crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex);
+            uint16_t result = (uint16_t)crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex);
             crank_talk_BytecodeAssembler_identityNotEquals(context, bytecodeAssembler, result, leftOperand, rightOperand, sendInstruction->super.super.super.sourcePosition);
             return self;
         }
@@ -1166,7 +1166,7 @@ crank_talk_HIRSendInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_t *c
     }
 
     crank_talk_BytecodeVectorOperand_t selectorValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, sendInstruction->selector, (crank_talk_oop_t)bytecodeAssembler);
-    crank_talk_BytecodeAssembler_sendMessage(context, bytecodeAssembler, crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex), selectorValue, sendInstruction->super.super.super.sourcePosition);
+    crank_talk_BytecodeAssembler_sendMessage(context, bytecodeAssembler, (crank_talk_BytecodeVectorOperand_t)crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex), selectorValue, sendInstruction->super.super.super.sourcePosition);
 
     return self;
 }
@@ -1192,7 +1192,7 @@ crank_talk_HIRSuperSendInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext
 
     crank_talk_BytecodeVectorOperand_t lookupClassValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, sendInstruction->lookupClass, (crank_talk_oop_t)bytecodeAssembler);
     crank_talk_BytecodeVectorOperand_t selectorValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, sendInstruction->selector, (crank_talk_oop_t)bytecodeAssembler);
-    crank_talk_BytecodeAssembler_superSendMessage(context, bytecodeAssembler, crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex), lookupClassValue, selectorValue, sendInstruction->super.super.super.sourcePosition);
+    crank_talk_BytecodeAssembler_superSendMessage(context, bytecodeAssembler, (crank_talk_BytecodeVectorOperand_t)crank_talk_oop_decodeSmallInteger(sendInstruction->super.super.bytecodeVectorIndex), lookupClassValue, selectorValue, sendInstruction->super.super.super.sourcePosition);
 
     return self;
 }
@@ -1209,9 +1209,9 @@ crank_talk_HIRSlotLoadInstruction_emitBytecodeAssemblyWith(crank_talk_VMContext_
     crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
 
     crank_talk_BytecodeVectorOperand_t receiverValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, slotInstruction->receiver, (crank_talk_oop_t)bytecodeAssembler);
-    crank_talk_BytecodeVectorOperand_t resultValue = crank_talk_oop_decodeSmallInteger(slotInstruction->super.super.bytecodeVectorIndex);
+    crank_talk_BytecodeVectorOperand_t resultValue = (crank_talk_BytecodeVectorOperand_t)crank_talk_oop_decodeSmallInteger(slotInstruction->super.super.bytecodeVectorIndex);
 
-    crank_talk_BytecodeAssembler_loadSlot(context, bytecodeAssembler, resultValue, receiverValue, crank_talk_oop_decodeSmallInteger(slotInstruction->slotIndex), slotInstruction->super.super.super.sourcePosition);
+    crank_talk_BytecodeAssembler_loadSlot(context, bytecodeAssembler, resultValue, receiverValue, (crank_talk_BytecodeVectorOperand_t)crank_talk_oop_decodeSmallInteger(slotInstruction->slotIndex), slotInstruction->super.super.super.sourcePosition);
 
     return self;
 }
@@ -1245,7 +1245,7 @@ crank_talk_HIRThisContextInstruction_emitBytecodeAssemblyWith(crank_talk_VMConte
     crank_talk_HIRThisContextInstruction_t *instruction = (crank_talk_HIRThisContextInstruction_t*)self;
     crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
 
-    crank_talk_BytecodeVectorOperand_t resultValue = crank_talk_oop_decodeSmallInteger(instruction->super.super.bytecodeVectorIndex);
+    crank_talk_BytecodeVectorOperand_t resultValue = (crank_talk_BytecodeVectorOperand_t)crank_talk_oop_decodeSmallInteger(instruction->super.super.bytecodeVectorIndex);
     crank_talk_BytecodeAssembler_thisContext(context, bytecodeAssembler, resultValue, instruction->super.super.super.sourcePosition);
     return self;
 }
@@ -1294,7 +1294,7 @@ crank_talk_HIRVariableLoadInstruction_emitBytecodeAssemblyWith(crank_talk_VMCont
     crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
 
     crank_talk_BytecodeVectorOperand_t variableValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(context, loadInstruction->variable, (crank_talk_oop_t)bytecodeAssembler);
-    crank_talk_BytecodeAssembler_loadFromVariable(context, bytecodeAssembler, crank_talk_oop_decodeSmallInteger(loadInstruction->super.super.bytecodeVectorIndex), variableValue, loadInstruction->super.super.super.sourcePosition);
+    crank_talk_BytecodeAssembler_loadFromVariable(context, bytecodeAssembler, (crank_talk_BytecodeVectorOperand_t)crank_talk_oop_decodeSmallInteger(loadInstruction->super.super.bytecodeVectorIndex), variableValue, loadInstruction->super.super.super.sourcePosition);
     return self;
 }
 

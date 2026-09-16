@@ -111,6 +111,7 @@ crank_talk_BinaryFileStream_print(crank_talk_VMContext_t *context, crank_talk_oo
 static crank_talk_oop_t
 crank_talk_BinaryFileStream_cr(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     (void)arguments;
@@ -127,6 +128,7 @@ crank_talk_BinaryFileStream_cr(crank_talk_VMContext_t *context, crank_talk_oop_t
 static crank_talk_oop_t
 crank_talk_BinaryFileStream_lf(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     (void)arguments;

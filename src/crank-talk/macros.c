@@ -80,6 +80,7 @@ crank_talk_ParseTree_equalsNotNilMessage(crank_talk_VMContext_t *context, crank_
 static crank_talk_oop_t
 crank_talk_MessageMacro_yourself(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount > 0);

@@ -219,6 +219,7 @@ crank_talk_HIRVariable_analyzeAndBuildIdentifierReferenceWith(crank_talk_VMConte
 static crank_talk_oop_t
 crank_talk_HIRValue_analyzeAndBuildIdentifierReferenceWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
@@ -383,6 +384,7 @@ crank_talk_ParseTreeThisContextReferenceNode_analyzeAndBuildWith(crank_talk_VMCo
 static crank_talk_oop_t
 crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)closure;
     assert(argumentCount >= 2);
     crank_talk_ParseTreeMessageCascadeNode_t *node = (crank_talk_ParseTreeMessageCascadeNode_t*)arguments[0];
     crank_talk_oop_t buildContextValue = arguments[1];
@@ -420,6 +422,7 @@ crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith(crank_talk_VMContext_
 static crank_talk_oop_t
 crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)closure;
     assert(argumentCount >= 2);
     crank_talk_ParseTreeMessageSendNode_t *node = (crank_talk_ParseTreeMessageSendNode_t*)arguments[0];
     crank_talk_oop_t buildContextValue = arguments[1];
@@ -513,6 +516,7 @@ crank_talk_ParseTreeSequenceNodeWithLocals_analyzeAndBuildWith(crank_talk_VMCont
 static crank_talk_oop_t
 crank_talk_ParseTreeReturnNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)closure;
     assert(argumentCount >= 2);
     crank_talk_ParseTreeReturnNode_t *node = (crank_talk_ParseTreeReturnNode_t*)arguments[0];
     crank_talk_oop_t buildContextValue = arguments[1];
@@ -532,6 +536,7 @@ crank_talk_ParseTreeReturnNode_analyzeAndBuildWith(crank_talk_VMContext_t *conte
 static crank_talk_oop_t
 crank_talk_ParseTreeSequenceNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)closure;
     assert(argumentCount >= 2);
     crank_talk_ParseTreeSequenceNode_t *node = (crank_talk_ParseTreeSequenceNode_t*)arguments[0];
     crank_talk_oop_t buildContext = arguments[1];
@@ -550,6 +555,7 @@ crank_talk_ParseTreeSequenceNode_analyzeAndBuildWith(crank_talk_VMContext_t *con
 static crank_talk_oop_t
 crank_talk_ParseTreeVariableDefinitionNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)closure;
     assert(argumentCount >= 2);
     crank_talk_ParseTreeVariableDefinitionNode_t *node = (crank_talk_ParseTreeVariableDefinitionNode_t*)arguments[0];
     crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)arguments[1];
@@ -563,6 +569,7 @@ crank_talk_ParseTreeVariableDefinitionNode_analyzeAndBuildWith(crank_talk_VMCont
 static crank_talk_oop_t
 crank_talk_ParseTreeCullBlockNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)closure;
     assert(argumentCount >= 2);
     crank_talk_ParseTreeCullBlockNode_t *node = (crank_talk_ParseTreeCullBlockNode_t*)arguments[0];
     crank_talk_oop_t buildContextValue = arguments[1];
@@ -583,6 +590,7 @@ crank_talk_ParseTreeCullBlockNode_analyzeAndBuildWith(crank_talk_VMContext_t *co
 static crank_talk_oop_t
 crank_talk_ParseTreeIfSelectionNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)closure;
     assert(argumentCount >= 2);
     crank_talk_ParseTreeIfSelectionNode_t *node = (crank_talk_ParseTreeIfSelectionNode_t*)arguments[0];
     crank_talk_oop_t buildContextValue = arguments[1];
@@ -661,6 +669,7 @@ crank_talk_ParseTreeIfSelectionNode_analyzeAndBuildWith(crank_talk_VMContext_t *
 static crank_talk_oop_t
 crank_talk_ParseTreeWhileNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)closure;
     assert(argumentCount >= 2);
     crank_talk_ParseTreeWhileNode_t *node = (crank_talk_ParseTreeWhileNode_t*)arguments[0];
     crank_talk_oop_t buildContextValue = arguments[1];
@@ -717,6 +726,7 @@ crank_talk_ParseTreeWhileNode_analyzeAndBuildWith(crank_talk_VMContext_t *contex
 static crank_talk_oop_t
 crank_talk_ParseTreeDoWhileNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)closure;
     assert(argumentCount >= 2);
     crank_talk_ParseTreeDoWhileNode_t *node = (crank_talk_ParseTreeDoWhileNode_t*)arguments[0];
     crank_talk_oop_t buildContextValue = arguments[1];

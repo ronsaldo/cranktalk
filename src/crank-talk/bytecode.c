@@ -74,13 +74,13 @@ crank_talk_BytecodeAssembler_newLabel(crank_talk_VMContext_t *context)
 CRANK_TALK_API crank_talk_BytecodeVectorOperand_t
 crank_talk_BytecodeAssembler_getArgumentOperand(size_t index)
 {
-    return (index << CrankTalkOperandVectorBits) | CrankTalkOperandVectorArguments;
+    return ((crank_talk_BytecodeVectorOperand_t)index << CrankTalkOperandVectorBits) | CrankTalkOperandVectorArguments;
 }
 
 CRANK_TALK_API crank_talk_BytecodeVectorOperand_t
 crank_talk_BytecodeAssembler_getCaptureOperand(size_t index)
 {
-    return (index << CrankTalkOperandVectorBits) | CrankTalkOperandVectorCaptures;
+    return ((crank_talk_BytecodeVectorOperand_t)index << CrankTalkOperandVectorBits) | CrankTalkOperandVectorCaptures;
 }
 
 CRANK_TALK_API crank_talk_BytecodeVectorOperand_t
@@ -101,6 +101,7 @@ crank_talk_BytecodeAssembler_getOrCreateLiteral(crank_talk_VMContext_t *context,
 CRANK_TALK_API crank_talk_BytecodeVectorOperand_t
 crank_talk_BytecodeAssembler_newTemporary(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler)
 {
+    (void)context;
     size_t temporaryCount = crank_talk_oop_decodeSmallInteger(assembler->temporaryCount) + 1;
     assembler->temporaryCount = crank_talk_oop_encodeSmallInteger(temporaryCount);
     return (crank_talk_BytecodeVectorOperand_t)((temporaryCount << CrankTalkOperandVectorBits) | CrankTalkOperandVectorTemporary);
@@ -484,8 +485,6 @@ crank_talk_BytecodeFunction_fetchVectorOperand(crank_talk_stackFrameBytecodeFunc
 
     default: abort();
     }
-
-    abort();
 }
 
 CRANK_TALK_INLINE void
@@ -810,7 +809,7 @@ crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank
         case CrankTalkOpcodeJump:
         {
             int16_t offset = crank_talk_BytecodeFunction_fetchInt16(bytecodesSize, &pc, bytecodes);
-            uint32_t destinationPC = pc + offset;
+            uint32_t destinationPC = (uint32_t)pc + offset;
             printf(" %04x -> %04x", offset, destinationPC);
         }   break;
         case CrankTalkOpcodeReturn:
@@ -872,7 +871,7 @@ crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank
             crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
 
             int16_t offset = crank_talk_BytecodeFunction_fetchInt16(bytecodesSize, &pc, bytecodes);
-            uint32_t destinationPC = pc + offset;
+            uint32_t destinationPC = (uint32_t)pc + offset;
             printf(" %04x -> %04x", offset, destinationPC);
         }   break;
 

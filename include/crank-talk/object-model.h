@@ -10,7 +10,8 @@
 
 #pragma once
 #ifdef _MSC_VER
-#pragma warning (disable : 4200)
+#pragma warning (disable : 4200) // Zero sized array in the end
+#pragma warning (disable : 4152) // Data function pointer conversion
 #endif
 
 typedef intptr_t crank_talk_oop_t;

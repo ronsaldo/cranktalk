@@ -11,6 +11,7 @@
 crank_talk_stackFrameOnDoRecord_t *
 crank_talk_StackFrame_findHandlerForType(crank_talk_VMContext_t *context, crank_talk_oop_t exceptionType)
 {
+    (void)context;
     crank_talk_stackFrameRecord_t *currentRecord = crank_talk_stackFrame_getActiveRecord();
     while(currentRecord)
     {

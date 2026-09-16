@@ -199,6 +199,7 @@ crank_talk_Behavior_environment_primitive(crank_talk_VMContext_t *context, crank
 {
     (void)closure;
     (void)argumentCount;
+    (void)arguments;
     assert(argumentCount > 0);
     return context->roots.systemEnvironment;
 }
@@ -206,6 +207,7 @@ crank_talk_Behavior_environment_primitive(crank_talk_VMContext_t *context, crank
 static crank_talk_oop_t
 crank_talk_Class_environment_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount > 0);
@@ -278,6 +280,7 @@ crank_talk_ShiftClassBuilder_slots_primitive(crank_talk_VMContext_t *context, cr
 static crank_talk_oop_t
 crank_talk_ShiftClassBuilder_tag_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
@@ -288,6 +291,7 @@ crank_talk_ShiftClassBuilder_tag_primitive(crank_talk_VMContext_t *context, cran
 static crank_talk_oop_t
 crank_talk_ShiftClassBuilder_package_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
@@ -326,6 +330,7 @@ crank_talk_ShiftClassBuilder_build_primitive(crank_talk_VMContext_t *context, cr
 static crank_talk_oop_t
 crank_talk_Slot_asSlot_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount > 0);

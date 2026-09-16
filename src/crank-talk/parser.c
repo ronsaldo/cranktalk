@@ -951,8 +951,6 @@ crank_talk_parseAssignmentExpression(crank_talk_VMContext_t *context, crank_talk
     {
         return assignedStore;
     }
-
-    return crank_talk_parseMessageCascade(context, state);
 }
 
 static crank_talk_oop_t

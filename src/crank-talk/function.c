@@ -268,6 +268,7 @@ crank_talk_CompiledFunction_ensureAnalysis(crank_talk_VMContext_t *context, cran
 CRANK_TALK_API crank_talk_oop_t
 crank_talk_CompiledFunction_getSourcePositionAtPC(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction, size_t pc)
 {
+    (void)context;
     if(!compiledFunction->sourcePositions)
         return crank_talk_oop_nil();
 

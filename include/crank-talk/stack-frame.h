@@ -7,6 +7,7 @@
 #ifdef _WIN32
 #define _longjmp longjmp
 #define _setjmp setjmp
+#pragma warning (disable : 4324)
 #endif
 
 #define CRANK_TALK_MAX_CALL_ARGUMENT_COUNT 16

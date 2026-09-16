@@ -7,6 +7,7 @@ crank_talk_True_not_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t 
 {
     (void)closure;
     (void)argumentCount;
+    (void)arguments;
     assert(argumentCount >= 1);
 
     return context->roots.falseValue;
@@ -17,6 +18,7 @@ crank_talk_False_not_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t
 {
     (void)closure;
     (void)argumentCount;
+    (void)arguments;
     assert(argumentCount >= 1);
 
     return context->roots.trueValue;
@@ -55,8 +57,10 @@ crank_talk_True_ifTrue_primitive(crank_talk_VMContext_t *context, crank_talk_oop
 static crank_talk_oop_t
 crank_talk_True_ifFalse_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
+    (void)arguments;
     assert(argumentCount >= 2);
 
     return crank_talk_oop_nil();
@@ -86,6 +90,8 @@ crank_talk_False_IfFalseIfTrue_primitive(crank_talk_VMContext_t *context, crank_
 static crank_talk_oop_t
 crank_talk_False_ifTrue_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
+    (void)arguments;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);

@@ -180,6 +180,7 @@ crank_talk_FunctionAnalysisEnvironment_lookupSymbolRecursively(crank_talk_VMCont
 static crank_talk_oop_t
 crank_talk_EmptyEnvironment_lookupReceiverClassRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     (void)arguments;
@@ -239,6 +240,7 @@ crank_talk_LexicalEnvironment_lookupIsInnerBlockRecursively(crank_talk_VMContext
 static crank_talk_oop_t
 crank_talk_FunctionAnalysisEnvironment_lookupIsInnerBlockRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 1);

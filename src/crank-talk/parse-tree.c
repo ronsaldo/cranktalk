@@ -162,7 +162,12 @@ crank_talk_ParseTree_traverseAndCollectErrorsInto(crank_talk_VMContext_t *contex
 CRANK_TALK_API void
 crank_talk_ParseTree_traverseListAndCollectErrorsInto(crank_talk_VMContext_t *context, crank_talk_Array_t *list, crank_talk_oop_t errorList)
 {
-
+    size_t listElementCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)list);
+    for(size_t i = 0; i < listElementCount; ++i)
+    {
+        crank_talk_ParseTreeNode_t *element = (crank_talk_ParseTreeNode_t *)list->elements[i];
+        crank_talk_ParseTree_traverseAndCollectErrorsInto(context, element, errorList);
+    }
 }
 
 static void

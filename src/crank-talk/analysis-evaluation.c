@@ -129,6 +129,7 @@ crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *con
 static crank_talk_oop_t
 crank_talk_ParseTreeLiteralVariableNode_analyzeAndEvaluateIdentifierReferenceWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);
@@ -162,6 +163,7 @@ crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndEvaluateWith(crank_talk_VM
 static crank_talk_oop_t
 crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    (void)context;
     (void)closure;
     (void)argumentCount;
     assert(argumentCount >= 2);

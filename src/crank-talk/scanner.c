@@ -225,11 +225,11 @@ crank_talk_ScannerState_skipWhite(crank_talk_VMContext_t *context, crank_talk_Sc
 static bool
 crank_talk_ScannerState_scanAdvanceKeyword(crank_talk_ScannerState_t *state)
 {
-    if(!isIdentifierStart(crank_talk_ScannerState_peekAt(state, 0)))
+    if(!isIdentifierStart((char)crank_talk_ScannerState_peekAt(state, 0)))
         return false;
     
     crank_talk_ScannerState_t initialState = *state;
-    while(isIdentifierMiddle(crank_talk_ScannerState_peekAt(state, 0)))
+    while(isIdentifierMiddle((char)crank_talk_ScannerState_peekAt(state, 0)))
         crank_talk_ScannerState_advance(state);
 
     if(crank_talk_ScannerState_peekAt(state, 0) == ':')
@@ -259,10 +259,10 @@ crank_talk_ScannerState_scanNextToken(crank_talk_VMContext_t *context, crank_tal
     int c = crank_talk_ScannerState_peekAt(state, 0);
 
     // Identifier and keyword
-    if(isIdentifierStart(c))
+    if(isIdentifierStart((char)c))
     {
         crank_talk_ScannerState_advance(state);
-        while(isIdentifierMiddle(crank_talk_ScannerState_peekAt(state, 0)))
+        while(isIdentifierMiddle((char)crank_talk_ScannerState_peekAt(state, 0)))
             crank_talk_ScannerState_advance(state);
 
         if(crank_talk_ScannerState_peekAt(state, 0) == ':')
@@ -289,37 +289,37 @@ crank_talk_ScannerState_scanNextToken(crank_talk_VMContext_t *context, crank_tal
     }
 
     // Numbers
-    if(isDigit(c) || (c == '-' && isDigit(crank_talk_ScannerState_peekAt(state, 1))))
+    if(isDigit((char)c) || (c == '-' && isDigit((char)crank_talk_ScannerState_peekAt(state, 1))))
     {
         crank_talk_ScannerState_advance(state);
 
-        while(isDigit(crank_talk_ScannerState_peekAt(state, 0)))
+        while(isDigit((char)crank_talk_ScannerState_peekAt(state, 0)))
             crank_talk_ScannerState_advance(state);
 
         // Parse the radix
         if(crank_talk_ScannerState_peekAt(state, 0) == 'R' || crank_talk_ScannerState_peekAt(state, 0) == 'r')
         {
             crank_talk_ScannerState_advance(state);
-            while(isIdentifierMiddle(crank_talk_ScannerState_peekAt(state, 0)))
+            while(isIdentifierMiddle((char)crank_talk_ScannerState_peekAt(state, 0)))
                 crank_talk_ScannerState_advance(state);
             return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindInteger, &initialState);
         }
 
         // Decimal point
-        if(crank_talk_ScannerState_peekAt(state, 0) == '.' && isDigit(crank_talk_ScannerState_peekAt(state, 1)))
+        if(crank_talk_ScannerState_peekAt(state, 0) == '.' && isDigit((char)crank_talk_ScannerState_peekAt(state, 1)))
         {
             crank_talk_ScannerState_advanceCount(state, 2);
-            while(isDigit(crank_talk_ScannerState_peekAt(state, 0)))
+            while(isDigit((char)crank_talk_ScannerState_peekAt(state, 0)))
                 crank_talk_ScannerState_advance(state);
 
             if(crank_talk_ScannerState_peekAt(state, 0) == 'E' || crank_talk_ScannerState_peekAt(state, 0) == 'e')
             {
                 int floatExponentOrDigit = crank_talk_ScannerState_peekAt(state, 1);
-                if(isDigit(floatExponentOrDigit) ||
-                    ((floatExponentOrDigit == '+' || floatExponentOrDigit == '-') && isDigit(crank_talk_ScannerState_peekAt(state, 2))))
+                if(isDigit((char)floatExponentOrDigit) ||
+                    ((floatExponentOrDigit == '+' || floatExponentOrDigit == '-') && isDigit((char)crank_talk_ScannerState_peekAt(state, 2))))
                 {
                     crank_talk_ScannerState_advanceCount(state, 2);
-                    while(isDigit(crank_talk_ScannerState_peekAt(state, 0)))
+                    while(isDigit((char)crank_talk_ScannerState_peekAt(state, 0)))
                         crank_talk_ScannerState_advance(state);
                 }
             }
@@ -333,10 +333,10 @@ crank_talk_ScannerState_scanNextToken(crank_talk_VMContext_t *context, crank_tal
     if(c == '#')
     {
         int c1 = crank_talk_ScannerState_peekAt(state, 1);
-        if(isIdentifierStart(c1))
+        if(isIdentifierStart((char)c1))
         {
             crank_talk_ScannerState_advanceCount(state, 2);
-            while(isIdentifierMiddle(crank_talk_ScannerState_peekAt(state, 0)))
+            while(isIdentifierMiddle((char)crank_talk_ScannerState_peekAt(state, 0)))
                 crank_talk_ScannerState_advance(state);
 
             if(crank_talk_ScannerState_peekAt(state, 0) == ':')
@@ -349,10 +349,10 @@ crank_talk_ScannerState_scanNextToken(crank_talk_VMContext_t *context, crank_tal
 
             return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindSymbol, &initialState);
         }
-        else if (isOperatorCharacter(c1))
+        else if (isOperatorCharacter((char)c1))
         {
             crank_talk_ScannerState_advanceCount(state, 2);
-            while(isIdentifierMiddle(crank_talk_ScannerState_peekAt(state, 0)))
+            while(isIdentifierMiddle((char)crank_talk_ScannerState_peekAt(state, 0)))
                 crank_talk_ScannerState_advance(state);
 
             return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindSymbol, &initialState);
@@ -454,11 +454,11 @@ crank_talk_ScannerState_scanNextToken(crank_talk_VMContext_t *context, crank_tal
         return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindDot, &initialState);
 
     default:
-        if(isOperatorCharacter(c))
+        if(isOperatorCharacter((char)c))
         {
             crank_talk_ScannerState_advance(state);
             bool hasMultiChars = false;
-            while(isOperatorCharacter(crank_talk_ScannerState_peekAt(state, 0)))
+            while(isOperatorCharacter((char)crank_talk_ScannerState_peekAt(state, 0)))
             {
                 hasMultiChars = true;
                 crank_talk_ScannerState_advance(state);
