@@ -45,9 +45,12 @@ crank_talk_analyzeAndEvaluateFileNamed(crank_talk_VMContext_t *context, crank_ta
     fileName[fileNameStringSize] = 0;
 
     // Compute the full path.
+#ifdef _WIN32
     // TODO: Implement this for Windows.
+    char *absolutePath = strdup(fileName);
+#else
     char *absolutePath = realpath(fileName, NULL);
-
+#endif
     // Open the file
     crank_talk_oop_t absolutePathString = crank_talk_String_createWithCString(context, absolutePath);
     FILE *file = fopen(absolutePath, "rb");

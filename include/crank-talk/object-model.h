@@ -9,6 +9,9 @@
 #include <string.h>
 
 #pragma once
+#ifdef _MSC_VER
+#pragma warning (disable : 4200)
+#endif
 
 typedef intptr_t crank_talk_oop_t;
 
@@ -356,7 +359,7 @@ CRANK_TALK_INLINE void
 crank_talk_object_setGCColor(crank_talk_oop_t oop, uint32_t newColor)
 {
     assert(crank_talk_oop_isNonNullPointer(oop));
-    crank_talk_object_getHeader(oop)->gcColor = newColor;
+    crank_talk_object_getHeader(oop)->gcColor = (uint8_t)newColor;
 }
 
 CRANK_TALK_INLINE void

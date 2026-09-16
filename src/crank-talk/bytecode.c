@@ -10,6 +10,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifdef _WIN32
+#include <malloc.h>
+#endif
+
 const char *CrankTalkOpcodeStringTable[] = {
 #define CRANK_TALK_OPCODE(x) #x,
 #include "crank-talk/opcodes.inc"

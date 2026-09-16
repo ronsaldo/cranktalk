@@ -4,6 +4,11 @@
 #include "object-model.h"
 #include <setjmp.h>
 
+#ifdef _WIN32
+#define _longjmp longjmp
+#define _setjmp setjmp
+#endif
+
 #define CRANK_TALK_MAX_CALL_ARGUMENT_COUNT 16
 
 typedef void (crank_talk_GCRootIterationFunction_t) (void *userdata, crank_talk_oop_t *root);
