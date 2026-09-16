@@ -7,6 +7,7 @@
 
 typedef struct crank_talk_Exception_s crank_talk_Exception_t;
 typedef struct crank_talk_Error_s crank_talk_Error_t;
+typedef struct crank_talk_AssertionFailure_s crank_talk_AssertionFailure_t;
 typedef struct crank_talk_MessageNotUnderstood_s crank_talk_MessageNotUnderstood_t;
 
 struct crank_talk_Exception_s
@@ -19,6 +20,11 @@ struct crank_talk_Exception_s
 struct crank_talk_Error_s
 {
     crank_talk_Exception_t super;
+};
+
+struct crank_talk_AssertionFailure_s
+{
+    crank_talk_Error_t super;
 };
 
 struct crank_talk_MessageNotUnderstood_s

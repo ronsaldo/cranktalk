@@ -344,7 +344,8 @@ crank_talk_ParseTreeSelfReferenceNode_analyzeAndBuildWith(crank_talk_VMContext_t
 
     crank_talk_oop_t foundBinding = crank_talk_Environment_lookupReceiverRecursively(context, buildContext->builder->lexicalEnvironment);
     if(!foundBinding)
-        crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->sourcePosition, "self is not defined in this context.");
+        return crank_talk_HIRConstantLiteralValue_create(context, crank_talk_oop_nil(), (crank_talk_oop_t)node->sourcePosition);
+
     assert(crank_talk_oop_isKindOf(context, foundBinding, context->roots.HIRVariableClass));
     return ((crank_talk_HIRVariable_t*)foundBinding)->value;
 }
@@ -361,7 +362,7 @@ crank_talk_ParseTreeSuperReferenceNode_analyzeAndBuildWith(crank_talk_VMContext_
 
     crank_talk_oop_t foundBinding = crank_talk_Environment_lookupReceiverRecursively(context, buildContext->builder->lexicalEnvironment);
     if(!foundBinding)
-        crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->sourcePosition, "self is not defined in this context.");
+        return crank_talk_HIRConstantLiteralValue_create(context, crank_talk_oop_nil(), (crank_talk_oop_t)node->sourcePosition);
     assert(crank_talk_oop_isKindOf(context, foundBinding, context->roots.HIRVariableClass));
     return ((crank_talk_HIRVariable_t*)foundBinding)->value;
 }

@@ -115,6 +115,45 @@ crank_talk_errorPrintfAtSourcePosition(crank_talk_VMContext_t *context, crank_ta
 }
 
 static crank_talk_oop_t
+crank_talk_Object_assert_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t assertValue = arguments[1];
+    if(assertValue != context->roots.trueValue)
+    {        
+        crank_talk_AssertionFailure_t *assertionFailure = (crank_talk_AssertionFailure_t *)CrankAllocateValuesObjectWithClassName(context, AssertionFailure);
+        assertionFailure->super.super.messageText = crank_talk_String_createWithCString(context, "Assertion failed");
+        crank_talk_Exception_signal(context, &assertionFailure->super.super);
+        abort();
+    }
+
+    return self;
+}
+
+static crank_talk_oop_t
+crank_talk_Object_assertWithDescription_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t assertValue = arguments[1];
+    crank_talk_oop_t description = arguments[2];
+    if(assertValue != context->roots.trueValue)
+    {        
+        crank_talk_AssertionFailure_t *assertionFailure = (crank_talk_AssertionFailure_t *)CrankAllocateValuesObjectWithClassName(context, AssertionFailure);
+        assertionFailure->super.super.messageText = description;
+        crank_talk_Exception_signal(context, &assertionFailure->super.super);
+        abort();
+    }
+
+    return self;
+}
+
+static crank_talk_oop_t
 crank_talk_BlockClosure_onDo_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -199,6 +238,9 @@ crank_talk_Exception_signalWith_primitive(crank_talk_VMContext_t *context, crank
 void
 crank_talk_registerErrorPrimitives(crank_talk_VMContext_t* context)
 {
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "assert:", 2, crank_talk_Object_assert_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "assert:description:", 3, crank_talk_Object_assertWithDescription_primitive);
+
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "on:do:", 3, crank_talk_BlockClosure_onDo_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "ensure:", 2, crank_talk_BlockClosure_ensure_primitive);
 

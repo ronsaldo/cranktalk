@@ -243,6 +243,7 @@ struct crank_talk_VMContextRoots_s
     // Exceptions
     crank_talk_oop_t ExceptionClass;
     crank_talk_oop_t ErrorClass;
+    crank_talk_oop_t AssertionFailureClass;
     crank_talk_oop_t MessageNotUnderstoodClass;
 };
 

@@ -832,6 +832,7 @@ crank_talk_context_createExceptionsDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(Exception, resumeValue),
         NULL);
     context->roots.ErrorClass = crank_talk_context_createClassAndMetaclass(context, "Error", context->roots.ExceptionClass, sizeof(crank_talk_Error_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.AssertionFailureClass = crank_talk_context_createClassAndMetaclass(context, "AssertionFailure", context->roots.ErrorClass, sizeof(crank_talk_AssertionFailure_t), CrankTalkGCObjectDataTypeOops, NULL);
     context->roots.MessageNotUnderstoodClass = crank_talk_context_createClassAndMetaclass(context, "MessageNotUnderstood", context->roots.ErrorClass, sizeof(crank_talk_MessageNotUnderstood_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(MessageNotUnderstood, message),
         NULL);

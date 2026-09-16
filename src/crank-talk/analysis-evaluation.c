@@ -205,26 +205,24 @@ static crank_talk_oop_t
 crank_talk_ParseTreeSelfReference_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
+    (void)context;
     (void)argumentCount;
+    (void)arguments;
     assert(argumentCount >= 2);
 
-    crank_talk_ParseTreeSelfReferenceNode_t *node = (crank_talk_ParseTreeSelfReferenceNode_t*)arguments[0];
-
-    crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->super.super.sourcePosition, "Invalid context for self.");
-    abort();
+    return crank_talk_oop_nil();
 }
 
 static crank_talk_oop_t
 crank_talk_ParseTreeSuperReference_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
+    (void)context;
     (void)argumentCount;
+    (void)arguments;
     assert(argumentCount >= 2);
 
-    crank_talk_ParseTreeSuperReferenceNode_t *node = (crank_talk_ParseTreeSuperReferenceNode_t*)arguments[0];
-
-    crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->super.super.sourcePosition, "Invalid context for super.");
-    abort();
+    return crank_talk_oop_nil();
 }
 
 
