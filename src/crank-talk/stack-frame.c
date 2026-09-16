@@ -1,6 +1,8 @@
 #include "crank-talk/stack-frame.h"
+#include "crank-talk/context.h"
 #include "crank-talk/errors.h"
 #include "crank-talk/function.h"
+#include "crank-talk/message.h"
 #include "crank-talk/string.h"
 #include <assert.h>
 #include <stdlib.h>
@@ -37,10 +39,29 @@ crank_talk_stackFrame_popRecord(crank_talk_stackFrameRecord_t *record)
 }
 
 CRANK_TALK_API void
+crank_talk_stackFrame_unwindPopRecord(crank_talk_VMContext_t *context, crank_talk_stackFrameRecord_t *record)
+{
+    assert(record->type < CrankTalkStackFrameRecordCount);
+    if(record->mappedContext) {
+        crank_talk_StackContext_t *mappedContext = (crank_talk_StackContext_t *)record->mappedContext;
+        mappedContext->stackContextPointer = crank_talk_oop_nil();
+    }
+
+    if(record->type == CrankTalkStackFrameRecordEnsureRecord)
+    {
+        crank_talk_stackFrameEnsureRecord_t *ensure = (crank_talk_stackFrameEnsureRecord_t *)record;
+        crank_talk_send0(context, context->roots.valueSymbol, ensure->ensureBlock);
+    }
+
+    crank_talk_stackFrame_activeRecord = record->previous;
+    assert(!crank_talk_stackFrame_activeRecord || crank_talk_stackFrame_activeRecord->type < CrankTalkStackFrameRecordCount);
+}
+
+CRANK_TALK_API void
 crank_talk_stackFrame_unwindAndJumpToBytecodeMethod(crank_talk_VMContext_t *context, crank_talk_stackFrameBytecodeFunctionActivationRecord_t *targetRecord)
 {
     while(crank_talk_stackFrame_activeRecord && crank_talk_stackFrame_activeRecord != &targetRecord->super)
-        crank_talk_stackFrame_popRecord(crank_talk_stackFrame_activeRecord);
+        crank_talk_stackFrame_unwindPopRecord(context, crank_talk_stackFrame_activeRecord);
 
     if(!crank_talk_stackFrame_activeRecord)
         crank_talk_errorPrintf(context, "Failed to unwind to record %p\n", targetRecord);
@@ -97,6 +118,19 @@ crank_talk_stackFrame_iterateGCRootsInRecordWith(crank_talk_stackFrameRecord_t *
             iterationFunction(userdata, &activationRecord->calloutArguments[i]);
 
         iterationFunction(userdata, &activationRecord->result);
+    } break;
+    case CrankTalkStackFrameRecordOnDoRecord:
+    {
+        crank_talk_stackFrameOnDoRecord_t *onDoRecord = (crank_talk_stackFrameOnDoRecord_t*)record;
+        iterationFunction(userdata, &onDoRecord->exceptionClass);
+        iterationFunction(userdata, &onDoRecord->exceptionAction);
+        iterationFunction(userdata, &onDoRecord->result);
+        abort();
+    } break;
+    case CrankTalkStackFrameRecordEnsureRecord:
+    {
+        crank_talk_stackFrameEnsureRecord_t *ensureRecord = (crank_talk_stackFrameEnsureRecord_t*)record;
+        iterationFunction(userdata, &ensureRecord->ensureBlock);
     } break;
     default: abort();
     }

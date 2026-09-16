@@ -532,11 +532,18 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(42, crank_talk_oop_decodeSmallInteger(blockResult));
     }
 
-    // Print the stack trace
+    //// Print the stack trace
+    //{
+    //    crank_talk_analyzeAndEvaluateString(context, "MyClass ![printStackTrace Smalltalk printStackTrace]");
+    //    crank_talk_analyzeAndEvaluateString(context, "MyClass new printStackTrace");
+    //}
+
+    // Error capture
     {
-        crank_talk_analyzeAndEvaluateString(context, "MyClass ![printStackTrace Smalltalk printStackTrace]");
-        crank_talk_analyzeAndEvaluateString(context, "MyClass new printStackTrace");
+        crank_talk_oop_t result = crank_talk_analyzeAndEvaluateString(context, "[Error new signal: 'An error'. 2] on: Error do: [42]");
+        AssertEquals(42, crank_talk_oop_decodeSmallInteger(result));
     }
+
 
     crank_talk_vm_destroyContext(context);
 }

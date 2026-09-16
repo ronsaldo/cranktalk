@@ -25,6 +25,7 @@ void crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* 
 void crank_talk_registerBehaviorPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerControlFlowPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerEnvironmentPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerErrorPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerFunctionalPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerMacrosPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context);
@@ -827,6 +828,7 @@ crank_talk_context_createExceptionsDefinitions(crank_talk_VMContext_t* context)
 {
     context->roots.ExceptionClass = crank_talk_context_createClassAndMetaclass(context, "Exception", context->roots.ObjectClass, sizeof(crank_talk_Exception_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(Exception, messageText),
+        CrankTalkSlotDef(Exception, resumeValue),
         NULL);
     context->roots.ErrorClass = crank_talk_context_createClassAndMetaclass(context, "Error", context->roots.ExceptionClass, sizeof(crank_talk_Error_t), CrankTalkGCObjectDataTypeOops, NULL);
     context->roots.MessageNotUnderstoodClass = crank_talk_context_createClassAndMetaclass(context, "MessageNotUnderstood", context->roots.ErrorClass, sizeof(crank_talk_MessageNotUnderstood_t), CrankTalkGCObjectDataTypeOops,
@@ -842,6 +844,7 @@ crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
     crank_talk_registerBehaviorPrimitives(context);
     crank_talk_registerControlFlowPrimitives(context);
     crank_talk_registerEnvironmentPrimitives(context);
+    crank_talk_registerErrorPrimitives(context);
     crank_talk_registerFunctionalPrimitives(context);
     crank_talk_registerMacrosPrimitives(context);
     crank_talk_registerNumbersPrimitives(context);
