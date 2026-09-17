@@ -247,6 +247,25 @@ crank_talk_HIRAllocaInstruction_analyzeAndBuildIdentifierReferenceWith(crank_tal
 }
 
 static crank_talk_oop_t
+crank_talk_HIRCaptureInstruction_analyzeAndBuildIdentifierReferenceWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_HIRCapture_t *self = (crank_talk_HIRCapture_t*)arguments[0];
+    crank_talk_oop_t referenceNode = arguments[1];
+    crank_talk_oop_t buildContextValue = arguments[2];
+    
+    crank_talk_ParseTreeIdentifierReferenceNode_t *node = (crank_talk_ParseTreeIdentifierReferenceNode_t*)referenceNode;
+    crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t*)buildContextValue;
+
+    if(crank_talk_oop_asBoolean(context, self->isVariable))
+        return crank_talk_HIRBuilder_variableLoad(context, buildContext->builder, &self->super.super, (crank_talk_oop_t)node->super.sourcePosition);
+    else
+        return (crank_talk_oop_t)self;
+}
+
+static crank_talk_oop_t
 crank_talk_Slot_analyzeAndBuildIdentifierReferenceWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -786,6 +805,7 @@ crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRVariable_analyzeAndBuildIdentifierReferenceWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRValueClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRValue_analyzeAndBuildIdentifierReferenceWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRAllocaInstruction_analyzeAndBuildIdentifierReferenceWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRCaptureClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRCaptureInstruction_analyzeAndBuildIdentifierReferenceWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SlotClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_Slot_analyzeAndBuildIdentifierReferenceWith);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeAssignmentNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeAssignmentNode_analyzeAndBuildWith);

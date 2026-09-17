@@ -261,6 +261,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.isTerminatorSymbol = crank_talk_Symbol_internWithCString(context, "isTerminator");
     context->roots.getBytecodeAssemblyOperandWithSymbol = crank_talk_Symbol_internWithCString(context, "getBytecodeAssemblyOperandWith:");
     context->roots.emitBytecodeAssemblyWithSymbol = crank_talk_Symbol_internWithCString(context, "emitBytecodeAssemblyWith:");
+    context->roots.isHIRVariableSymbol = crank_talk_Symbol_internWithCString(context, "isHIRVariable");
 
     context->roots.valueSymbol = crank_talk_Symbol_internWithCString(context, "value");
     context->roots.valueWithSymbol = crank_talk_Symbol_internWithCString(context, "value:");
@@ -701,6 +702,7 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
     context->roots.HIRArgumentClass = crank_talk_context_createClassAndMetaclass(context, "HIRArgument", context->roots.HIRFunctionLocalClass, sizeof(crank_talk_HIRArgument_t), CrankTalkGCObjectDataTypeOops, NULL);
     context->roots.HIRCaptureClass = crank_talk_context_createClassAndMetaclass(context, "HIRCapture", context->roots.HIRFunctionLocalClass, sizeof(crank_talk_HIRCapture_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRCapture, capturedValue),
+        CrankTalkSlotDef(HIRCapture, isVariable),
         NULL);
     context->roots.HIRBasicBlockClass = crank_talk_context_createClassAndMetaclass(context, "HIRBasicBlock", context->roots.HIRFunctionLocalClass, sizeof(crank_talk_HIRBasicBlock_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRBasicBlock, nextBlock),

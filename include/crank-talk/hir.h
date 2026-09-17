@@ -84,6 +84,7 @@ struct crank_talk_HIRCapture_s
 {
     crank_talk_HIRFunctionLocal_t super;
     crank_talk_HIRFunctionLocal_t *capturedValue;
+    crank_talk_oop_t isVariable;
 };
 
 struct crank_talk_HIRBasicBlock_s

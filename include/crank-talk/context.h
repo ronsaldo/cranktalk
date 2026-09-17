@@ -130,6 +130,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t isTerminatorSymbol;
     crank_talk_oop_t getBytecodeAssemblyOperandWithSymbol;
     crank_talk_oop_t emitBytecodeAssemblyWithSymbol;
+    crank_talk_oop_t isHIRVariableSymbol;
 
     crank_talk_oop_t valueSymbol;
     crank_talk_oop_t valueWithSymbol;

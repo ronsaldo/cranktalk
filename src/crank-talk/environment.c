@@ -167,6 +167,7 @@ crank_talk_FunctionAnalysisEnvironment_lookupSymbolRecursively(crank_talk_VMCont
             crank_talk_oop_t captureValue = CrankAllocateValuesObjectWithClassName(context, HIRCapture);
             crank_talk_HIRCapture_t *capture = (crank_talk_HIRCapture_t *)captureValue;
             capture->capturedValue = (crank_talk_HIRFunctionLocal_t*)hirVariable->value;
+            capture->isVariable = crank_talk_send0(context, context->roots.isHIRVariableSymbol, (crank_talk_oop_t)capture->capturedValue);
 
             crank_talk_OrderedCollection_add(context, environment->captureList, captureValue);
             crank_talk_IdentityDictionary_hirVariableAtPut(context, environment->captureSymbolTable, symbol, captureValue);
