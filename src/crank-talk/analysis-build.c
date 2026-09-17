@@ -79,6 +79,27 @@ crank_talk_HIRAlloca_analyzeAndBuildAssignmentWithWith(crank_talk_VMContext_t *c
 }
 
 static crank_talk_oop_t
+crank_talk_HIRCapture_analyzeAndBuildAssignmentWithWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 4);
+    crank_talk_HIRValue_t* self = (crank_talk_HIRValue_t*)arguments[0];
+    crank_talk_ParseTreeAssignmentNode_t *assignmentNode =(crank_talk_ParseTreeAssignmentNode_t*)arguments[1];
+    crank_talk_HIRValue_t *assignedValue = (crank_talk_HIRValue_t*)arguments[2];
+    crank_talk_oop_t buildContextValue = arguments[3];
+
+    crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t*)buildContextValue;
+
+    crank_talk_HIRCapture_t *capture = (crank_talk_HIRCapture_t *)self;
+    if(!crank_talk_oop_asBoolean(context, capture->isVariable))
+        crank_talk_errorPrintfAtSourcePosition(context, self->sourcePosition, "Captured value is not a variable.");
+
+    crank_talk_HIRBuilder_variableStore(context, buildContext->builder, self, assignedValue, (crank_talk_oop_t)assignmentNode->super.sourcePosition);
+    return (crank_talk_oop_t)assignedValue;
+}
+
+static crank_talk_oop_t
 crank_talk_Slot_analyzeAndBuildAssignmentWithWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -799,6 +820,7 @@ crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.LiteralVariableClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_LiteralVariable_analyzeAndBuildAssignmentWithWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_HIRVariable_analyzeAndBuildAssignmentWithWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_HIRAlloca_analyzeAndBuildAssignmentWithWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRCaptureClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_HIRCapture_analyzeAndBuildAssignmentWithWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SlotClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_Slot_analyzeAndBuildAssignmentWithWith);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.LiteralVariableClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_LiteralVariable_analyzeAndBuildIdentifierReferenceWith);
