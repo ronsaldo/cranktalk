@@ -211,6 +211,26 @@ crank_talk_BlockClosure_doWhileFalseWith_primitive(crank_talk_VMContext_t *conte
     return crank_talk_oop_nil();
 }
 
+static crank_talk_oop_t
+crank_talk_Number_toDo_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 3);
+
+    crank_talk_oop_t number = arguments[0];
+    crank_talk_oop_t target = arguments[1];
+    crank_talk_oop_t block = arguments[2];
+
+    while (crank_talk_oop_decodeSmallInteger(number) <= crank_talk_oop_decodeSmallInteger(target))
+    {
+        crank_talk_send1(context, context->roots.valueWithSymbol, block, number);
+        number = crank_talk_oop_encodeSmallInteger(crank_talk_oop_decodeSmallInteger(number) + 1);
+    }
+
+    return crank_talk_oop_nil();
+}
+
 void
 crank_talk_registerControlFlowPrimitives(crank_talk_VMContext_t* context)
 {
@@ -237,4 +257,6 @@ crank_talk_registerControlFlowPrimitives(crank_talk_VMContext_t* context)
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "doWhileTrue:", 2, crank_talk_BlockClosure_doWhileTrueWith_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "doWhileFalse:", 2, crank_talk_BlockClosure_doWhileFalseWith_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.NumberClass, "to:do:", 3, crank_talk_Number_toDo_primitive);
 }

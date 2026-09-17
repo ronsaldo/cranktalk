@@ -541,5 +541,11 @@ void analysisAndEvaluation_runTests(void)
         Assert(crank_talk_oop_isKindOf(context, result, context->roots.ErrorClass));
     }
 
+    // to:do:
+    {
+        crank_talk_oop_t result = crank_talk_analyzeAndEvaluateString(context, "|sum| sum := 0. 1 to: 5 do: [:x | sum := sum + x]. sum");
+        AssertEquals(15, crank_talk_oop_decodeSmallInteger(result));
+    }
+
     crank_talk_vm_destroyContext(context);
 }
