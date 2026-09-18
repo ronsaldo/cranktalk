@@ -844,7 +844,7 @@ crank_talk_ToByDoNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank
     gcFrame.stopValue = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->stopExpression, buildContextValue);
     gcFrame.stepValue = (crank_talk_HIRValue_t*)crank_talk_HIRConstantLiteralValue_create(context, crank_talk_oop_encodeSmallInteger(1), (crank_talk_oop_t)node->super.sourcePosition);
     if(node->stepExpression)
-        crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->stepExpression, buildContextValue);
+        gcFrame.stepValue = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->stepExpression, buildContextValue);
 
     // Alloca the current number
     gcFrame.currentNumberVariable = (crank_talk_HIRValue_t*)crank_talk_HIRBuilder_alloca(context, builder->allocaBuilder, (crank_talk_oop_t)node->super.sourcePosition);
@@ -858,21 +858,26 @@ crank_talk_ToByDoNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank
     // Loop header
     crank_talk_HIRBuilder_branch(context, builder, gcFrame.loopHeader, (crank_talk_oop_t)node->super.sourcePosition);
     builder->basicBlock = gcFrame.loopHeader;
+    
     crank_talk_HIRFunction_addBasicBlock(builder->hirFunction, gcFrame.loopHeader);
 
+    crank_talk_oop_t currentNumber = crank_talk_HIRBuilder_variableLoad(context, builder, gcFrame.currentNumberVariable, (crank_talk_oop_t)node->super.sourcePosition);
+
     {
-        crank_talk_oop_t currentNumber = crank_talk_HIRBuilder_variableLoad(context, builder, gcFrame.currentNumberVariable, (crank_talk_oop_t)node->super.sourcePosition);
         crank_talk_oop_t lessOrEqualsSelector = crank_talk_HIRConstantLiteralValue_create(context, context->roots.lessOrEqualsSymbol, (crank_talk_oop_t)node->super.sourcePosition);
         crank_talk_oop_t continueCondition = crank_talk_HIRBuilder_send(context, builder, (crank_talk_HIRValue_t*)lessOrEqualsSelector, (crank_talk_Array_t*)crank_talk_Array_WithWith(context, currentNumber, (crank_talk_oop_t)gcFrame.stopValue), (crank_talk_oop_t)node->super.sourcePosition);
         crank_talk_HIRBuilder_conditionalBranch(context, builder, (crank_talk_HIRValue_t*)continueCondition, gcFrame.loopBody, gcFrame.loopMerge, (crank_talk_oop_t)node->super.sourcePosition);
     }
 
     // Loop body
-    builder->basicBlock = gcFrame.loopBody;
     crank_talk_HIRFunction_addBasicBlock(builder->hirFunction, gcFrame.loopBody);
+    builder->basicBlock = gcFrame.loopBody;
 
+    // Increment
     {
-        //crank_talk_oop_t currentNumber = crank_talk_HIRBuilder_variableLoad(context, builder, gcFrame.currentNumberVariable, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_oop_t plusSelector = crank_talk_HIRConstantLiteralValue_create(context, context->roots.plusSymbol, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_oop_t incrementedValue = crank_talk_HIRBuilder_send(context, builder, (crank_talk_HIRValue_t*)plusSelector, (crank_talk_Array_t*)crank_talk_Array_WithWith(context, currentNumber, (crank_talk_oop_t)gcFrame.stepValue), (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_HIRBuilder_variableStore(context,builder, gcFrame.currentNumberVariable, (crank_talk_HIRValue_t*)incrementedValue, (crank_talk_oop_t)node->super.sourcePosition);
     }
 
     crank_talk_HIRBuilder_branch(context, builder, gcFrame.loopHeader, (crank_talk_oop_t)node->super.sourcePosition);
