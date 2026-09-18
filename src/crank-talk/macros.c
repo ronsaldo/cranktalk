@@ -296,6 +296,43 @@ crank_talk_MessageMacro_doWhileFalseWith(crank_talk_VMContext_t *context, crank_
     return whileNodeValue;
 }
 
+static crank_talk_oop_t
+crank_talk_MessageMacro_toDo(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_ParseTreeMessageSendNode_t *sendNode = (crank_talk_ParseTreeMessageSendNode_t *)arguments[0];
+    assert(crank_talk_object_getSizeInSlots((crank_talk_oop_t)sendNode->arguments) == 2);
+
+    crank_talk_oop_t toDoNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeToByDoNode);
+    crank_talk_ParseTreeToByDoNode_t *toDoNode = (crank_talk_ParseTreeToByDoNode_t *)toDoNodeValue;
+    toDoNode->super.sourcePosition = sendNode->super.sourcePosition;
+    toDoNode->startExpression = sendNode->receiver;
+    toDoNode->stopExpression = (crank_talk_ParseTreeNode_t*)sendNode->arguments->elements[0];
+    toDoNode->blockExpression = (crank_talk_ParseTreeNode_t*)sendNode->arguments->elements[1];
+    return toDoNodeValue;
+}
+
+static crank_talk_oop_t
+crank_talk_MessageMacro_toByDo(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_ParseTreeMessageSendNode_t *sendNode = (crank_talk_ParseTreeMessageSendNode_t *)arguments[0];
+    assert(crank_talk_object_getSizeInSlots((crank_talk_oop_t)sendNode->arguments) == 3);
+
+    crank_talk_oop_t toDoNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeToByDoNode);
+    crank_talk_ParseTreeToByDoNode_t *toDoNode = (crank_talk_ParseTreeToByDoNode_t *)toDoNodeValue;
+    toDoNode->super.sourcePosition = sendNode->super.sourcePosition;
+    toDoNode->startExpression = sendNode->receiver;
+    toDoNode->stopExpression = (crank_talk_ParseTreeNode_t*)sendNode->arguments->elements[0];
+    toDoNode->stepExpression = (crank_talk_ParseTreeNode_t*)sendNode->arguments->elements[1];
+    toDoNode->blockExpression = (crank_talk_ParseTreeNode_t*)sendNode->arguments->elements[2];
+    return toDoNodeValue;
+}
+
 void crank_talk_registerMacrosPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_createAndSetMessageMacro(context, "yourself", crank_talk_MessageMacro_yourself);
@@ -315,6 +352,9 @@ void crank_talk_registerMacrosPrimitives(crank_talk_VMContext_t* context)
 
     crank_talk_createAndSetMessageMacro(context, "doWhileTrue:", crank_talk_MessageMacro_doWhileTrueWith);
     crank_talk_createAndSetMessageMacro(context, "doWhileFalse:", crank_talk_MessageMacro_doWhileFalseWith);
+
+    crank_talk_createAndSetMessageMacro(context, "to:do:", crank_talk_MessageMacro_toDo);
+    crank_talk_createAndSetMessageMacro(context, "to:by:do:", crank_talk_MessageMacro_toByDo);
 }
 
 

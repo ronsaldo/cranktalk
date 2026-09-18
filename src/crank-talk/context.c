@@ -281,6 +281,9 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     context->roots.asSlotSymbol = crank_talk_Symbol_internWithCString(context, "asSlot");
 
+    context->roots.plusSymbol = crank_talk_Symbol_internWithCString(context, "+");
+    context->roots.lessOrEqualsSymbol = crank_talk_Symbol_internWithCString(context, "<=");
+
     // Message send macro dictionary.
     context->roots.messageSendMacroDictionary = crank_talk_IdentityDictionary_create(context);
 
@@ -654,6 +657,12 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
     context->roots.ParseTreeDoWhileNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeDoWhileNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeDoWhileNode_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(ParseTreeDoWhileNode, bodyExpression),
         CrankTalkSlotDef(ParseTreeDoWhileNode, condition),
+        NULL);
+    context->roots.ParseTreeToByDoNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeToByDoNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeToByDoNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeToByDoNode, startExpression),
+        CrankTalkSlotDef(ParseTreeToByDoNode, stopExpression),
+        CrankTalkSlotDef(ParseTreeToByDoNode, stepExpression),
+        CrankTalkSlotDef(ParseTreeToByDoNode, blockExpression),
         NULL);
 
     // Environment

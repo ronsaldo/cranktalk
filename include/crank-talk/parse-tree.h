@@ -36,6 +36,8 @@ typedef struct crank_talk_ParseTreeIfSelectionNode_s crank_talk_ParseTreeIfSelec
 typedef struct crank_talk_ParseTreeWhileNode_s crank_talk_ParseTreeWhileNode_t;
 typedef struct crank_talk_ParseTreeDoWhileNode_s crank_talk_ParseTreeDoWhileNode_t;
 
+typedef struct crank_talk_ParseTreeToByDoNode_s crank_talk_ParseTreeToByDoNode_t;
+
 struct crank_talk_ParseTreeNode_s
 {
     crank_talk_Object_t super;
@@ -215,6 +217,15 @@ struct crank_talk_ParseTreeDoWhileNode_s
     crank_talk_ParseTreeNode_t super;
     crank_talk_ParseTreeNode_t *bodyExpression;
     crank_talk_ParseTreeNode_t *condition;
+};
+
+struct crank_talk_ParseTreeToByDoNode_s
+{
+    crank_talk_ParseTreeNode_t super;
+    crank_talk_ParseTreeNode_t *startExpression;
+    crank_talk_ParseTreeNode_t *stopExpression;
+    crank_talk_ParseTreeNode_t *stepExpression;
+    crank_talk_ParseTreeNode_t *blockExpression;
 };
 
 CRANK_TALK_API bool crank_talk_isParseTreeNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);

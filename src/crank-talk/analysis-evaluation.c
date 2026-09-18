@@ -10,6 +10,7 @@
 #include "crank-talk/stack-frame.h"
 #include "crank-talk/string.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 CRANK_TALK_API crank_talk_oop_t
 crank_talk_createTopLevelEvaluationEnvironment(crank_talk_VMContext_t *context, crank_talk_oop_t sourceCodeValue)
@@ -684,6 +685,96 @@ crank_talk_ParseTreeDoWhileNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *c
     return crank_talk_oop_nil();
 }
 
+static crank_talk_oop_t
+crank_talk_ParseTree_cullInlineBlock(crank_talk_VMContext_t *context, crank_talk_ParseTreeNode_t *blockValueNode, crank_talk_oop_t evaluationContextValue, crank_talk_oop_t cullArgument)
+{
+    crank_talk_AnalysisAndEvaluationContext_t *evaluationContext = (crank_talk_AnalysisAndEvaluationContext_t*)evaluationContextValue;
+
+    assert(crank_talk_isParseTreeBlockNode(context, (crank_talk_oop_t)blockValueNode));
+    crank_talk_ParseTreeBlockNode_t *blockNode = (crank_talk_ParseTreeBlockNode_t*)blockValueNode;
+    size_t blockArgumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)blockNode->arguments);
+    if(blockArgumentCount > 1)
+        crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)blockNode->super.sourcePosition, "Expected a block with at most on argument.");
+
+    struct {
+        crank_talk_oop_t oldLexicalEnvironment;
+        crank_talk_oop_t result;
+    } gcFrame = {
+        .oldLexicalEnvironment = evaluationContext->lexicalEnvironment,
+        .result = crank_talk_oop_nil()
+    };
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    evaluationContext->lexicalEnvironment = crank_talk_LexicalEnvironment_create(context, evaluationContext->lexicalEnvironment);
+
+    crank_talk_oop_t *blockArguments = blockNode->arguments->elements;
+    if(blockArgumentCount == 1)
+    {
+        crank_talk_oop_t argumentDefinitionValue = blockArguments[0];
+
+        if(!crank_talk_oop_isKindOf(context, argumentDefinitionValue, context->roots.ParseTreeArgumentDefinitionNodeClass))
+            crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)((crank_talk_ParseTreeNode_t*)argumentDefinitionValue)->sourcePosition, "Expected an argument definition node.");
+
+        crank_talk_ParseTreeArgumentDefinitionNode_t *argumentDefinition = (crank_talk_ParseTreeArgumentDefinitionNode_t*)argumentDefinitionValue;
+        crank_talk_LexicalEnvironment_setNewSymbolBinding(context, evaluationContext->lexicalEnvironment, (crank_talk_oop_t)argumentDefinition->name, cullArgument, (crank_talk_oop_t)blockNode->super.sourcePosition);
+
+    }
+
+    // Evaluate the block body
+    gcFrame.result = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)blockNode->body, evaluationContextValue);
+
+    evaluationContext->lexicalEnvironment = gcFrame.oldLexicalEnvironment;
+    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+    
+    return gcFrame.result;
+}
+
+static crank_talk_oop_t
+crank_talk_ParseTreeToByDoNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_oop_t evaluationContextValue = arguments[1];
+
+    crank_talk_ParseTreeToByDoNode_t *node = (crank_talk_ParseTreeToByDoNode_t*)self;
+    
+    struct {
+        crank_talk_oop_t startValue;
+        crank_talk_oop_t currentValue;
+        crank_talk_oop_t stepValue;
+        crank_talk_oop_t stopValue;
+        crank_talk_oop_t blockValue;
+    } gcFrame = {};
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    // Evaluate the end points.
+    gcFrame.startValue = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->startExpression, evaluationContextValue);
+    gcFrame.currentValue = gcFrame.startValue;
+    gcFrame.stepValue = crank_talk_oop_encodeSmallInteger(1);
+    if(node->stepExpression)
+        gcFrame.stepValue = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->stepExpression, evaluationContextValue);
+    gcFrame.stopValue = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->stopExpression, evaluationContextValue);
+
+    if(!crank_talk_isParseTreeBlockNode(context, (crank_talk_oop_t)node->blockExpression))
+        gcFrame.blockValue = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->blockExpression, evaluationContextValue);
+
+    // Loop
+    while(crank_talk_oop_asBoolean(context, crank_talk_send1(context, context->roots.lessOrEqualsSymbol, gcFrame.currentValue, gcFrame.stopValue)))
+    {
+        if(gcFrame.blockValue)
+            crank_talk_send1(context, context->roots.valueWithSymbol, gcFrame.blockValue, gcFrame.currentValue);
+        else
+            crank_talk_ParseTree_cullInlineBlock(context, node->blockExpression, evaluationContextValue, gcFrame.currentValue);
+
+        gcFrame.currentValue = crank_talk_send1(context, context->roots.plusSymbol, gcFrame.currentValue, gcFrame.stepValue);
+    }
+
+    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+    return gcFrame.startValue;
+}
+
 void
 crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context)
 {
@@ -714,4 +805,6 @@ crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* conte
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIfSelectionNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeIfSelectionNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeWhileNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeWhileNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeDoWhileNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeDoWhileNode_analyzeAndEvaluateWith);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeToByDoNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeToByDoNode_analyzeAndEvaluateWith);
 }

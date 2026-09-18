@@ -149,6 +149,9 @@ struct crank_talk_VMContextRoots_s
     
     crank_talk_oop_t asSlotSymbol;
 
+    crank_talk_oop_t plusSymbol;
+    crank_talk_oop_t lessOrEqualsSymbol;
+
     // Message send macro dictionary.
     crank_talk_oop_t messageSendMacroDictionary;
 
@@ -186,6 +189,8 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t ParseTreeIfSelectionNodeClass;
     crank_talk_oop_t ParseTreeWhileNodeClass;
     crank_talk_oop_t ParseTreeDoWhileNodeClass;
+
+    crank_talk_oop_t ParseTreeToByDoNodeClass;
 
     // Environment
     crank_talk_oop_t AbstractEnvironmentClass;
