@@ -99,7 +99,7 @@ crank_talk_ProtoObject_class_primitive(crank_talk_VMContext_t *context, crank_ta
 {
     (void)closure;
     (void)argumentCount;
-    assert(argumentCount > 0);
+    assert(argumentCount >= 1);
     return (crank_talk_oop_t)crank_talk_oop_getClass(context, arguments[0]);
 }
 
@@ -108,8 +108,19 @@ crank_talk_Object_species_primitive(crank_talk_VMContext_t *context, crank_talk_
 {
     (void)closure;
     (void)argumentCount;
-    assert(argumentCount > 0);
+    assert(argumentCount >= 1);
     return (crank_talk_oop_t)crank_talk_oop_getClass(context, arguments[0]);
+}
+
+static crank_talk_oop_t
+crank_talk_Object_isKindOf_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t object = arguments[0];
+    crank_talk_oop_t clazz = arguments[1];
+    return crank_talk_oop_fromBoolean(context, crank_talk_oop_isKindOf(context, object, clazz));
 }
 
 static crank_talk_oop_t
@@ -368,6 +379,7 @@ crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "~=", 2, crank_talk_Object_notEquals_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "hash", 2, crank_talk_Object_hash_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "species", 1, crank_talk_Object_species_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "isKindOf:", 2, crank_talk_Object_isKindOf_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "basicSize", 1, crank_talk_Object_basicSize_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "size", 1, crank_talk_Object_basicSize_primitive);

@@ -38,3 +38,25 @@ do: aBlock separatedBy: aSeparator
         aBlock value: (self at: index)
     ]
 ].
+
+SequenceableCollection ![
+hasEqualElements: otherCollection
+    | size |
+    (otherCollection isKindOf: SequenceableCollection) ifFalse: [^ false].
+    
+    size := self size.
+    size = otherCollection size ifFalse: [^ false ].
+    1 to: size do: [:index |
+        (self at: size) = (otherCollection at: size) ifFalse: [
+            ^ false
+        ]
+    ].
+    ^ true
+].
+
+SequenceableCollection ![
+= otherCollection
+    self == otherCollection ifTrue: [^ true].
+    self species == otherCollection species ifFalse: [^ false ].
+    ^ self hasEqualElements: otherCollection
+].
