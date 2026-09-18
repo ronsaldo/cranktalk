@@ -79,7 +79,7 @@ crank_talk_BinaryFileStream_nextPutAll(crank_talk_VMContext_t *context, crank_ta
 
     size_t bytesSize = crank_talk_object_getSizeInBytes(bytesObject);
     uint8_t *bytesData = crank_talk_oop_getBytesData(bytesObject);
-    if(fwrite(bytesData, bytesSize, 1, file) != 1)
+    if(bytesSize > 0 &&fwrite(bytesData, bytesSize, 1, file) != 1)
         crank_talk_error(context, "Failed to write in file.");
 
     return self;
@@ -102,7 +102,7 @@ crank_talk_BinaryFileStream_print(crank_talk_VMContext_t *context, crank_talk_oo
 
     size_t bytesSize = crank_talk_object_getSizeInBytes(bytesObject);
     uint8_t *bytesData = crank_talk_oop_getBytesData(bytesObject);
-    if(fwrite(bytesData, bytesSize, 1, file) != 1)
+    if(bytesSize > 0 && fwrite(bytesData, bytesSize, 1, file) != 1)
         crank_talk_error(context, "Failed to write in file.");
 
     return self;

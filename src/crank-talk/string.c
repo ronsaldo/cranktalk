@@ -1,5 +1,6 @@
 #include "crank-talk/string.h"
 #include "crank-talk/context.h"
+#include "crank-talk/errors.h"
 #include "crank-talk/message.h"
 #include "crank-talk/set.h"
 #include <stdlib.h>
@@ -449,6 +450,71 @@ crank_talk_Symbol_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_
     return receiver;
 }
 
+static crank_talk_oop_t
+crank_talk_StringStream_nextPut_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t stream = arguments[0];
+    crank_talk_oop_t character = arguments[1];
+    if(!crank_talk_oop_isCharacter(character))
+        crank_talk_errorPrintf(context, "Expected a character for nextPut:.");
+    crank_talk_StringStream_insertCharacter(context, stream, crank_talk_oop_decodeCharacter(character));
+    return stream;
+}
+
+static crank_talk_oop_t
+crank_talk_StringStream_nextPutAll_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t stream = arguments[0];
+    crank_talk_oop_t bytes = arguments[1];
+    crank_talk_StringStream_insertBytesObject(context, stream, bytes);
+    return stream;
+}
+
+static crank_talk_oop_t
+crank_talk_StringStream_print_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t stream = arguments[0];
+    crank_talk_oop_t object = arguments[1];
+    crank_talk_StringStream_print(context, stream, object);
+    return stream;
+}
+
+static crank_talk_oop_t
+crank_talk_StringStream_space_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+    crank_talk_oop_t stream = arguments[0];
+    crank_talk_StringStream_insertCharacter(context, stream, ' ');
+    return stream;
+}
+
+static crank_talk_oop_t
+crank_talk_StringStream_lf_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+    crank_talk_oop_t stream = arguments[0];
+    crank_talk_StringStream_insertCharacter(context, stream, '\n');
+    return stream;
+}
+
 void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "asString", 1, crank_talk_Object_asString_primitive);
@@ -469,5 +535,11 @@ void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context)
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "asString", 1, crank_talk_Symbol_asString_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "printOn:", 2, crank_talk_Symbol_printOn_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "nextPut:", 2, crank_talk_StringStream_nextPut_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "nextPutAll:", 2, crank_talk_StringStream_nextPutAll_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "print:", 2, crank_talk_StringStream_print_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "space", 1, crank_talk_StringStream_space_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "lf", 1, crank_talk_StringStream_lf_primitive);
 
 }
