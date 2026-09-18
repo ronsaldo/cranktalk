@@ -549,8 +549,6 @@ void analysisAndEvaluation_runTests(void)
 
     // Block with to:do:
     {
-        //crank_talk_oop_t result = crank_talk_analyzeAndEvaluateString(context, "[|sum| sum := 0. 1 to: 5 do: [:x | sum := sum + x]. sum]");
-        //crank_talk_Functional_dumpToConsole(context, result);
         crank_talk_oop_t result = crank_talk_analyzeAndEvaluateString(context, "[|sum| sum := 0. 1 to: 5 do: [:x | sum := sum + x]. sum] value");
         AssertEquals(15, crank_talk_oop_decodeSmallInteger(result));
     }

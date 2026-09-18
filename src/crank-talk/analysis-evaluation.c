@@ -694,7 +694,7 @@ crank_talk_ParseTree_cullInlineBlock(crank_talk_VMContext_t *context, crank_talk
     crank_talk_ParseTreeBlockNode_t *blockNode = (crank_talk_ParseTreeBlockNode_t*)blockValueNode;
     size_t blockArgumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)blockNode->arguments);
     if(blockArgumentCount > 1)
-        crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)blockNode->super.sourcePosition, "Expected a block with at most on argument.");
+        crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)blockNode->super.sourcePosition, "Expected a block with at most one argument.");
 
     struct {
         crank_talk_oop_t oldLexicalEnvironment;

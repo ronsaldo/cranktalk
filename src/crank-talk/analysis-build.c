@@ -815,6 +815,54 @@ crank_talk_ParseTreeDoWhileNode_analyzeAndBuildWith(crank_talk_VMContext_t *cont
 }
 
 static crank_talk_oop_t
+crank_talk_ParseTree_cullInlineBlock(crank_talk_VMContext_t *context, crank_talk_ParseTreeNode_t *blockValueNode, crank_talk_oop_t buildContextValue, crank_talk_HIRValue_t *cullArgument)
+{
+    if(!crank_talk_isParseTreeBlockNode(context, (crank_talk_oop_t)blockValueNode))
+        crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)blockValueNode->sourcePosition, "Expected an inlinable block.");
+
+    crank_talk_ParseTreeBlockNode_t *blockNode = (crank_talk_ParseTreeBlockNode_t *)blockValueNode;
+
+    crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)buildContextValue;
+    crank_talk_HIRBuilder_t *builder = buildContext->builder;
+
+    size_t blockArgumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)blockNode->arguments);
+    if(blockArgumentCount > 1)
+        crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)blockNode->super.sourcePosition, "Expected a block with at most one argument.");
+
+    struct {
+        crank_talk_oop_t oldLexicalEnvironment;
+        crank_talk_oop_t result;
+    } gcFrame = {
+        .oldLexicalEnvironment = builder->lexicalEnvironment,
+        .result = crank_talk_oop_nil()
+    };
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    builder->lexicalEnvironment = crank_talk_LexicalEnvironment_create(context, builder->lexicalEnvironment);
+
+    crank_talk_oop_t *blockArguments = blockNode->arguments->elements;
+    if(blockArgumentCount == 1)
+    {
+        crank_talk_oop_t argumentDefinitionValue = blockArguments[0];
+
+        if(!crank_talk_oop_isKindOf(context, argumentDefinitionValue, context->roots.ParseTreeArgumentDefinitionNodeClass))
+            crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)((crank_talk_ParseTreeNode_t*)argumentDefinitionValue)->sourcePosition, "Expected an argument definition node.");
+
+        crank_talk_ParseTreeArgumentDefinitionNode_t *argumentDefinition = (crank_talk_ParseTreeArgumentDefinitionNode_t*)argumentDefinitionValue;
+        crank_talk_LexicalEnvironment_setHIRSymbolBinding(context, builder->lexicalEnvironment, (crank_talk_oop_t)argumentDefinition->name, (crank_talk_oop_t)cullArgument);
+    }
+
+
+    gcFrame.result = (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)blockNode->body, buildContextValue);
+
+    builder->lexicalEnvironment = gcFrame.oldLexicalEnvironment;
+    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+
+    return gcFrame.result;
+
+}
+
+static crank_talk_oop_t
 crank_talk_ToByDoNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -872,6 +920,9 @@ crank_talk_ToByDoNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank
     // Loop body
     crank_talk_HIRFunction_addBasicBlock(builder->hirFunction, gcFrame.loopBody);
     builder->basicBlock = gcFrame.loopBody;
+
+    // Cull inline block.
+    crank_talk_ParseTree_cullInlineBlock(context, node->blockExpression, buildContextValue, (crank_talk_HIRValue_t*)currentNumber);
 
     // Increment
     {
