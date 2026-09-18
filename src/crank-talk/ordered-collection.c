@@ -2,6 +2,8 @@
 #include "crank-talk/array.h"
 #include "crank-talk/context.h"
 #include "crank-talk/errors.h"
+#include "crank-talk/message.h"
+#include <stdio.h>
 
 CRANK_TALK_API crank_talk_oop_t
 crank_talk_OrderedCollection_create(crank_talk_VMContext_t *context)
@@ -63,7 +65,8 @@ crank_talk_OrderedCollection_asArray(crank_talk_VMContext_t *context, crank_talk
     return arrayValue;
 }
 
-CRANK_TALK_API crank_talk_oop_t crank_talk_OrderedCollection_at(crank_talk_VMContext_t *context, crank_talk_oop_t orderedCollectionValue, size_t index)
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_OrderedCollection_at(crank_talk_VMContext_t *context, crank_talk_oop_t orderedCollectionValue, size_t index)
 {
     (void)context;
     crank_talk_OrderedCollection_t *collection = (crank_talk_OrderedCollection_t*)orderedCollectionValue;
@@ -72,4 +75,95 @@ CRANK_TALK_API crank_talk_oop_t crank_talk_OrderedCollection_at(crank_talk_VMCon
         crank_talk_error(context, "Ordered collection index is out of bounds.");
     
     return collection->storage->elements[index - 1];
+}
+
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_OrderedCollection_atPut(crank_talk_VMContext_t *context, crank_talk_oop_t orderedCollectionValue, size_t index, crank_talk_oop_t value)
+{
+    (void)context;
+    crank_talk_OrderedCollection_t *collection = (crank_talk_OrderedCollection_t*)orderedCollectionValue;
+    size_t size = crank_talk_oop_decodeSmallInteger(collection->size);
+    if(index < 1 || index > size)
+        crank_talk_error(context, "Ordered collection index is out of bounds.");
+    
+    collection->storage->elements[index - 1] = value;
+    return value;
+}
+
+static crank_talk_oop_t
+crank_talk_OrderedCollection_initialize_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+    crank_talk_oop_t orderedCollectionValue = arguments[0];
+    crank_talk_OrderedCollection_t *orderedCollection = (crank_talk_OrderedCollection_t *)orderedCollectionValue;
+    orderedCollection->size = crank_talk_oop_encodeSmallInteger(0);
+    return orderedCollectionValue;
+}
+
+static crank_talk_oop_t
+crank_talk_OrderedCollection_add_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t orderedCollection = arguments[0];
+    crank_talk_oop_t element = arguments[1];
+    crank_talk_OrderedCollection_add(context, orderedCollection, element);
+    return element;
+}
+
+static crank_talk_oop_t
+crank_talk_OrderedCollection_asArray_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+    crank_talk_oop_t orderedCollection = arguments[0];
+    return crank_talk_OrderedCollection_asArray(context, orderedCollection);
+}
+
+
+static crank_talk_oop_t
+crank_talk_OrderedCollection_at_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t orderedCollection = arguments[0];
+    crank_talk_oop_t index = arguments[1];
+    if(!crank_talk_oop_isSmallInteger(index))
+        crank_talk_error(context, "Expected a SmallInteger index for OrderedCollection >> #at:");
+    return crank_talk_OrderedCollection_at(context, orderedCollection, crank_talk_oop_decodeSmallInteger(index));
+}
+
+static crank_talk_oop_t
+crank_talk_OrderedCollection_atPut_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 3);
+    crank_talk_oop_t orderedCollection = arguments[0];
+    crank_talk_oop_t index = arguments[1];
+    crank_talk_oop_t value = arguments[1];
+    if(!crank_talk_oop_isSmallInteger(index))
+        crank_talk_error(context, "Expected a SmallInteger index for OrderedCollection >> #at:");
+    return crank_talk_OrderedCollection_atPut(context, orderedCollection, crank_talk_oop_decodeSmallInteger(index), value);
+}
+
+
+void
+crank_talk_registerOrderedCollectionPrimitives(crank_talk_VMContext_t* context)
+{
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "initialize", 2, crank_talk_OrderedCollection_initialize_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "add:", 2, crank_talk_OrderedCollection_add_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "asArray", 1, crank_talk_OrderedCollection_asArray_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "at:", 2, crank_talk_OrderedCollection_at_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "at:put:", 3, crank_talk_OrderedCollection_atPut_primitive);
 }

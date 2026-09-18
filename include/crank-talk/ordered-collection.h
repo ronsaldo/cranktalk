@@ -9,5 +9,6 @@ CRANK_TALK_API size_t crank_talk_OrderedCollection_getSize(crank_talk_oop_t orde
 CRANK_TALK_API void crank_talk_OrderedCollection_add(crank_talk_VMContext_t *context, crank_talk_oop_t orderedCollectionValue, crank_talk_oop_t value);
 CRANK_TALK_API crank_talk_oop_t crank_talk_OrderedCollection_asArray(crank_talk_VMContext_t *context, crank_talk_oop_t orderedCollectionValue);
 CRANK_TALK_API crank_talk_oop_t crank_talk_OrderedCollection_at(crank_talk_VMContext_t *context, crank_talk_oop_t orderedCollectionValue, size_t index);
+CRANK_TALK_API crank_talk_oop_t crank_talk_OrderedCollection_atPut(crank_talk_VMContext_t *context, crank_talk_oop_t orderedCollectionValue, size_t index, crank_talk_oop_t value);
 
 #endif //SYSMEL_VM_ORDERED_COLLECTION_H
