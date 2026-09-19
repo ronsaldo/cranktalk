@@ -263,7 +263,12 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t OSWindowEventHandlerClass;
     
     crank_talk_oop_t OSEventClass;
-    
+
+    crank_talk_oop_t OSKeyboardEventClass;
+    crank_talk_oop_t OSKeyDownEventClass;
+    crank_talk_oop_t OSKeyUpEventClass;
+    crank_talk_oop_t OSTextInputEventClass;
+
     crank_talk_oop_t OSMouseEventClass;
     crank_talk_oop_t OSMouseButtonEventClass;
     crank_talk_oop_t OSMouseButtonPressEventClass;

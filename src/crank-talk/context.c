@@ -887,6 +887,18 @@ crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(OSEvent, window),
         NULL);
 
+    context->roots.OSKeyboardEventClass = crank_talk_context_createClassAndMetaclass(context, "OSKeyboardEvent", context->roots.OSEventClass, sizeof(crank_talk_OSKeyboardEvent_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(OSKeyboardEvent, scancode),
+        CrankTalkSlotDef(OSKeyboardEvent, symbol),
+        CrankTalkSlotDef(OSKeyboardEvent, modifiers),
+        CrankTalkSlotDef(OSKeyboardEvent, repeat),
+        NULL);
+    context->roots.OSKeyDownEventClass = crank_talk_context_createClassAndMetaclass(context, "OSKeyDownEvent", context->roots.OSKeyboardEventClass, sizeof(crank_talk_OSKeyDownEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.OSKeyUpEventClass = crank_talk_context_createClassAndMetaclass(context, "OSKeyUpEvent", context->roots.OSKeyboardEventClass, sizeof(crank_talk_OSKeyUpEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.OSTextInputEventClass = crank_talk_context_createClassAndMetaclass(context, "OSTextInputEvent", context->roots.OSEventClass, sizeof(crank_talk_OSTextInputEvent_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(OSTextInputEvent, text),
+        CrankTalkSlotDef(OSTextInputEvent, modifiers),
+        NULL);
     context->roots.OSMouseEventClass = crank_talk_context_createClassAndMetaclass(context, "OSMouseEvent", context->roots.OSEventClass, sizeof(crank_talk_OSMouseEvent_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(OSMouseEvent, position),
         CrankTalkSlotDef(OSMouseEvent, delta),

@@ -2,6 +2,7 @@
 #include "crank-talk/array.h"
 #include "crank-talk/context.h"
 #include "crank-talk/message.h"
+#include "crank-talk/string.h"
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 
@@ -43,6 +44,40 @@ static void sdl2_dispatchEvent(crank_talk_VMContext_t *context, uint32_t windowI
     crank_talk_OSEvent_t *osEvent = (crank_talk_OSEvent_t *)event;
     osEvent->window = osWindow;
     crank_talk_send1(context, context->roots.processEventSymbol, (crank_talk_oop_t)osWindow->eventHandler, event);
+}
+
+static void
+sdl2_onTextInput(crank_talk_VMContext_t *context, SDL_TextInputEvent *event)
+{
+    crank_talk_oop_t textInputEventValue = CrankAllocateValuesObjectWithClassName(context, OSTextInputEvent);
+    crank_talk_OSTextInputEvent_t *textEvent = (crank_talk_OSTextInputEvent_t *)textInputEventValue;
+    textEvent->text = crank_talk_String_createWithCString(context, event->text);
+    textEvent->modifiers = crank_talk_oop_encodeSmallInteger(SDL_GetModState());
+    sdl2_dispatchEvent(context, event->windowID, textInputEventValue);
+}
+
+static void
+sdl2_onKeyDown(crank_talk_VMContext_t *context, SDL_KeyboardEvent *event)
+{
+    crank_talk_oop_t keyEventValue = CrankAllocateValuesObjectWithClassName(context, OSKeyDownEvent);
+    crank_talk_OSKeyDownEvent_t *keyEvent = (crank_talk_OSKeyDownEvent_t *)keyEventValue;
+    keyEvent->super.scancode = crank_talk_oop_encodeSmallInteger(event->keysym.scancode);
+    keyEvent->super.symbol = crank_talk_oop_encodeSmallInteger(event->keysym.sym);
+    keyEvent->super.modifiers = crank_talk_oop_encodeSmallInteger(event->keysym.mod);
+    keyEvent->super.repeat = crank_talk_oop_encodeSmallInteger(event->repeat);
+    sdl2_dispatchEvent(context, event->windowID, keyEventValue);
+}
+
+static void
+sdl2_onKeyUp(crank_talk_VMContext_t *context, SDL_KeyboardEvent *event)
+{
+    crank_talk_oop_t keyEventValue = CrankAllocateValuesObjectWithClassName(context, OSKeyUpEvent);
+    crank_talk_OSKeyUpEvent_t *keyEvent = (crank_talk_OSKeyUpEvent_t *)keyEventValue;
+    keyEvent->super.scancode = crank_talk_oop_encodeSmallInteger(event->keysym.scancode);
+    keyEvent->super.symbol = crank_talk_oop_encodeSmallInteger(event->keysym.sym);
+    keyEvent->super.modifiers = crank_talk_oop_encodeSmallInteger(event->keysym.mod);
+    keyEvent->super.repeat = crank_talk_oop_encodeSmallInteger(event->repeat);
+    sdl2_dispatchEvent(context, event->windowID, keyEventValue);
 }
 
 static void
@@ -118,6 +153,15 @@ processSDL2Event(crank_talk_VMContext_t *context, SDL_Event *event)
 {
     switch(event->type)
     {
+    case SDL_KEYDOWN:
+        sdl2_onKeyDown(context, &event->key);
+        break;
+    case SDL_KEYUP:
+        sdl2_onKeyUp(context, &event->key);
+        break;
+    case SDL_TEXTINPUT:
+        sdl2_onTextInput(context, &event->text);
+        break;
     case SDL_MOUSEBUTTONDOWN:
         sdl2_onMouseButtonDown(context, &event->button);
         break;

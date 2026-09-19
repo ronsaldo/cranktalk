@@ -4,6 +4,21 @@ processEvent: anEvent
 ].
 
 OSWindowEventHandler ![
+visitKeyDownEvent: anEvent
+    Stdio stdout nextPutAll: 'Key down '; print: anEvent symbol; lf.
+].
+
+OSWindowEventHandler ![
+visitKeyUpEvent: anEvent
+    Stdio stdout nextPutAll: 'Key up '; print: anEvent symbol; lf.
+].
+
+OSWindowEventHandler ![
+visitTextInputEvent: anEvent
+    Stdio stdout nextPutAll: 'Text input '; nextPutAll: anEvent text; lf.
+].
+
+OSWindowEventHandler ![
 visitMouseButtonPressEvent: anEvent
     Stdio stdout nextPutAll: 'Mouse button press'; lf.
 ].

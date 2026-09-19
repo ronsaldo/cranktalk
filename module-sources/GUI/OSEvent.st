@@ -4,6 +4,55 @@ window
     ^ window
 ].
 
+"OSKeyboardEvent"
+OSKeyboardEvent ![
+scancode
+    ^ scancode
+].
+
+OSKeyboardEvent ![
+symbol
+    ^ symbol
+].
+
+OSKeyboardEvent ![
+modifiers
+    ^ modifiers
+].
+
+OSKeyboardEvent ![
+repeat
+    ^ repeat
+].
+
+"OSKeyDownEvent"
+OSKeyDownEvent ![
+accept: anEventHandler
+    ^ anEventHandler visitKeyDownEvent: self
+].
+
+"OSKeyUpEvent"
+OSKeyUpEvent ![
+accept: anEventHandler
+    ^ anEventHandler visitKeyUpEvent: self
+].
+
+"OSTextInputEvent"
+OSTextInputEvent ![
+accept: anEventHandler
+    ^ anEventHandler visitTextInputEvent: self
+].
+
+OSTextInputEvent ![
+text
+    ^ text
+].
+
+OSTextInputEvent ![
+modifiers
+    ^ modifiers
+].
+
 "OSMouseEvent"
 OSMouseEvent ![
 position

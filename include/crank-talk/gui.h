@@ -12,6 +12,10 @@ typedef struct crank_talk_OSWindow_s crank_talk_OSWindow_t;
 typedef struct crank_talk_OSWindowEventHandler_s crank_talk_OSWindowEventHandler_t;
 
 typedef struct crank_talk_OSEvent_s crank_talk_OSEvent_t;
+    typedef struct crank_talk_OSKeyboardEvent_s crank_talk_OSKeyboardEvent_t;
+        typedef struct crank_talk_OSKeyDownEvent_s crank_talk_OSKeyDownEvent_t;
+        typedef struct crank_talk_OSKeyUpEvent_s crank_talk_OSKeyUpEvent_t;
+    typedef struct crank_talk_OSTextInputEvent_s crank_talk_OSTextInputEvent_t;
     typedef struct crank_talk_OSMouseEvent_s crank_talk_OSMouseEvent_t;
         typedef struct crank_talk_OSMouseButtonEvent_s crank_talk_OSMouseButtonEvent_t;
             typedef struct crank_talk_OSMouseButtonPressEvent_s crank_talk_OSMouseButtonPressEvent_t;
@@ -68,6 +72,32 @@ struct crank_talk_OSEvent_s
 {
     crank_talk_Object_t super;
     crank_talk_OSWindow_t *window;
+};
+
+struct crank_talk_OSKeyboardEvent_s
+{
+    crank_talk_OSEvent_t super;
+    crank_talk_oop_t scancode;
+    crank_talk_oop_t symbol;
+    crank_talk_oop_t modifiers;
+    crank_talk_oop_t repeat;
+};
+
+struct crank_talk_OSKeyDownEvent_s
+{
+    crank_talk_OSKeyboardEvent_t super;
+};
+
+struct crank_talk_OSKeyUpEvent_s
+{
+    crank_talk_OSKeyboardEvent_t super;
+};
+
+struct crank_talk_OSTextInputEvent_s
+{
+    crank_talk_OSEvent_t super;
+    crank_talk_oop_t text;
+    crank_talk_oop_t modifiers;
 };
 
 struct crank_talk_OSMouseEvent_s
