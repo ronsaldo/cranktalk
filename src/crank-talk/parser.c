@@ -164,6 +164,7 @@ parseIntegerConstant(size_t constantStringSize, const char *constantString)
     int64_t result = 0;
     int64_t radix = 10;
     bool hasSeenRadix = false;
+    bool isNegative = constantString[0] == '-';
 
     for (size_t i = 0; i < constantStringSize; ++i)
     {
@@ -184,7 +185,8 @@ parseIntegerConstant(size_t constantStringSize, const char *constantString)
                 result = result * radix + (int64_t)(c - 'a' + 10);
         }
     }
-    return result;
+
+    return isNegative ? -result : result;
 }
 
 static crank_talk_oop_t

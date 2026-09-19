@@ -1,0 +1,2 @@
+thisContext 
+    loadFile: 'Point.st'.

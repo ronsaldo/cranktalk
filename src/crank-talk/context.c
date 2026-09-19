@@ -874,6 +874,10 @@ crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
         NULL);
     context->roots.OSWindowClass = crank_talk_context_createClassAndMetaclass(context, "OSWindow", context->roots.ObjectClass, sizeof(crank_talk_OSWindow_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(OSWindow, handle),
+        CrankTalkSlotDef(OSWindow, eventHandler),
+        CrankTalkSlotDef(OSWindow, extent),
+        NULL);
+    context->roots.OSWindowEventHandlerClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowEventHandler", context->roots.ObjectClass, sizeof(crank_talk_OSWindowEventHandler_t), CrankTalkGCObjectDataTypeOops,
         NULL);
 }
 

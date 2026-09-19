@@ -8,6 +8,7 @@ typedef struct crank_talk_Rectangle_s crank_talk_Rectangle_t;
 typedef struct crank_talk_Form_s crank_talk_Form_t;
 typedef struct crank_talk_FormCanvas_s crank_talk_FormCanvas_t;
 typedef struct crank_talk_OSWindow_s crank_talk_OSWindow_t;
+typedef struct crank_talk_OSWindowEventHandler_s crank_talk_OSWindowEventHandler_t;
 
 struct crank_talk_Point_s
 {
@@ -42,6 +43,13 @@ struct crank_talk_OSWindow_s
 {
     crank_talk_Object_t super;
     crank_talk_ExternalAddress_t *handle;
+    crank_talk_OSWindowEventHandler_t *eventHandler;
+    crank_talk_Point_t *extent;
+};
+
+struct crank_talk_OSWindowEventHandler_s
+{
+    crank_talk_Object_t super;
 };
 
 #endif //CRANK_TALK_GUI_H
