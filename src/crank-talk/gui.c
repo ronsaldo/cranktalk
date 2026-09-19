@@ -8,6 +8,15 @@
 static bool hasInitializedSDL2 = false;
 static bool isQuitting = false;
 
+CRANK_TALK_API crank_talk_Point_t*
+crank_talk_Point_make(crank_talk_VMContext_t *context, crank_talk_oop_t x, crank_talk_oop_t y)
+{
+    crank_talk_Point_t *point = (crank_talk_Point_t *)CrankAllocateValuesObjectWithClassName(context, Point);
+    point->x = x;
+    point->y = y;
+    return point;
+}
+
 static void
 crank_talk_ensureSDL2Initialization()
 {
@@ -21,11 +30,73 @@ crank_talk_ensureSDL2Initialization()
     hasInitializedSDL2 = true;
 }
 
+static void sdl2_dispatchEvent(crank_talk_VMContext_t *context, uint32_t windowID, crank_talk_oop_t event)
+{
+    SDL_Window *window = SDL_GetWindowFromID(windowID);
+    if(!window)
+        return;
+
+    crank_talk_OSWindow_t *osWindow = SDL_GetWindowData(window, "OSWindow");
+    if(!osWindow || !osWindow->eventHandler)
+        return;
+
+    crank_talk_send1(context, context->roots.processEventSymbol, (crank_talk_oop_t)osWindow->eventHandler, event);
+}
+
+static void
+sdl2_onMouseButtonDown(crank_talk_VMContext_t *context, SDL_MouseButtonEvent *event)
+{
+    crank_talk_oop_t buttonEventValue = CrankAllocateValuesObjectWithClassName(context, OSMouseButtonPressEvent);
+    crank_talk_OSMouseButtonPressEvent_t *buttonEvent = (crank_talk_OSMouseButtonPressEvent_t *)buttonEventValue;
+    buttonEvent->super.super.delta = crank_talk_Point_make(context, crank_talk_oop_encodeSmallInteger(0), crank_talk_oop_encodeSmallInteger(0));
+    buttonEvent->super.super.position = crank_talk_Point_make(context, crank_talk_oop_encodeSmallInteger(event->x), crank_talk_oop_encodeSmallInteger(event->y));
+    buttonEvent->super.super.modifiers = crank_talk_oop_encodeSmallInteger(SDL_GetModState());
+    buttonEvent->super.button = crank_talk_oop_encodeSmallInteger(event->button);
+    
+    sdl2_dispatchEvent(context, event->windowID, buttonEventValue);
+}
+
+static void
+sdl2_onMouseButtonUp(crank_talk_VMContext_t *context, SDL_MouseButtonEvent *event)
+{
+    crank_talk_oop_t buttonEventValue = CrankAllocateValuesObjectWithClassName(context, OSMouseButtonReleaseEvent);
+    crank_talk_OSMouseButtonReleaseEvent_t *buttonEvent = (crank_talk_OSMouseButtonReleaseEvent_t *)buttonEventValue;
+    buttonEvent->super.super.delta = crank_talk_Point_make(context, crank_talk_oop_encodeSmallInteger(0), crank_talk_oop_encodeSmallInteger(0));
+    buttonEvent->super.super.position = crank_talk_Point_make(context, crank_talk_oop_encodeSmallInteger(event->x), crank_talk_oop_encodeSmallInteger(event->y));
+    buttonEvent->super.super.modifiers = crank_talk_oop_encodeSmallInteger(SDL_GetModState());
+    buttonEvent->super.button = crank_talk_oop_encodeSmallInteger(event->button);
+    
+    sdl2_dispatchEvent(context, event->windowID, buttonEventValue);
+}
+
+static void
+sdl2_onMouseMotion(crank_talk_VMContext_t *context, SDL_MouseMotionEvent *event)
+{
+    crank_talk_oop_t motionEventValue = CrankAllocateValuesObjectWithClassName(context, OSMouseMoveEvent);
+    crank_talk_OSMouseMoveEvent_t *moveEvent = (crank_talk_OSMouseMoveEvent_t *)motionEventValue;
+    moveEvent->super.delta = crank_talk_Point_make(context, crank_talk_oop_encodeSmallInteger(event->xrel), crank_talk_oop_encodeSmallInteger(event->yrel));
+    moveEvent->super.position = crank_talk_Point_make(context, crank_talk_oop_encodeSmallInteger(event->x), crank_talk_oop_encodeSmallInteger(event->y));
+    moveEvent->super.modifiers = crank_talk_oop_encodeSmallInteger(SDL_GetModState());
+    moveEvent->buttonState = crank_talk_oop_encodeSmallInteger(event->state);
+    
+    sdl2_dispatchEvent(context, event->windowID, motionEventValue);
+
+}
+
 static void
 processSDL2Event(crank_talk_VMContext_t *context, SDL_Event *event)
 {
     switch(event->type)
     {
+    case SDL_MOUSEBUTTONDOWN:
+        sdl2_onMouseButtonDown(context, &event->button);
+        break;
+    case SDL_MOUSEBUTTONUP:
+        sdl2_onMouseButtonUp(context, &event->button);
+        break;
+    case SDL_MOUSEMOTION:
+        sdl2_onMouseMotion(context, &event->motion);
+        break;
     case SDL_QUIT:
         isQuitting = true;
         break;

@@ -93,7 +93,10 @@ struct crank_talk_OSMouseButtonReleaseEvent_s
 struct crank_talk_OSMouseMoveEvent_s
 {
     crank_talk_OSMouseEvent_t super;
+    crank_talk_oop_t buttonState;
 };
+
+CRANK_TALK_API crank_talk_Point_t* crank_talk_Point_make(crank_talk_VMContext_t *context, crank_talk_oop_t x, crank_talk_oop_t y);
 
 #endif //CRANK_TALK_GUI_H
 

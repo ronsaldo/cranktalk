@@ -287,6 +287,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.plusSymbol = crank_talk_Symbol_internWithCString(context, "+");
     context->roots.lessOrEqualsSymbol = crank_talk_Symbol_internWithCString(context, "<=");
 
+    context->roots.processEventSymbol = crank_talk_Symbol_internWithCString(context, "processEvent:");
+
     // Message send macro dictionary.
     context->roots.messageSendMacroDictionary = crank_talk_IdentityDictionary_create(context);
 
@@ -880,7 +882,22 @@ crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
     context->roots.OSWindowEventHandlerClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowEventHandler", context->roots.ObjectClass, sizeof(crank_talk_OSWindowEventHandler_t), CrankTalkGCObjectDataTypeOops,
         NULL);
 
-    context->roots.OSWindowEventHandlerClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowEventHandler", context->roots.ObjectClass, sizeof(crank_talk_OSWindowEventHandler_t), CrankTalkGCObjectDataTypeOops,
+    context->roots.OSEventClass = crank_talk_context_createClassAndMetaclass(context, "OSEvent", context->roots.ObjectClass, sizeof(crank_talk_OSEvent_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(OSEvent, window),
+        NULL);
+
+    context->roots.OSMouseEventClass = crank_talk_context_createClassAndMetaclass(context, "OSMouseEvent", context->roots.OSEventClass, sizeof(crank_talk_OSMouseEvent_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(OSMouseEvent, position),
+        CrankTalkSlotDef(OSMouseEvent, delta),
+        CrankTalkSlotDef(OSMouseEvent, modifiers),
+        NULL);
+    context->roots.OSMouseButtonEventClass = crank_talk_context_createClassAndMetaclass(context, "OSMouseButtonEvent", context->roots.OSMouseEventClass, sizeof(crank_talk_OSMouseButtonEvent_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(OSMouseButtonEvent, button),
+        NULL);
+    context->roots.OSMouseButtonPressEventClass = crank_talk_context_createClassAndMetaclass(context, "OSMouseButtonPressEvent", context->roots.OSMouseButtonEventClass, sizeof(crank_talk_OSMouseButtonPressEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.OSMouseButtonReleaseEventClass = crank_talk_context_createClassAndMetaclass(context, "OSMouseButtonReleaseEvent", context->roots.OSMouseButtonEventClass, sizeof(crank_talk_OSMouseButtonReleaseEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.OSMouseMoveEventClass = crank_talk_context_createClassAndMetaclass(context, "OSMouseMoveEvent", context->roots.OSMouseEventClass, sizeof(crank_talk_OSMouseMoveEvent_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(OSMouseMoveEvent, buttonState),
         NULL);
 
     context->roots.openWindowList = crank_talk_Array_create(context, 0);

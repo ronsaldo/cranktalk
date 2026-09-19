@@ -152,6 +152,8 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t plusSymbol;
     crank_talk_oop_t lessOrEqualsSymbol;
 
+    crank_talk_oop_t processEventSymbol;
+
     // Message send macro dictionary.
     crank_talk_oop_t messageSendMacroDictionary;
 
@@ -259,6 +261,13 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t FormCanvasClass;
     crank_talk_oop_t OSWindowClass;
     crank_talk_oop_t OSWindowEventHandlerClass;
+    
+    crank_talk_oop_t OSEventClass;
+    crank_talk_oop_t OSMouseEventClass;
+    crank_talk_oop_t OSMouseButtonEventClass;
+    crank_talk_oop_t OSMouseButtonPressEventClass;
+    crank_talk_oop_t OSMouseButtonReleaseEventClass;
+    crank_talk_oop_t OSMouseMoveEventClass;
 
     crank_talk_oop_t openWindowList;
 };
