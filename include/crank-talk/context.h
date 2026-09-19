@@ -259,6 +259,8 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t FormCanvasClass;
     crank_talk_oop_t OSWindowClass;
     crank_talk_oop_t OSWindowEventHandlerClass;
+
+    crank_talk_oop_t openWindowList;
 };
 
 struct crank_talk_VMContext_s

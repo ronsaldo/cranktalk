@@ -1,4 +1,5 @@
 #include "crank-talk/gui.h"
+#include "crank-talk/array.h"
 #include "crank-talk/context.h"
 #include "crank-talk/message.h"
 #define SDL_MAIN_HANDLED
@@ -56,6 +57,8 @@ crank_talk_OSWindow_open_primitive(crank_talk_VMContext_t *context, crank_talk_o
     SDL_Window *handle = SDL_CreateWindow("CrankTalk Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_SHOWN);
     osWindow->handle = (crank_talk_ExternalAddress_t*)crank_talk_ExternalAddress_make(context, handle);
 
+    SDL_SetWindowData(handle, "OSWindow", osWindow);
+    context->roots.openWindowList = crank_talk_Array_concat(context, context->roots.openWindowList, crank_talk_Array_With(context, self));
     return self;
 }
 

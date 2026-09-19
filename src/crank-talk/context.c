@@ -879,6 +879,11 @@ crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
         NULL);
     context->roots.OSWindowEventHandlerClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowEventHandler", context->roots.ObjectClass, sizeof(crank_talk_OSWindowEventHandler_t), CrankTalkGCObjectDataTypeOops,
         NULL);
+
+    context->roots.OSWindowEventHandlerClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowEventHandler", context->roots.ObjectClass, sizeof(crank_talk_OSWindowEventHandler_t), CrankTalkGCObjectDataTypeOops,
+        NULL);
+
+    context->roots.openWindowList = crank_talk_Array_create(context, 0);
 }
 
 static void 
