@@ -17,6 +17,9 @@ typedef struct crank_talk_OSEvent_s crank_talk_OSEvent_t;
             typedef struct crank_talk_OSMouseButtonPressEvent_s crank_talk_OSMouseButtonPressEvent_t;
             typedef struct crank_talk_OSMouseButtonReleaseEvent_s crank_talk_OSMouseButtonReleaseEvent_t;
         typedef struct crank_talk_OSMouseMoveEvent_s crank_talk_OSMouseMoveEvent_t;
+        typedef struct crank_talk_OSMouseWheelEvent_s crank_talk_OSMouseWheelEvent_t;
+    typedef struct crank_talk_OSWindowEvent_s crank_talk_OSWindowEvent_t;
+        typedef struct crank_talk_OSWindowExposeEvent_s crank_talk_OSWindowExposeEvent_t;
 
 struct crank_talk_Point_s
 {
@@ -94,6 +97,23 @@ struct crank_talk_OSMouseMoveEvent_s
 {
     crank_talk_OSMouseEvent_t super;
     crank_talk_oop_t buttonState;
+};
+
+struct crank_talk_OSMouseWheelEvent_s
+{
+    crank_talk_OSMouseEvent_t super;
+    crank_talk_oop_t scrollHorizontal;
+    crank_talk_oop_t scrollVertical;
+};
+
+struct crank_talk_OSWindowEvent_s
+{
+    crank_talk_OSMouseEvent_t super;
+};
+
+struct crank_talk_OSWindowExposeEvent_s
+{
+    crank_talk_OSMouseEvent_t super;
 };
 
 CRANK_TALK_API crank_talk_Point_t* crank_talk_Point_make(crank_talk_VMContext_t *context, crank_talk_oop_t x, crank_talk_oop_t y);

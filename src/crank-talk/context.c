@@ -899,6 +899,13 @@ crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
     context->roots.OSMouseMoveEventClass = crank_talk_context_createClassAndMetaclass(context, "OSMouseMoveEvent", context->roots.OSMouseEventClass, sizeof(crank_talk_OSMouseMoveEvent_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(OSMouseMoveEvent, buttonState),
         NULL);
+    context->roots.OSMouseWheelEventClass = crank_talk_context_createClassAndMetaclass(context, "OSMouseWheelEvent", context->roots.OSMouseEventClass, sizeof(crank_talk_OSMouseWheelEvent_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(OSMouseWheelEvent, scrollHorizontal),
+        CrankTalkSlotDef(OSMouseWheelEvent, scrollVertical),
+        NULL);
+
+    context->roots.OSWindowEventClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowEvent", context->roots.OSEventClass, sizeof(crank_talk_OSWindowEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.OSWindowExposeEventClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowExposeEvent", context->roots.OSWindowEventClass, sizeof(crank_talk_OSWindowExposeEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
 
     context->roots.openWindowList = crank_talk_Array_create(context, 0);
 }

@@ -263,11 +263,16 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t OSWindowEventHandlerClass;
     
     crank_talk_oop_t OSEventClass;
+    
     crank_talk_oop_t OSMouseEventClass;
     crank_talk_oop_t OSMouseButtonEventClass;
     crank_talk_oop_t OSMouseButtonPressEventClass;
     crank_talk_oop_t OSMouseButtonReleaseEventClass;
     crank_talk_oop_t OSMouseMoveEventClass;
+
+    crank_talk_oop_t OSMouseWheelEventClass;
+    crank_talk_oop_t OSWindowEventClass;
+    crank_talk_oop_t OSWindowExposeEventClass;
 
     crank_talk_oop_t openWindowList;
 };

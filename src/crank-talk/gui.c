@@ -80,7 +80,35 @@ sdl2_onMouseMotion(crank_talk_VMContext_t *context, SDL_MouseMotionEvent *event)
     moveEvent->buttonState = crank_talk_oop_encodeSmallInteger(event->state);
     
     sdl2_dispatchEvent(context, event->windowID, motionEventValue);
+}
 
+static void
+sdl2_onMouseWheel(crank_talk_VMContext_t *context, SDL_MouseWheelEvent *event)
+{
+    crank_talk_oop_t wheelEventValue = CrankAllocateValuesObjectWithClassName(context, OSMouseWheelEvent);
+    crank_talk_OSMouseWheelEvent_t *wheelEvent = (crank_talk_OSMouseWheelEvent_t *)wheelEventValue;
+    wheelEvent->super.delta = crank_talk_Point_make(context, crank_talk_oop_encodeSmallInteger(0), crank_talk_oop_encodeSmallInteger(0));
+    wheelEvent->super.position = crank_talk_Point_make(context, crank_talk_oop_encodeSmallInteger(event->mouseX), crank_talk_oop_encodeSmallInteger(event->mouseY));
+    wheelEvent->super.modifiers = crank_talk_oop_encodeSmallInteger(SDL_GetModState());
+    wheelEvent->scrollHorizontal = crank_talk_oop_encodeSmallInteger(event->x);
+    wheelEvent->scrollVertical = crank_talk_oop_encodeSmallInteger(event->y);
+    
+    sdl2_dispatchEvent(context, event->windowID, wheelEventValue);
+}
+
+static void
+sdl2_onWindowEvent(crank_talk_VMContext_t *context, SDL_WindowEvent *event)
+{
+    switch (event->event)
+    {
+    case SDL_WINDOWEVENT_EXPOSED:
+    {
+        crank_talk_oop_t exposeEventValue = CrankAllocateValuesObjectWithClassName(context, OSWindowExposeEvent);
+        sdl2_dispatchEvent(context, event->windowID, exposeEventValue);
+    } break;
+    default:
+        break;
+    }
 }
 
 static void
@@ -96,6 +124,12 @@ processSDL2Event(crank_talk_VMContext_t *context, SDL_Event *event)
         break;
     case SDL_MOUSEMOTION:
         sdl2_onMouseMotion(context, &event->motion);
+        break;
+    case SDL_MOUSEWHEEL:
+        sdl2_onMouseWheel(context, &event->wheel);
+        break;
+    case SDL_WINDOWEVENT:
+        sdl2_onWindowEvent(context, &event->window);
         break;
     case SDL_QUIT:
         isQuitting = true;
