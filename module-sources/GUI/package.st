@@ -1,2 +1,3 @@
 thisContext 
-    loadFile: 'Point.st'.
+    loadFile: 'Point.st';
+    loadFile: 'OSWindow.st'
