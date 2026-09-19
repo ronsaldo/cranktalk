@@ -8,6 +8,7 @@
 #include "crank-talk/environment.h"
 #include "crank-talk/errors.h"
 #include "crank-talk/gc.h"
+#include "crank-talk/gui.h"
 #include "crank-talk/hir.h"
 #include "crank-talk/io.h"
 #include "crank-talk/ordered-collection.h"
@@ -27,6 +28,7 @@ void crank_talk_registerControlFlowPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerEnvironmentPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerErrorPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerFunctionalPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerGUIPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerMacrosPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerHIRPrimitives(crank_talk_VMContext_t* context);
@@ -851,6 +853,31 @@ crank_talk_context_createExceptionsDefinitions(crank_talk_VMContext_t* context)
 }
 
 static void 
+crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
+{
+    context->roots.PointClass = crank_talk_context_createClassAndMetaclass(context, "Point", context->roots.ObjectClass, sizeof(crank_talk_Point_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(Point, x),
+        CrankTalkSlotDef(Point, y),
+        NULL);
+    context->roots.RectangleClass = crank_talk_context_createClassAndMetaclass(context, "Rectangle", context->roots.ObjectClass, sizeof(crank_talk_Rectangle_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(Rectangle, origin),
+        CrankTalkSlotDef(Rectangle, corner),
+        NULL);
+    context->roots.FormClass = crank_talk_context_createClassAndMetaclass(context, "Form", context->roots.ObjectClass, sizeof(crank_talk_Form_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(Form, bits),
+        CrankTalkSlotDef(Form, width),
+        CrankTalkSlotDef(Form, height),
+        CrankTalkSlotDef(Form, depth),
+        NULL);
+    context->roots.FormCanvasClass = crank_talk_context_createClassAndMetaclass(context, "FormCanvas", context->roots.ObjectClass, sizeof(crank_talk_FormCanvas_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(FormCanvas, form),
+        NULL);
+    context->roots.OSWindowClass = crank_talk_context_createClassAndMetaclass(context, "OSWindow", context->roots.ObjectClass, sizeof(crank_talk_OSWindow_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(OSWindow, handle),
+        NULL);
+}
+
+static void 
 crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_registerAnalysisAndBuildPrimitives(context);
@@ -860,6 +887,7 @@ crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
     crank_talk_registerEnvironmentPrimitives(context);
     crank_talk_registerErrorPrimitives(context);
     crank_talk_registerFunctionalPrimitives(context);
+    crank_talk_registerGUIPrimitives(context);
     crank_talk_registerMacrosPrimitives(context);
     crank_talk_registerNumbersPrimitives(context);
     crank_talk_registerHIRPrimitives(context);
@@ -882,6 +910,7 @@ crank_talk_vm_createContext(void)
     crank_talk_context_createFrontEndDefinitions(context);
     crank_talk_context_createIODefinitions(context);
     crank_talk_context_createExceptionsDefinitions(context);
+    crank_talk_context_createGUIDefinitions(context);
     crank_talk_registerPrimitives(context);
     crank_talk_gc_collect(context);
     return context;
