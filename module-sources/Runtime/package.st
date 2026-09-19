@@ -3,7 +3,7 @@ thisContext
     loadFile: 'SequenceableCollection.st';
     loadFile: 'Array.st'.
 
-Stdio stdout nextPutAll: 'Hello World from Runtime/package.st'; lf.
+"Stdio stdout nextPutAll: 'Hello World from Runtime/package.st'; lf.
 [
     self assert: true.
     self assert: true description: 'myAssert'.
@@ -13,4 +13,4 @@ Stdio stdout print: ({1. 2 . 3} collect: [:x | x * 2]); lf.
 Stdio stdout print: ({1. 2 . 3} collectWithIndex: [:x :index | x * 2 + index]); lf.
 Stdio stdout print: ({1. 2 . 3} select: [:x | x >= 2]); lf.
 Stdio stdout print: ({1. 2 . 3} reject: [:x | x >= 2]); lf.
-Stdio stdout print: {1. 2 . 3} = {1. 2. 3}; lf.
+Stdio stdout print: {1. 2 . 3} = {1. 2. 3}; lf."

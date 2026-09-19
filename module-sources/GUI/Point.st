@@ -70,4 +70,4 @@ Point ![
     ^ (x // arg x) @ (y // arg y)
 ].
 
-Stdio stdout print: (0@1) + (2 @ -3); lf.
+"Stdio stdout print: (0@1) + (2 @ -3); lf."

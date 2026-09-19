@@ -40,6 +40,8 @@ static void sdl2_dispatchEvent(crank_talk_VMContext_t *context, uint32_t windowI
     if(!osWindow || !osWindow->eventHandler)
         return;
 
+    crank_talk_OSEvent_t *osEvent = (crank_talk_OSEvent_t *)event;
+    osEvent->window = osWindow;
     crank_talk_send1(context, context->roots.processEventSymbol, (crank_talk_oop_t)osWindow->eventHandler, event);
 }
 
