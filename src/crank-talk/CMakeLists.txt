@@ -34,9 +34,7 @@ set(CrankTalk_Sources
 )
 
 add_library(CrankTalk ${CrankTalk_Sources})
-if(NOT WIN32)
-target_link_libraries(CrankTalk m)
-endif()
+target_link_libraries(CrankTalk ${CrankTalk_DEP_LIBS})
 
 add_executable(crank-talk main.c)
 target_link_libraries(crank-talk CrankTalk)

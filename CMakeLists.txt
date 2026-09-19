@@ -32,6 +32,35 @@ else()
 	#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--export-dynamic")
 endif()
 
+if(NOT WIN32)
+	set(CrankTalk_DEP_LIBS ${CrankTalk_DEP_LIBS} m)
+endif()
+
+if(WIN32)
+    set(SDL2_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/thirdparty/SDL2-2.30.8/include")
+    set(SDL2_LIBRARY "${PROJECT_SOURCE_DIR}/thirdparty/SDL2-2.30.8/lib/x64/SDL2.lib")
+    include_directories("${SDL2_INCLUDE_DIR}")
+    set(CrankTalk_DEP_LIBS ${CrankTalk_DEP_LIBS} ${SDL2_LIBRARY})
+
+else()
+    # For VisualStudio or mingw in Window
+    find_path(SDL2_INCLUDE_DIR
+      NAMES SDL.h
+      PATH_SUFFIXES SDL2
+    )
+
+    find_path(SDL2_LIBRARY_PATH
+      NAMES SDL2.lib SDL2.a
+    )
+
+    find_library(SDL2_LIBRARY NAMES SDL2 PATHS ${SDL2_LIBRARY_PATH})
+	set(SDL2_MAIN_LIBRARY "")
+    
+    set(CrankTalk_DEP_LIBS ${CrankTalk_DEP_LIBS} ${SDL2_MAIN_LIBRARY} ${SDL2_LIBRARY})
+    
+    include_directories("${SDL2_INCLUDE_DIR}")
+endif()
+
 # Perform platform checks
 include(${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
 include(${CMAKE_ROOT}/Modules/CheckIncludeFileCXX.cmake)
