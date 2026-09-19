@@ -161,7 +161,7 @@ crank_talk_OSWindow_open_primitive(crank_talk_VMContext_t *context, crank_talk_o
     intptr_t windowWidth = crank_talk_oop_decodeSmallInteger(osWindow->extent->x);
     intptr_t windowHeight = crank_talk_oop_decodeSmallInteger(osWindow->extent->y);
 
-    SDL_Window *handle = SDL_CreateWindow("CrankTalk Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_SHOWN);
+    SDL_Window *handle = SDL_CreateWindow("CrankTalk Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     osWindow->handle = (crank_talk_ExternalAddress_t*)crank_talk_ExternalAddress_make(context, handle);
 
     SDL_SetWindowData(handle, "OSWindow", osWindow);

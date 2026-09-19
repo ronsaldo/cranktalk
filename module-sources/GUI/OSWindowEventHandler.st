@@ -25,5 +25,6 @@ visitMouseWheelEvent: anEvent
 
 OSWindowEventHandler ![
 visitWindowExposeEvent: anEvent
+    anEvent window render.
     Stdio stdout nextPutAll: 'Window expose'; lf.
 ].

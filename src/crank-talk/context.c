@@ -878,6 +878,7 @@ crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(OSWindow, handle),
         CrankTalkSlotDef(OSWindow, eventHandler),
         CrankTalkSlotDef(OSWindow, extent),
+        CrankTalkSlotDef(OSWindow, renderer),
         NULL);
     context->roots.OSWindowEventHandlerClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowEventHandler", context->roots.ObjectClass, sizeof(crank_talk_OSWindowEventHandler_t), CrankTalkGCObjectDataTypeOops,
         NULL);

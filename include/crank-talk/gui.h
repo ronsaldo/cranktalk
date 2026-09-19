@@ -56,6 +56,7 @@ struct crank_talk_OSWindow_s
     crank_talk_ExternalAddress_t *handle;
     crank_talk_OSWindowEventHandler_t *eventHandler;
     crank_talk_Point_t *extent;
+    crank_talk_oop_t renderer;
 };
 
 struct crank_talk_OSWindowEventHandler_s
