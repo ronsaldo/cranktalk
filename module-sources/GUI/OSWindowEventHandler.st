@@ -30,7 +30,7 @@ visitMouseButtonReleaseEvent: anEvent
 
 OSWindowEventHandler ![
 visitMouseMoveEvent: anEvent
-    Stdio stdout nextPutAll: 'Mouse move'; lf.
+    Stdio stdout nextPutAll: 'Mouse move '; print: anEvent position; lf.
 ].
 
 OSWindowEventHandler ![
