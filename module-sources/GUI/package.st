@@ -12,4 +12,5 @@ thisContext
     loadFile: 'MorphicLayout.st';
     loadFile: 'BorderedMorph.st';
     loadFile: 'RootMorph.st';
+    loadFile: 'StringMorph.st';
     loadFile: 'SystemWindowMorph.st'

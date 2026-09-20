@@ -176,7 +176,6 @@ crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive(crank_talk_VMC
     crank_talk_FormCanvas_fillRectangleWithColor(context, form, fMinX, fMinY, fMaxX, fMinY + borderWidth, fillColor);
     // Bottom
     crank_talk_FormCanvas_fillRectangleWithColor(context, form, fMinX, fMaxY - borderWidth, fMaxX, fMaxY, fillColor);
-    //crank_talk_FormCanvas_fillRectangleWithColor(context, form, fMinX, fMinY, fMaxX, fMaxY, fillColor);
 
     return self;
 }
