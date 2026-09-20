@@ -260,8 +260,16 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t RectangleClass;
     crank_talk_oop_t FormClass;
     crank_talk_oop_t FormCanvasClass;
+    crank_talk_oop_t FontClass;
+    crank_talk_oop_t FontBakedCharClass;
+    crank_talk_oop_t FontFaceClass;
     crank_talk_oop_t OSWindowClass;
     crank_talk_oop_t OSWindowEventHandlerClass;
+
+    crank_talk_oop_t defaultFont;
+    crank_talk_oop_t defaultFontFace;
+    crank_talk_oop_t defaultMonospacedFont;
+    crank_talk_oop_t defaultMonospacedFontFace;
     
     crank_talk_oop_t OSEventClass;
 
@@ -297,6 +305,5 @@ struct crank_talk_VMContext_s
 
 CRANK_TALK_API crank_talk_VMContext_t *crank_talk_vm_createContext(void);
 CRANK_TALK_API void crank_talk_vm_destroyContext(crank_talk_VMContext_t *context);
-
 
 #endif //CRANK_TALK_CONTEXT_H

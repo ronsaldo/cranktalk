@@ -7,6 +7,9 @@ typedef struct crank_talk_Color_s crank_talk_Color_t;
 typedef struct crank_talk_Point_s crank_talk_Point_t;
 typedef struct crank_talk_Rectangle_s crank_talk_Rectangle_t;
 typedef struct crank_talk_Form_s crank_talk_Form_t;
+typedef struct crank_talk_Font_s crank_talk_Font_t;
+typedef struct crank_talk_FontBakedChar_s crank_talk_FontBakedChar_t;
+typedef struct crank_talk_FontFace_s crank_talk_FontFace_t;
 typedef struct crank_talk_FormCanvas_s crank_talk_FormCanvas_t;
 
 typedef struct crank_talk_OSWindow_s crank_talk_OSWindow_t;
@@ -61,6 +64,34 @@ struct crank_talk_Form_s
     crank_talk_oop_t height;
     crank_talk_oop_t depth;
 };
+
+struct crank_talk_Font_s
+{
+    crank_talk_Object_t super;
+    crank_talk_ByteArray_t *rawData;
+};
+
+struct crank_talk_FontBakedChar_s
+{
+    crank_talk_Object_t super;
+    crank_talk_oop_t x0;
+    crank_talk_oop_t y0;
+    crank_talk_oop_t x1;
+    crank_talk_oop_t y1;
+    crank_talk_oop_t xoff;
+    crank_talk_oop_t yoff;
+    crank_talk_oop_t advance;
+};
+
+struct crank_talk_FontFace_s
+{
+    crank_talk_Object_t super;
+    crank_talk_Form_t *image;
+    crank_talk_Array_t *bakedChars;
+};
+
+//typedef struct crank_talk_Font_s crank_talk_Font_t;
+//typedef struct crank_talk_FontFace_s crank_talk_FontFace_t;
 
 struct crank_talk_FormCanvas_s
 {

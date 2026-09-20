@@ -880,11 +880,30 @@ crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(Form, height),
         CrankTalkSlotDef(Form, depth),
         NULL);
+    
+    context->roots.FontClass = crank_talk_context_createClassAndMetaclass(context, "Font", context->roots.ObjectClass, sizeof(crank_talk_Font_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(Font, rawData),
+        NULL);
+    context->roots.FontBakedCharClass = crank_talk_context_createClassAndMetaclass(context, "FontBakedChar", context->roots.ObjectClass, sizeof(crank_talk_FontBakedChar_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(FontBakedChar, x0),
+        CrankTalkSlotDef(FontBakedChar, y0),
+        CrankTalkSlotDef(FontBakedChar, x1),
+        CrankTalkSlotDef(FontBakedChar, y1),
+        CrankTalkSlotDef(FontBakedChar, xoff),
+        CrankTalkSlotDef(FontBakedChar, yoff),
+        CrankTalkSlotDef(FontBakedChar, advance),
+        NULL);
+    context->roots.FontFaceClass = crank_talk_context_createClassAndMetaclass(context, "FontFace", context->roots.ObjectClass, sizeof(crank_talk_FontFace_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(FontFace, image),
+        CrankTalkSlotDef(FontFace, bakedChars),
+        NULL);
+
     context->roots.FormCanvasClass = crank_talk_context_createClassAndMetaclass(context, "FormCanvas", context->roots.ObjectClass, sizeof(crank_talk_FormCanvas_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(FormCanvas, form),
         CrankTalkSlotDef(FormCanvas, origin),
         CrankTalkSlotDef(FormCanvas, scaleFactor),
         NULL);
+
     context->roots.OSWindowClass = crank_talk_context_createClassAndMetaclass(context, "OSWindow", context->roots.ObjectClass, sizeof(crank_talk_OSWindow_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(OSWindow, handle),
         CrankTalkSlotDef(OSWindow, eventHandler),
