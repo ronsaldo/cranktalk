@@ -84,6 +84,11 @@ drawChildrenWith: aCanvas
 ].
 
 Morph ![
+fitSize
+    "By default do nothing"
+].
+
+Morph ![
 updateLayout
     layout ~~ nil ifTrue: [
         layout applyWithLocalBounds: self localBounds

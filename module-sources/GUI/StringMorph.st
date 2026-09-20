@@ -19,6 +19,11 @@ drawOn: aCanvas
 ].
 
 StringMorph ![
+fitSize
+    "By default do nothing"
+].
+
+StringMorph ![
 label
     ^ label
 ].
