@@ -15,7 +15,7 @@ defaultColor
 
 StringMorph ![
 drawOn: aCanvas
-    
+    aCanvas drawString: label inRectangle: self localBounds color: color
 ].
 
 StringMorph ![

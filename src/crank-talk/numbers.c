@@ -6,6 +6,19 @@
 #include <string.h>
 
 static crank_talk_oop_t
+crank_talk_Number_asFloat_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+
+    double value = crank_talk_oop_numberAsFloat(self);
+    return crank_talk_oop_fromFloat(context, value);
+}
+
+static crank_talk_oop_t
 crank_talk_Float_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -443,6 +456,8 @@ crank_talk_SmallInteger_greaterOrEquals_primitive(crank_talk_VMContext_t *contex
 void
 crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context)
 {
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.NumberClass, "asFloat", 1, crank_talk_Number_asFloat_primitive);
+
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "printOn:", 2, crank_talk_Float_printOn_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "negated", 1, crank_talk_Float_negated_primitive);
