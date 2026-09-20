@@ -53,6 +53,11 @@ int main(int argc, const char *argv[])
                 arg = argv[++i];
                 analyzeAndEvaluateAndPrintString(context, arg);
             }
+            else if(!strcmp(arg, "-eval"))
+            {
+                arg = argv[++i];
+                crank_talk_analyzeAndEvaluateString(context, arg);
+            }
         }
         else
         {

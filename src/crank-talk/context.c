@@ -926,6 +926,14 @@ crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
     context->roots.OSWindowEventClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowEvent", context->roots.OSEventClass, sizeof(crank_talk_OSWindowEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
     context->roots.OSWindowExposeEventClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowExposeEvent", context->roots.OSWindowEventClass, sizeof(crank_talk_OSWindowExposeEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
 
+    context->roots.OSWindowRendererClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowRenderer", context->roots.ObjectClass, sizeof(crank_talk_OSWindowRenderer_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(OSWindowRenderer, rendererHandle),
+        NULL);
+    context->roots.OSWindowFormRendererClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowFormRenderer", context->roots.OSWindowRendererClass, sizeof(crank_talk_OSWindowFormRenderer_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(OSWindowFormRenderer, form),
+        CrankTalkSlotDef(OSWindowFormRenderer, textureHandle),
+        NULL);
+
     context->roots.openWindowList = crank_talk_Array_create(context, 0);
 }
 

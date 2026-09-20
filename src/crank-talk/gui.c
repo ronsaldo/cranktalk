@@ -1,6 +1,8 @@
 #include "crank-talk/gui.h"
 #include "crank-talk/array.h"
+#include "crank-talk/bytes.h"
 #include "crank-talk/context.h"
+#include "crank-talk/errors.h"
 #include "crank-talk/message.h"
 #include "crank-talk/string.h"
 #define SDL_MAIN_HANDLED
@@ -229,9 +231,140 @@ crank_talk_OSWindow_mainLoop_primitive(crank_talk_VMContext_t *context, crank_ta
     return self;
 }
 
+static crank_talk_oop_t
+crank_talk_OSWindow_newFormRenderer_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_OSWindow_t *osWindow = (crank_talk_OSWindow_t *)self;
+    if(!osWindow->handle || !osWindow->handle->address)
+        crank_talk_error(context, "Expected an opened window for creating a form renderer.");
+    if(osWindow->renderer)
+        crank_talk_error(context, "Window already has an associated renderer.");
+
+    SDL_Window *windowHandle = osWindow->handle->address;
+    SDL_Renderer *renderer =SDL_CreateRenderer(windowHandle, -1, 0);
+
+    crank_talk_OSWindowFormRenderer_t *formRenderer = (crank_talk_OSWindowFormRenderer_t*)CrankAllocateValuesObjectWithClassName(context, OSWindowFormRenderer);
+    formRenderer->super.rendererHandle = (crank_talk_ExternalAddress_t*)crank_talk_ExternalAddress_make(context, renderer);
+    osWindow->renderer = &formRenderer->super;
+
+    return (crank_talk_oop_t)formRenderer;
+}
+
+static crank_talk_oop_t
+crank_talk_OSWindowRenderer_beginFrame_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_OSWindowRenderer_t *osWindowRenderer = (crank_talk_OSWindowRenderer_t *)self;
+    if(!osWindowRenderer->rendererHandle)
+        crank_talk_error(context, "Expected a valid window renderer.");
+
+    SDL_Renderer *renderer = osWindowRenderer->rendererHandle->address;
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_RenderClear(renderer);
+    return self;
+}
+
+static crank_talk_oop_t
+crank_talk_OSWindowRenderer_endFrame_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_OSWindowRenderer_t *osWindowRenderer = (crank_talk_OSWindowRenderer_t *)self;
+    if(!osWindowRenderer->rendererHandle)
+        crank_talk_error(context, "Expected a valid window renderer.");
+
+    SDL_Renderer *renderer = osWindowRenderer->rendererHandle->address;
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_RenderPresent(renderer);
+    return self;
+}
+
+static crank_talk_oop_t
+crank_talk_OSWindowFormRenderer_beginFrame_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_OSWindowFormRenderer_t *osWindowRenderer = (crank_talk_OSWindowFormRenderer_t *)self;
+    if(!osWindowRenderer->super.rendererHandle)
+        crank_talk_error(context, "Expected a valid window renderer.");
+
+    SDL_Renderer *renderer = osWindowRenderer->super.rendererHandle->address;
+    int rendererWidth = 0;
+    int rendererHeight = 0;
+    SDL_GetRendererOutputSize(renderer, &rendererWidth, &rendererHeight);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_RenderClear(renderer);
+
+    if(!osWindowRenderer->form
+        || crank_talk_oop_decodeSmallInteger(osWindowRenderer->form->width) != rendererWidth
+        || crank_talk_oop_decodeSmallInteger(osWindowRenderer->form->height) != rendererHeight)
+    {
+        crank_talk_Form_t *newForm = (crank_talk_Form_t *)CrankAllocateValuesObjectWithClassName(context, Form);
+        newForm->width = crank_talk_oop_encodeSmallInteger(rendererWidth);
+        newForm->height = crank_talk_oop_encodeSmallInteger(rendererHeight);
+        newForm->depth = crank_talk_oop_encodeSmallInteger(32);
+        newForm->bits = (crank_talk_ByteArray_t*)crank_talk_ByteArray_create(context, rendererWidth*4*rendererHeight);
+        osWindowRenderer->form = newForm;
+
+        // Destroy the old texture
+        if(osWindowRenderer->textureHandle)
+        {
+            SDL_DestroyTexture(osWindowRenderer->textureHandle->address);
+            osWindowRenderer->textureHandle = NULL;
+        }
+
+        // Create a new texture
+        SDL_Texture *newTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_STREAMING, rendererWidth, rendererHeight);
+        osWindowRenderer->textureHandle = (crank_talk_ExternalAddress_t*)crank_talk_ExternalAddress_make(context, newTexture);
+    }
+    return self;
+}
+
+static crank_talk_oop_t
+crank_talk_OSWindowFormRenderer_blitForm_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_OSWindowFormRenderer_t *osWindowRenderer = (crank_talk_OSWindowFormRenderer_t *)self;
+    if(!osWindowRenderer->super.rendererHandle || !osWindowRenderer->textureHandle)
+        crank_talk_error(context, "Expected a valid window renderer.");
+
+    crank_talk_Form_t *form = osWindowRenderer->form;
+    SDL_Renderer *renderer = osWindowRenderer->super.rendererHandle->address;
+    SDL_Texture *texture = osWindowRenderer->textureHandle->address;
+    SDL_UpdateTexture(texture, NULL, crank_talk_oop_getBytesData((crank_talk_oop_t)form->bits), crank_talk_oop_decodeSmallInteger(form->width)*4);
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    return self;
+}
+
 void
 crank_talk_registerGUIPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.OSWindowClass), "mainLoop", 1, crank_talk_OSWindow_mainLoop_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowClass, "open", 1, crank_talk_OSWindow_open_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowClass, "newFormRenderer", 1, crank_talk_OSWindow_newFormRenderer_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowRendererClass, "beginFrame", 1, crank_talk_OSWindowRenderer_beginFrame_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowRendererClass, "endFrame", 1, crank_talk_OSWindowRenderer_endFrame_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowFormRendererClass, "beginFrame", 1, crank_talk_OSWindowFormRenderer_beginFrame_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowFormRendererClass, "blitForm", 1, crank_talk_OSWindowFormRenderer_blitForm_primitive);
 }

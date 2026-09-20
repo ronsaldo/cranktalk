@@ -26,6 +26,10 @@ typedef struct crank_talk_OSEvent_s crank_talk_OSEvent_t;
     typedef struct crank_talk_OSWindowEvent_s crank_talk_OSWindowEvent_t;
         typedef struct crank_talk_OSWindowExposeEvent_s crank_talk_OSWindowExposeEvent_t;
 
+
+typedef struct crank_talk_OSWindowRenderer_s crank_talk_OSWindowRenderer_t;
+typedef struct crank_talk_OSWindowFormRenderer_s crank_talk_OSWindowFormRenderer_t;
+
 struct crank_talk_Color_s
 {
     crank_talk_Object_t super;
@@ -70,7 +74,7 @@ struct crank_talk_OSWindow_s
     crank_talk_ExternalAddress_t *handle;
     crank_talk_OSWindowEventHandler_t *eventHandler;
     crank_talk_Point_t *extent;
-    crank_talk_oop_t renderer;
+    crank_talk_OSWindowRenderer_t *renderer;
 };
 
 struct crank_talk_OSWindowEventHandler_s
@@ -155,6 +159,19 @@ struct crank_talk_OSWindowEvent_s
 struct crank_talk_OSWindowExposeEvent_s
 {
     crank_talk_OSMouseEvent_t super;
+};
+
+struct crank_talk_OSWindowRenderer_s
+{
+    crank_talk_Object_t super;
+    crank_talk_ExternalAddress_t *rendererHandle; 
+};
+
+struct crank_talk_OSWindowFormRenderer_s
+{
+    crank_talk_OSWindowRenderer_t super;
+    crank_talk_Form_t *form;
+    crank_talk_ExternalAddress_t *textureHandle; 
 };
 
 CRANK_TALK_API crank_talk_Point_t* crank_talk_Point_make(crank_talk_VMContext_t *context, crank_talk_oop_t x, crank_talk_oop_t y);

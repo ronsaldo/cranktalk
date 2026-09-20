@@ -12,7 +12,9 @@ initialize
 
 Morph ![
 addMorph: aMorph
-    submorphs add: aMorph
+    self assert: aMorph owner == nil.
+    submorphs add: aMorph.
+    aMorph owner: self
 ].
 
 Morph ![
@@ -33,4 +35,14 @@ extent
 Morph ![
 extent: anExtent
     bounds := bounds origin extent: anExtent
+].
+
+Morph ![
+owner
+    ^ owner
+].
+
+Morph ![
+owner: anOwner
+    owner := anOwner
 ].

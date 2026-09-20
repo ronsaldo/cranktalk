@@ -26,6 +26,16 @@ eventHandler: anEventHandler
 ].
 
 OSWindow ![
+renderer
+    ^ renderer
+].
+
+OSWindow ![
+renderer: aRenderer
+    renderer := aRenderer
+].
+
+OSWindow ![
 render
     Stdio stdout nextPutAll: 'Todo: Render OSWindow'; lf
 ].

@@ -280,6 +280,9 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t OSWindowEventClass;
     crank_talk_oop_t OSWindowExposeEventClass;
 
+    crank_talk_oop_t OSWindowRendererClass;
+    crank_talk_oop_t OSWindowFormRendererClass;
+
     crank_talk_oop_t openWindowList;
 };
 

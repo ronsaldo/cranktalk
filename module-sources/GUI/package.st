@@ -5,6 +5,7 @@ thisContext
     loadFile: 'OSEvent.st';
     loadFile: 'OSWindow.st';
     loadFile: 'OSWindowEventHandler.st';
+    loadFile: 'OSWindowRenderer.st';
     loadFile: 'Morph.st';
     loadFile: 'RootMorph.st';
     loadFile: 'SystemWindowMorph.st'

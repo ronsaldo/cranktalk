@@ -10,6 +10,7 @@ Morph ![
 openInWindow
     SystemWindowMorph new
         extent: self extent;
+        addMorph: self;
         open
 ].
 
@@ -20,8 +21,18 @@ open
         extent: self extent;
         eventHandler: (SystemWindowMorphEventHandler new
             systemWindowMorph: self;
-            yourself).
-    osWindow open
+            yourself);
+        open;
+        newFormRenderer;
+        yourself
+].
+SystemWindowMorph ![
+render
+    osWindow renderer beginFrame.
+
+    osWindow renderer
+        blitForm;
+        endFrame
 ].
 
 SystemWindowMorphEventHandler ![
@@ -66,6 +77,5 @@ visitMouseWheelEvent: anEvent
 
 SystemWindowMorphEventHandler ![
 visitWindowExposeEvent: anEvent
-    anEvent window render.
-    Stdio stdout nextPutAll: 'Morph Window expose'; lf.
+    systemWindowMorph render
 ].
