@@ -5,9 +5,14 @@ Object << #Morph
 Morph ![
 initialize
     super initialize.
-    submorphs := Array new.
+    submorphs := OrderedCollection new.
     bounds := self defaultBounds.
     color := self defaultColor.
+].
+
+Morph ![
+addMorph: aMorph
+    submorphs add: aMorph
 ].
 
 Morph ![
