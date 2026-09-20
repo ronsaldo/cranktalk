@@ -6,6 +6,21 @@ initialize
 ].
 
 OSWindow ![
+extent
+    ^ extent
+].
+
+OSWindow ![
+extent: anExtent
+    extent := anExtent
+].
+
+OSWindow ![
+eventHandler
+    ^ eventHandler
+].
+
+OSWindow ![
 eventHandler: anEventHandler
     eventHandler := anEventHandler
 ].

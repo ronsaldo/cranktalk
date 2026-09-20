@@ -9,14 +9,24 @@ RootMorph << #SystemWindowMorph
 Morph ![
 openInWindow
     SystemWindowMorph new
+        extent: self extent;
         open
 ].
 
 SystemWindowMorph ![
 open
     osWindow := OSWindow new.
-    osWindow eventHandler: SystemWindowMorphEventHandler new.
+    osWindow
+        extent: self extent;
+        eventHandler: (SystemWindowMorphEventHandler new
+            systemWindowMorph: self;
+            yourself).
     osWindow open
+].
+
+SystemWindowMorphEventHandler ![
+systemWindowMorph: aSystemWindowMorph
+    systemWindowMorph := aSystemWindowMorph
 ].
 
 SystemWindowMorphEventHandler ![

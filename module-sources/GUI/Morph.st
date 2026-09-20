@@ -19,3 +19,13 @@ Morph ![
 defaultColor
     ^ Color blue
 ].
+
+Morph ![
+extent
+    ^ bounds extent
+].
+
+Morph ![
+extent: anExtent
+    bounds := bounds origin extent: anExtent
+].
