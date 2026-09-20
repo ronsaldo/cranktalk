@@ -475,8 +475,8 @@ crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive(crank_talk_VM
     crank_talk_Form_t *fontForm = fontFace->image;
     int fontImageWidth  = (int)crank_talk_oop_decodeSmallInteger(fontForm->width);
     int fontImageHeight = (int)crank_talk_oop_decodeSmallInteger(fontForm->height);
-    float currentBaselineX = (float)crank_talk_oop_numberAsFloat(baselineStart->x);
-    float currentBaselineY = (float)crank_talk_oop_numberAsFloat(baselineStart->y);
+    float currentBaselineX = (float)crank_talk_oop_numberAsFloat(baselineStart->x) + crank_talk_oop_numberAsFloat(formCanvas->origin->x);
+    float currentBaselineY = (float)crank_talk_oop_numberAsFloat(baselineStart->y) + crank_talk_oop_numberAsFloat(formCanvas->origin->y);
 
     // TODO: Decode UTF-8
     for(size_t i = stringStartIndex - 1; i < stringStopIndex; ++i)

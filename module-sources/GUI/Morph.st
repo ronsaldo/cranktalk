@@ -34,7 +34,8 @@ bounds
 
 Morph ![
 bounds: newBounds
-    bounds := newBounds
+    bounds := newBounds.
+    self updateLayout
 ].
 
 Morph ![
@@ -51,6 +52,16 @@ Morph ![
 extent: anExtent
     bounds := bounds origin extent: anExtent.
     self updateLayout.
+].
+
+Morph ![
+origin
+    ^ bounds origin
+].
+
+Morph ![
+origin: newOrigin
+    bounds := newOrigin extent: self extent
 ].
 
 Morph ![
