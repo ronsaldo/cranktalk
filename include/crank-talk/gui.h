@@ -3,6 +3,7 @@
 
 #include "object-model.h"
 
+typedef struct crank_talk_Color_s crank_talk_Color_t;
 typedef struct crank_talk_Point_s crank_talk_Point_t;
 typedef struct crank_talk_Rectangle_s crank_talk_Rectangle_t;
 typedef struct crank_talk_Form_s crank_talk_Form_t;
@@ -24,6 +25,15 @@ typedef struct crank_talk_OSEvent_s crank_talk_OSEvent_t;
         typedef struct crank_talk_OSMouseWheelEvent_s crank_talk_OSMouseWheelEvent_t;
     typedef struct crank_talk_OSWindowEvent_s crank_talk_OSWindowEvent_t;
         typedef struct crank_talk_OSWindowExposeEvent_s crank_talk_OSWindowExposeEvent_t;
+
+struct crank_talk_Color_s
+{
+    crank_talk_Object_t super;
+    crank_talk_oop_t r;
+    crank_talk_oop_t g;
+    crank_talk_oop_t b;
+    crank_talk_oop_t a;
+};
 
 struct crank_talk_Point_s
 {

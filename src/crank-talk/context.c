@@ -857,6 +857,12 @@ crank_talk_context_createExceptionsDefinitions(crank_talk_VMContext_t* context)
 static void 
 crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
 {
+    context->roots.ColorClass = crank_talk_context_createClassAndMetaclass(context, "Color", context->roots.ObjectClass, sizeof(crank_talk_Color_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(Color, r),
+        CrankTalkSlotDef(Color, g),
+        CrankTalkSlotDef(Color, b),
+        CrankTalkSlotDef(Color, a),
+        NULL);
     context->roots.PointClass = crank_talk_context_createClassAndMetaclass(context, "Point", context->roots.ObjectClass, sizeof(crank_talk_Point_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(Point, x),
         CrankTalkSlotDef(Point, y),
