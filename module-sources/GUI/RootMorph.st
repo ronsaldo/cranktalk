@@ -1,0 +1,3 @@
+Morph << #RootMorph
+    slots: {};
+    build.

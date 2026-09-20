@@ -6,6 +6,11 @@ initialize
 ].
 
 OSWindow ![
+eventHandler: anEventHandler
+    eventHandler := anEventHandler
+].
+
+OSWindow ![
 render
     Stdio stdout nextPutAll: 'Todo: Render OSWindow'; lf
 ].
