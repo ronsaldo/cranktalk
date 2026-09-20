@@ -40,6 +40,14 @@ crank_talk_Font_default(crank_talk_VMContext_t *context)
 }
 
 static crank_talk_oop_t
+crank_talk_Font_defaultMonospaced(crank_talk_VMContext_t *context)
+{
+    if(!context->roots.defaultMonospacedFont)
+        context->roots.defaultMonospacedFont = crank_talk_Font_loadFromFile(context, "assets/fonts/DejaVuSansMono.ttf");
+    return context->roots.defaultMonospacedFont;
+}
+
+static crank_talk_oop_t
 crank_talk_Font_default_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -47,6 +55,16 @@ crank_talk_Font_default_primitive(crank_talk_VMContext_t *context, crank_talk_oo
     assert(argumentCount >= 1);
 
     return crank_talk_Font_default(context);
+}
+
+static crank_talk_oop_t
+crank_talk_Font_defaultMonospaced_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    return crank_talk_Font_defaultMonospaced(context);
 }
 
 static crank_talk_oop_t
@@ -113,6 +131,24 @@ crank_talk_FontFace_default_primitive(crank_talk_VMContext_t *context, crank_tal
     assert(argumentCount >= 1);
 
     return crank_talk_FontFace_default(context);
+}
+
+static crank_talk_oop_t
+crank_talk_FontFace_defaultMonospaced(crank_talk_VMContext_t *context)
+{
+    if(!context->roots.defaultMonospacedFontFace)
+        context->roots.defaultMonospacedFontFace = crank_talk_FontFace_createWithSize(context, (crank_talk_Font_t*)crank_talk_Font_defaultMonospaced(context), 16);
+    return context->roots.defaultMonospacedFontFace;
+}
+
+static crank_talk_oop_t
+crank_talk_FontFace_defaultMonospaced_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    return crank_talk_FontFace_defaultMonospaced(context);
 }
 
 static stbtt_bakedchar
@@ -467,9 +503,11 @@ crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive(crank_talk_VM
 void
 crank_talk_registerGUIPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontClass), "default", 3, crank_talk_Font_default_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontClass), "default", 1, crank_talk_Font_default_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontClass), "defaultMonospaced", 1, crank_talk_Font_defaultMonospaced_primitive);
     
-    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontFaceClass), "default", 3, crank_talk_FontFace_default_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontFaceClass), "default", 1, crank_talk_FontFace_default_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontFaceClass), "defaultMonospaced", 1, crank_talk_FontFace_defaultMonospaced_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FontFaceClass, "measureTextExtent:", 2, crank_talk_FontFace_measureTextExtent_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "fillWithColor:", 3, crank_talk_FormCanvas_fillWithColor_primitive);
