@@ -28,6 +28,11 @@ defaultColor
 ].
 
 Morph ![
+localBounds
+    ^ 0@0 corner: self extent
+].
+
+Morph ![
 extent
     ^ bounds extent
 ].
@@ -45,4 +50,24 @@ owner
 Morph ![
 owner: anOwner
     owner := anOwner
+].
+
+Morph ![
+fullDrawOn: aCanvas
+    aCanvas withTranslation: bounds origin do: [
+        self drawOn: aCanvas.
+        self drawChildrenWith: aCanvas
+    ]
+].
+
+Morph ![
+drawOn: aCanvas
+    aCanvas fillRectangle: self localBounds color: color
+].
+
+Morph ![
+drawChildrenWith: aCanvas
+    submorphs do: [:each |
+        each fullDrawOn: aCanvas
+    ]
 ].

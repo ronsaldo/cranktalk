@@ -1,5 +1,6 @@
 #include "crank-talk/parse-tree.h"
 #include "crank-talk/context.h"
+#include "crank-talk/errors.h"
 #include "crank-talk/message.h"
 #include "crank-talk/ordered-collection.h"
 #include "crank-talk/string.h"
@@ -171,11 +172,13 @@ crank_talk_ParseTree_traverseListAndCollectErrorsInto(crank_talk_VMContext_t *co
 }
 
 static void
-crank_talk_ParseTree_printError(crank_talk_oop_t errorNodeValue)
+crank_talk_ParseTree_printError(crank_talk_VMContext_t *context, crank_talk_oop_t errorNodeValue)
 {
     // TODO: Print the location.
     crank_talk_ParseTreeParseErrorNode_t *errorNode = (crank_talk_ParseTreeParseErrorNode_t*)errorNodeValue;
-    fprintf(stderr, "Parse error: " CRANK_TALK_STRING_FORMAT "\n", CRANK_TALK_STRING_FORMAT_ARG(errorNode->errorMessage));
+    crank_talk_errorPrintfAtSourcePosition(context, (crank_talk_oop_t)errorNode->super.sourcePosition,
+        "Parse error: " CRANK_TALK_STRING_FORMAT "\n", CRANK_TALK_STRING_FORMAT_ARG(errorNode->errorMessage)
+    );
 }
 
 CRANK_TALK_API bool
@@ -188,7 +191,7 @@ crank_talk_ParseTree_checkAndPrintErrors(crank_talk_VMContext_t *context, crank_
     for(size_t i = 1; i <= errorCount; ++i)
     {
         crank_talk_oop_t errorNode = crank_talk_OrderedCollection_at(context, errorList, i);
-        crank_talk_ParseTree_printError(errorNode);
+        crank_talk_ParseTree_printError(context, errorNode);
     }
         
     return errorCount == 0;

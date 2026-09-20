@@ -15,4 +15,11 @@ setForm: aForm
     form := aForm
 ].
 
-
+FormCanvas ![
+withTranslation: translatin do: aBlock
+    | oldOrigin |
+    oldOrigin := origin.
+    aBlock ensure: [
+        origin := oldOrigin.
+    ].
+].

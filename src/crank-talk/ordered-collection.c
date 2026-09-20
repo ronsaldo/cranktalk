@@ -157,6 +157,16 @@ crank_talk_OrderedCollection_atPut_primitive(crank_talk_VMContext_t *context, cr
     return crank_talk_OrderedCollection_atPut(context, orderedCollection, crank_talk_oop_decodeSmallInteger(index), value);
 }
 
+static crank_talk_oop_t
+crank_talk_OrderedCollection_size_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+    return ((crank_talk_OrderedCollection_t*)arguments[0])->size;
+}
+
 
 void
 crank_talk_registerOrderedCollectionPrimitives(crank_talk_VMContext_t* context)
@@ -166,4 +176,5 @@ crank_talk_registerOrderedCollectionPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "asArray", 1, crank_talk_OrderedCollection_asArray_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "at:", 2, crank_talk_OrderedCollection_at_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "at:put:", 3, crank_talk_OrderedCollection_atPut_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "size", 1, crank_talk_OrderedCollection_size_primitive);
 }

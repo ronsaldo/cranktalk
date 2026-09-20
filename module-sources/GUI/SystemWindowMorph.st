@@ -15,6 +15,11 @@ openInWindow
 ].
 
 SystemWindowMorph ![
+defaultColor
+    ^ Color white
+].
+
+SystemWindowMorph ![
 open
     osWindow := OSWindow new.
     osWindow
@@ -30,11 +35,12 @@ SystemWindowMorph ![
 render
     | canvas |
     osWindow renderer beginFrame.
+    Stdio stdout print: osWindow extent; lf.
     
     canvas := FormCanvas on: osWindow renderer form.
-    canvas
-        fillWithColor: Color green;
-        fillRectangle: (0@0 extent: 20@20) color: Color blue.
+    canvas fillWithColor: Color green.
+    self fullDrawOn: canvas.
+        "fillRectangle: (0@0 extent: 20@20) color: Color blue."
 
     osWindow renderer
         blitForm;
