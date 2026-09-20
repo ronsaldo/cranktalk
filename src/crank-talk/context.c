@@ -21,6 +21,8 @@
 
 #define CrankTalkSlotDef(clazz, fieldName) #fieldName, offsetof(crank_talk_ ## clazz ##_t, fieldName)
 
+void crank_talk_SDL2Shutdown(crank_talk_VMContext_t* context);
+
 void crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerBehaviorPrimitives(crank_talk_VMContext_t* context);
@@ -983,6 +985,7 @@ crank_talk_vm_createContext(void)
 CRANK_TALK_API void
 crank_talk_vm_destroyContext(crank_talk_VMContext_t *context)
 {
+    crank_talk_SDL2Shutdown(context);
     crank_talk_dynarray_destroy(&context->markingStack);
     crank_talk_heap_freeAll(&context->heap);
     free(context);

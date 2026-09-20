@@ -207,6 +207,31 @@ crank_talk_OSWindow_open_primitive(crank_talk_VMContext_t *context, crank_talk_o
 }
 
 static crank_talk_oop_t
+crank_talk_OSWindow_close_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_OSWindow_t *osWindow = (crank_talk_OSWindow_t *)self;
+    if(osWindow->renderer)
+    {
+        crank_talk_send0(context, crank_talk_Symbol_internWithCString(context, "close"), (crank_talk_oop_t)osWindow->renderer);
+        osWindow->renderer = NULL;
+    }
+        
+    if(osWindow->handle)
+    {
+        SDL_Window *handle = osWindow->handle->address;
+        SDL_DestroyWindow(handle);
+        osWindow->handle = NULL;
+    }
+
+    return self;
+}
+
+static crank_talk_oop_t
 crank_talk_OSWindow_mainLoop_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -283,6 +308,34 @@ crank_talk_OSWindowRenderer_endFrame_primitive(crank_talk_VMContext_t *context, 
 }
 
 static crank_talk_oop_t
+crank_talk_OSWindowFormRenderer_close_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_OSWindowFormRenderer_t *osWindowRenderer = (crank_talk_OSWindowFormRenderer_t *)self;
+    if(!osWindowRenderer->super.rendererHandle)
+        return self;
+
+    if(osWindowRenderer->textureHandle)
+    {
+        SDL_DestroyTexture(osWindowRenderer->textureHandle->address);
+        osWindowRenderer->textureHandle = NULL;
+    }
+
+    if(osWindowRenderer->super.rendererHandle)
+    {
+        SDL_DestroyRenderer(osWindowRenderer->super.rendererHandle->address);
+        osWindowRenderer->super.rendererHandle = NULL;
+    }
+
+    return self;
+}
+
+static crank_talk_oop_t
 crank_talk_OSWindowFormRenderer_beginFrame_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -347,15 +400,33 @@ crank_talk_OSWindowFormRenderer_blitForm_primitive(crank_talk_VMContext_t *conte
 }
 
 void
+crank_talk_SDL2Shutdown(crank_talk_VMContext_t* context)
+{
+    if(!hasInitializedSDL2)
+        return;
+
+    crank_talk_Array_t *openWindowList = (crank_talk_Array_t *)context->roots.openWindowList;
+    size_t openWindowCount =  crank_talk_object_getSizeInSlots(context->roots.openWindowList);
+    for(size_t i = 0;i < openWindowCount; ++i)
+        crank_talk_send0(context, crank_talk_Symbol_internWithCString(context, "close"), openWindowList->elements[i]);
+
+    SDL_Quit();
+    hasInitializedSDL2 = false;
+}
+
+void
 crank_talk_registerGUIBackendPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.OSWindowClass), "mainLoop", 1, crank_talk_OSWindow_mainLoop_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowClass, "open", 1, crank_talk_OSWindow_open_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowClass, "close", 1, crank_talk_OSWindow_close_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowClass, "newFormRenderer", 1, crank_talk_OSWindow_newFormRenderer_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowRendererClass, "beginFrame", 1, crank_talk_OSWindowRenderer_beginFrame_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowRendererClass, "endFrame", 1, crank_talk_OSWindowRenderer_endFrame_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowFormRendererClass, "close", 1, crank_talk_OSWindowFormRenderer_close_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowFormRendererClass, "beginFrame", 1, crank_talk_OSWindowFormRenderer_beginFrame_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowFormRendererClass, "blitForm", 1, crank_talk_OSWindowFormRenderer_blitForm_primitive);
 }
