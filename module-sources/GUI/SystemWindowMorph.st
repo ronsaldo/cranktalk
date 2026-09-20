@@ -28,7 +28,13 @@ open
 ].
 SystemWindowMorph ![
 render
+    | canvas |
     osWindow renderer beginFrame.
+    
+    canvas := FormCanvas on: osWindow renderer form.
+    canvas
+        fillWithColor: Color green;
+        fillRectangle: (0@0 extent: 20@20) color: Color blue.
 
     osWindow renderer
         blitForm;

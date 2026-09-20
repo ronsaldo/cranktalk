@@ -1,5 +1,6 @@
 thisContext 
     loadFile: 'Color.st';
+    loadFile: 'FormCanvas.st';
     loadFile: 'Point.st';
     loadFile: 'Rectangle.st';
     loadFile: 'OSEvent.st';

@@ -28,6 +28,7 @@ void crank_talk_registerControlFlowPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerEnvironmentPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerErrorPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerFunctionalPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerGUIBackendPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerGUIPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerMacrosPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context);
@@ -879,6 +880,8 @@ crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
         NULL);
     context->roots.FormCanvasClass = crank_talk_context_createClassAndMetaclass(context, "FormCanvas", context->roots.ObjectClass, sizeof(crank_talk_FormCanvas_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(FormCanvas, form),
+        CrankTalkSlotDef(FormCanvas, origin),
+        CrankTalkSlotDef(FormCanvas, scaleFactor),
         NULL);
     context->roots.OSWindowClass = crank_talk_context_createClassAndMetaclass(context, "OSWindow", context->roots.ObjectClass, sizeof(crank_talk_OSWindow_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(OSWindow, handle),
@@ -947,6 +950,7 @@ crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
     crank_talk_registerEnvironmentPrimitives(context);
     crank_talk_registerErrorPrimitives(context);
     crank_talk_registerFunctionalPrimitives(context);
+    crank_talk_registerGUIBackendPrimitives(context);
     crank_talk_registerGUIPrimitives(context);
     crank_talk_registerMacrosPrimitives(context);
     crank_talk_registerNumbersPrimitives(context);

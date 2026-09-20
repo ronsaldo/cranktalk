@@ -15,6 +15,7 @@ set(CrankTalk_Sources
     eval.c
     function.c
     gc.c
+    gui-sdl2.c
     gui.c
     heap.c
     hir.c
