@@ -100,3 +100,7 @@ layout: aLayout
     layout := aLayout.
     self updateLayout
 ].
+Morph ![
+rootMorph
+    ^ owner ~~ nil ifTrue: [owner rootMorph] ifTrue: [nil]
+].

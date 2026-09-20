@@ -10,5 +10,6 @@ thisContext
     loadFile: 'OSWindowRenderer.st';
     loadFile: 'Morph.st';
     loadFile: 'MorphicLayout.st';
+    loadFile: 'BorderedMorph.st';
     loadFile: 'RootMorph.st';
     loadFile: 'SystemWindowMorph.st'
