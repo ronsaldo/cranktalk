@@ -3,9 +3,14 @@
 #include "crank-talk/bytes.h"
 #include "crank-talk/context.h"
 #include "crank-talk/errors.h"
+#include "crank-talk/io.h"
 #include "crank-talk/message.h"
 #include "crank-talk/string.h"
 #include <stdio.h>
+
+#define STB_TRUETYPE_IMPLEMENTATION
+#include "stb_truetype.h"
+#undef STB_TRUETYPE_IMPLEMENTATION
 
 CRANK_TALK_API crank_talk_Point_t*
 crank_talk_Point_make(crank_talk_VMContext_t *context, crank_talk_oop_t x, crank_talk_oop_t y)
@@ -14,6 +19,101 @@ crank_talk_Point_make(crank_talk_VMContext_t *context, crank_talk_oop_t x, crank
     point->x = x;
     point->y = y;
     return point;
+}
+
+static crank_talk_oop_t
+crank_talk_Font_loadFromFile(crank_talk_VMContext_t *context, const char *fileName)
+{
+    crank_talk_ByteArray_t *bytes = crank_talk_io_readWholeFileAsByteArray(context, fileName);
+    crank_talk_oop_t fontValue = CrankAllocateValuesObjectWithClassName(context, Font);
+    crank_talk_Font_t *font = (crank_talk_Font_t *)fontValue;
+    font->rawData = bytes;
+    return fontValue;
+}
+
+static crank_talk_oop_t
+crank_talk_Font_default(crank_talk_VMContext_t *context)
+{
+    if(!context->roots.defaultFont)
+        context->roots.defaultFont = crank_talk_Font_loadFromFile(context, "assets/fonts/DejaVuSans.ttf");
+    return context->roots.defaultFont;
+}
+
+static crank_talk_oop_t
+crank_talk_Font_default_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    return crank_talk_Font_default(context);
+}
+
+static crank_talk_oop_t
+crank_talk_FontFace_createWithSize(crank_talk_VMContext_t *context, crank_talk_Font_t *font, uint32_t fontFaceSize)
+{
+    crank_talk_Form_t *image = (crank_talk_Form_t*)CrankAllocateValuesObjectWithClassName(context, Form);
+    int imageWidth = 512;
+    int imageHeight = 512;
+
+    image->width = crank_talk_oop_encodeSmallInteger(imageWidth);
+    image->height = crank_talk_oop_encodeSmallInteger(imageHeight);
+    image->depth = crank_talk_oop_encodeSmallInteger(8);
+    image->bits = (crank_talk_ByteArray_t*)crank_talk_ByteArray_create(context, imageWidth*imageHeight);
+
+    size_t bakedCharDataSize = 256-31;
+    stbtt_bakedchar *bakedCharsData = calloc(bakedCharDataSize, sizeof(stbtt_bakedchar));
+    stbtt_BakeFontBitmap(font->rawData->elements, 0, (float)fontFaceSize, image->bits->elements, imageWidth, imageHeight, 31, bakedCharDataSize, bakedCharsData);
+
+    float ascent;
+    float descent;
+    float linegap;
+    stbtt_GetScaledFontVMetrics(font->rawData->elements, 0, (float)fontFaceSize, &ascent, &descent, &linegap);
+
+    printf("Font face ascent %f descent %f linegap %f\n", ascent, descent, linegap);
+    crank_talk_FontFace_t *fontFace = (crank_talk_FontFace_t *)CrankAllocateValuesObjectWithClassName(context, FontFace);
+
+    fontFace->image = image;
+    fontFace->ascent = crank_talk_oop_fromFloat(context, ascent);
+    fontFace->descent = crank_talk_oop_fromFloat(context, descent);
+    fontFace->linegap = crank_talk_oop_fromFloat(context, linegap);
+
+    fontFace->bakedChars = (crank_talk_Array_t*)crank_talk_Array_create(context, bakedCharDataSize);
+    for(size_t i = 0; i < bakedCharDataSize; ++i)
+    {
+        stbtt_bakedchar *bakedChar = bakedCharsData + i;
+        crank_talk_FontBakedChar_t *fontBakedChar = (crank_talk_FontBakedChar_t *)CrankAllocateValuesObjectWithClassName(context, FontBakedChar);
+        fontBakedChar->x0 = crank_talk_oop_encodeSmallInteger(bakedChar->x0);
+        fontBakedChar->y0 = crank_talk_oop_encodeSmallInteger(bakedChar->y0);
+        fontBakedChar->x1 = crank_talk_oop_encodeSmallInteger(bakedChar->x1);
+        fontBakedChar->y1 = crank_talk_oop_encodeSmallInteger(bakedChar->y1);
+        fontBakedChar->xoff = crank_talk_oop_fromFloat(context, bakedChar->xoff);
+        fontBakedChar->yoff = crank_talk_oop_fromFloat(context, bakedChar->yoff);
+        fontBakedChar->advance = crank_talk_oop_fromFloat(context, bakedChar->xadvance);
+        fontFace->bakedChars->elements[i] = (crank_talk_oop_t)fontBakedChar;
+    }
+
+    free(bakedCharsData);
+
+    return (crank_talk_oop_t)fontFace;
+}
+
+static crank_talk_oop_t
+crank_talk_FontFace_default(crank_talk_VMContext_t *context)
+{
+    if(!context->roots.defaultFontFace)
+        context->roots.defaultFontFace = crank_talk_FontFace_createWithSize(context, (crank_talk_Font_t*)crank_talk_Font_default(context), 16);
+    return context->roots.defaultFontFace;
+}
+
+static crank_talk_oop_t
+crank_talk_FontFace_default_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    return crank_talk_FontFace_default(context);
 }
 
 static uint32_t
@@ -183,6 +283,10 @@ crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive(crank_talk_VMC
 void
 crank_talk_registerGUIPrimitives(crank_talk_VMContext_t* context)
 {
+    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontClass), "default", 3, crank_talk_Font_default_primitive);
+    
+    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontFaceClass), "default", 3, crank_talk_FontFace_default_primitive);
+
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "fillWithColor:", 3, crank_talk_FormCanvas_fillWithColor_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "fillRectangle:color:", 3, crank_talk_FormCanvas_fillRectangleWithColor_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "frameRectangle:borderWidth:color:", 4, crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive);

@@ -1,4 +1,5 @@
 #include "crank-talk/io.h"
+#include "crank-talk/bytes.h"
 #include "crank-talk/context.h"
 #include "crank-talk/errors.h"
 #include "crank-talk/message.h"
@@ -33,6 +34,28 @@ crank_talk_Stdio_stderr_primitive(crank_talk_VMContext_t *context, crank_talk_oo
     (void)arguments;
     assert(argumentCount > 0);
     return context->roots.stderrStream;
+}
+
+CRANK_TALK_API crank_talk_ByteArray_t*
+crank_talk_io_readWholeFileAsByteArray(crank_talk_VMContext_t *context, const char *fileName)
+{
+    FILE *file = fopen(fileName, "rb");
+    if(!file)
+        crank_talk_errorPrintf(context, "Failed to open file %s.", fileName);
+
+    fseek(file, 0, SEEK_END);
+    size_t fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    crank_talk_ByteArray_t *bytes = (crank_talk_ByteArray_t*)crank_talk_ByteArray_create(context, fileSize);
+    if(fileSize > 0 && fread(bytes->elements, fileSize, 1, file) != 1)
+    {
+        fclose(file);
+        crank_talk_errorPrintf(context, "Failed to read the content of file %s.", fileName);
+    }
+
+    fclose(file);
+    return bytes;
 }
 
 static crank_talk_oop_t

@@ -17,4 +17,6 @@ struct crank_talk_BinaryFileStream_s
     crank_talk_oop_t handle;
 };
 
+CRANK_TALK_API crank_talk_ByteArray_t *crank_talk_io_readWholeFileAsByteArray(crank_talk_VMContext_t *context, const char *fileName);
+
 #endif // CRANK_TALK_IO_H

@@ -88,6 +88,9 @@ struct crank_talk_FontFace_s
     crank_talk_Object_t super;
     crank_talk_Form_t *image;
     crank_talk_Array_t *bakedChars;
+    crank_talk_oop_t ascent;
+    crank_talk_oop_t descent;
+    crank_talk_oop_t linegap;
 };
 
 //typedef struct crank_talk_Font_s crank_talk_Font_t;

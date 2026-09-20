@@ -1,6 +1,7 @@
 thisContext 
     loadFile: 'Color.st';
     loadFile: 'Font.st';
+    loadFile: 'FontFace.st';
     loadFile: 'Form.st';
     loadFile: 'FormCanvas.st';
     loadFile: 'Point.st';
