@@ -163,6 +163,52 @@ crank_talk_MessageMacro_ifFalse(crank_talk_VMContext_t *context, crank_talk_oop_
 }
 
 static crank_talk_oop_t
+crank_talk_MessageMacro_and(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_ParseTreeMessageSendNode_t *sendNode = (crank_talk_ParseTreeMessageSendNode_t *)arguments[0];
+    assert(crank_talk_object_getSizeInSlots((crank_talk_oop_t)sendNode->arguments) == 1);
+
+    crank_talk_ParseTreeLiteralNode_t *falseLiteralNode = (crank_talk_ParseTreeLiteralNode_t *)CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+    falseLiteralNode->super.sourcePosition = sendNode->super.sourcePosition;
+    falseLiteralNode->value = context->roots.falseValue;
+
+    crank_talk_oop_t ifSelectionNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeIfSelectionNode);
+    crank_talk_ParseTreeIfSelectionNode_t *ifSelectionNode = (crank_talk_ParseTreeIfSelectionNode_t *)ifSelectionNodeValue;
+    ifSelectionNode->super.sourcePosition = sendNode->super.sourcePosition;
+    ifSelectionNode->condition = sendNode->receiver;
+    ifSelectionNode->trueExpression = crank_talk_ParseTree_addEmptyCullBlockNode(context, (crank_talk_ParseTreeNode_t*)sendNode->arguments->elements[0]);
+    ifSelectionNode->falseExpression = &falseLiteralNode->super;
+
+    return ifSelectionNodeValue;
+}
+
+static crank_talk_oop_t
+crank_talk_MessageMacro_or(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount > 0);
+    crank_talk_ParseTreeMessageSendNode_t *sendNode = (crank_talk_ParseTreeMessageSendNode_t *)arguments[0];
+    assert(crank_talk_object_getSizeInSlots((crank_talk_oop_t)sendNode->arguments) == 1);
+
+    crank_talk_ParseTreeLiteralNode_t *trueLiteralNode = (crank_talk_ParseTreeLiteralNode_t *)CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+    trueLiteralNode->super.sourcePosition = sendNode->super.sourcePosition;
+    trueLiteralNode->value = context->roots.trueValue;
+
+    crank_talk_oop_t ifSelectionNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeIfSelectionNode);
+    crank_talk_ParseTreeIfSelectionNode_t *ifSelectionNode = (crank_talk_ParseTreeIfSelectionNode_t *)ifSelectionNodeValue;
+    ifSelectionNode->super.sourcePosition = sendNode->super.sourcePosition;
+    ifSelectionNode->condition = sendNode->receiver;
+    ifSelectionNode->trueExpression = &trueLiteralNode->super;
+    ifSelectionNode->falseExpression = crank_talk_ParseTree_addEmptyCullBlockNode(context, (crank_talk_ParseTreeNode_t*)sendNode->arguments->elements[0]);
+
+    return ifSelectionNodeValue;
+}
+
+static crank_talk_oop_t
 crank_talk_MessageMacro_whileTrue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -340,6 +386,9 @@ void crank_talk_registerMacrosPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetMessageMacro(context, "ifFalse:ifTrue:", crank_talk_MessageMacro_ifFalseIfTrue);
     crank_talk_createAndSetMessageMacro(context, "ifTrue:", crank_talk_MessageMacro_ifTrue);
     crank_talk_createAndSetMessageMacro(context, "ifFalse:", crank_talk_MessageMacro_ifFalse);
+
+    crank_talk_createAndSetMessageMacro(context, "and:", crank_talk_MessageMacro_and);
+    crank_talk_createAndSetMessageMacro(context, "or:", crank_talk_MessageMacro_or);
 
     crank_talk_createAndSetMessageMacro(context, "whileTrue", crank_talk_MessageMacro_whileTrue);
     crank_talk_createAndSetMessageMacro(context, "whileTrue:", crank_talk_MessageMacro_whileTrueWith);

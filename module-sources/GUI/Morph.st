@@ -28,6 +28,11 @@ defaultColor
 ].
 
 Morph ![
+currentColor
+    ^ color
+].
+
+Morph ![
 bounds
     ^ bounds
 ].
@@ -84,7 +89,7 @@ fullDrawOn: aCanvas
 
 Morph ![
 drawOn: aCanvas
-    aCanvas fillRectangle: self localBounds color: color
+    aCanvas fillRectangle: self localBounds color: self currentColor
 ].
 
 Morph ![
@@ -116,7 +121,18 @@ layout: aLayout
     layout := aLayout.
     self updateLayout
 ].
+
 Morph ![
 rootMorph
-    ^ owner ~~ nil ifTrue: [owner rootMorph] ifTrue: [nil]
+    ^ owner ~~ nil ifTrue: [owner rootMorph] ifFalse: [nil]
 ].
+
+Morph ![
+getMouseFocus
+    ^ self rootMorph getMouseFocus
+].
+
+Morph ![
+hasMouseFocus
+    ^ self getMouseFocus == self
+]

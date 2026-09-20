@@ -33,3 +33,8 @@ Rectangle ![
 origin
     ^ origin
 ].
+
+Rectangle ![
+containsPoint: aPoint
+    ^ origin <= aPoint and: [aPoint <= corner]
+].

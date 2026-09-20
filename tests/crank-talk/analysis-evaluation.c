@@ -184,6 +184,36 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(context->roots.trueValue, value);
     }
 
+    // and:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "false and: [false]");
+        AssertEquals(context->roots.falseValue, value);
+
+        value = crank_talk_analyzeAndEvaluateString(context, "false and: [true]");
+        AssertEquals(context->roots.falseValue, value);
+
+        value = crank_talk_analyzeAndEvaluateString(context, "true and: [false]");
+        AssertEquals(context->roots.falseValue, value);
+
+        value = crank_talk_analyzeAndEvaluateString(context, "true and: [true]");
+        AssertEquals(context->roots.trueValue, value);
+    }
+
+    // or:
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "false or: [false]");
+        AssertEquals(context->roots.falseValue, value);
+
+        value = crank_talk_analyzeAndEvaluateString(context, "false or: [true]");
+        AssertEquals(context->roots.trueValue, value);
+
+        value = crank_talk_analyzeAndEvaluateString(context, "true or: [false]");
+        AssertEquals(context->roots.trueValue, value);
+
+        value = crank_talk_analyzeAndEvaluateString(context, "true or: [true]");
+        AssertEquals(context->roots.trueValue, value);
+    }
+
     // ifTrue:ifFalse:
     {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "true ifTrue: [1] ifFalse: [2]");

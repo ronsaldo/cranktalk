@@ -70,4 +70,9 @@ Point ![
     ^ (x // arg x) @ (y // arg y)
 ].
 
+Point ![
+<= aPoint
+    ^ x <= aPoint x and: [y <= aPoint y]
+].
+
 "Stdio stdout print: (0@1) + (2 @ -3); lf."
