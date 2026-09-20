@@ -11,6 +11,7 @@ openInWindow
     SystemWindowMorph new
         extent: self extent;
         addMorph: self;
+        layout: (FillMorphicLayout new morph: self; yourself);
         open
 ].
 

@@ -9,5 +9,6 @@ thisContext
     loadFile: 'OSWindowEventHandler.st';
     loadFile: 'OSWindowRenderer.st';
     loadFile: 'Morph.st';
+    loadFile: 'MorphicLayout.st';
     loadFile: 'RootMorph.st';
     loadFile: 'SystemWindowMorph.st'

@@ -1,5 +1,5 @@
 Object << #Morph
-    slots: {#bounds . #owner . #submorphs . #color};
+    slots: {#bounds . #owner . #submorphs . #color. #layout};
     build.
 
 Morph ![
@@ -85,4 +85,18 @@ drawChildrenWith: aCanvas
 
 Morph ![
 updateLayout
+    layout ~~ nil ifTrue: [
+        layout applyWithLocalBounds: self localBounds
+    ]
+].
+
+Morph ![
+layout
+    ^ layout
+].
+
+Morph ![
+layout: aLayout
+    layout := aLayout.
+    self updateLayout
 ].
