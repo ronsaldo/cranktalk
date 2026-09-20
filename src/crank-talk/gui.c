@@ -80,15 +80,41 @@ crank_talk_FormCanvas_fillRectangleWithColor_primitive(crank_talk_VMContext_t *c
     if(crank_talk_oop_decodeSmallInteger(form->depth) != 32)
         crank_talk_error(context, "Only 32 bit forms are supported.");
     
-    size_t formWidth = (size_t)crank_talk_oop_decodeSmallInteger(form->width);
-    size_t formHeight = (size_t)crank_talk_oop_decodeSmallInteger(form->height);
-    size_t formPitch = formWidth*4;
+    // Fetch the form parameters
+    int formWidth = (int)crank_talk_oop_decodeSmallInteger(form->width);
+    int formHeight = (int)crank_talk_oop_decodeSmallInteger(form->height);
+    int formPitch = formWidth*4;
     uint8_t *formBits = form->bits->elements;
 
-    uint32_t fillColor = crank_talk_Color_encodeBGRA32(color);
+    // Fetch the rectangle corners.
+    float originX = (float)crank_talk_oop_numberAsFloat(formCanvas->origin->x);
+    float originY = (float)crank_talk_oop_numberAsFloat(formCanvas->origin->y);
+    float scaleX = (float)crank_talk_oop_numberAsFloat(formCanvas->scaleFactor->x);
+    float scaleY = (float)crank_talk_oop_numberAsFloat(formCanvas->scaleFactor->y);
 
-    uint32_t *pixel = (uint32_t *)formBits;
-    pixel[0] = 0xff0000ff;
+    float fMinX = ((float)crank_talk_oop_numberAsFloat(rectangle->origin->x) + originX) * scaleX;
+    float fMinY = ((float)crank_talk_oop_numberAsFloat(rectangle->origin->y) + originY) * scaleY;
+    float fMaxX = ((float)crank_talk_oop_numberAsFloat(rectangle->corner->x) + originX) * scaleX;
+    float fMaxY = ((float)crank_talk_oop_numberAsFloat(rectangle->corner->y) + originY) * scaleY;
+
+    // Clamp the rectangle.
+    int minX = (int)fMinX;
+    int minY = (int)fMinY;
+    int maxX = (int)fMaxX;
+    int maxY = (int)fMaxY;
+    if(minX < 0) minX = 0;
+    if(minY < 0) minY = 0;
+    if(maxX > formWidth) maxX = formWidth;
+    if(maxY > formHeight) maxY = formHeight;
+
+    // Fill the rectangle
+    uint32_t fillColor = crank_talk_Color_encodeBGRA32(color);
+    for(int y = minY; y < maxY; ++y)
+    {
+        uint32_t *row = (uint32_t*)(formBits + formPitch*y);
+        for(int x = minX; x < maxX; ++x)
+            row[x] = fillColor;
+    }
     
     return self;
 }
