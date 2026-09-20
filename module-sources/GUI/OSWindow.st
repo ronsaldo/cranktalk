@@ -6,11 +6,6 @@ initialize
 ].
 
 OSWindow ![
-extent
-    ^ extent
-].
-
-OSWindow ![
 extent: anExtent
     extent := anExtent
 ].

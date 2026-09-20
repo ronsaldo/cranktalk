@@ -28,6 +28,16 @@ defaultColor
 ].
 
 Morph ![
+bounds
+    ^ bounds
+].
+
+Morph ![
+bounds: newBounds
+    bounds := newBounds
+].
+
+Morph ![
 localBounds
     ^ 0@0 corner: self extent
 ].
@@ -39,7 +49,8 @@ extent
 
 Morph ![
 extent: anExtent
-    bounds := bounds origin extent: anExtent
+    bounds := bounds origin extent: anExtent.
+    self updateLayout.
 ].
 
 Morph ![
@@ -70,4 +81,8 @@ drawChildrenWith: aCanvas
     submorphs do: [:each |
         each fullDrawOn: aCanvas
     ]
+].
+
+Morph ![
+updateLayout
 ].

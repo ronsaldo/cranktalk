@@ -1,5 +1,6 @@
 thisContext 
     loadFile: 'Color.st';
+    loadFile: 'Form.st';
     loadFile: 'FormCanvas.st';
     loadFile: 'Point.st';
     loadFile: 'Rectangle.st';

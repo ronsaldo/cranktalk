@@ -33,14 +33,17 @@ open
 ].
 SystemWindowMorph ![
 render
-    | canvas |
+    | canvas windowExtent formExtent scaleFactor|
     osWindow renderer beginFrame.
-    Stdio stdout print: osWindow extent; lf.
-    
+    windowExtent := osWindow extent.
+    self extent: windowExtent.
+
+    formExtent := osWindow renderer form extent.
+    scaleFactor := formExtent // windowExtent.
+
     canvas := FormCanvas on: osWindow renderer form.
-    canvas fillWithColor: Color green.
+    canvas scaleFactor: scaleFactor.
     self fullDrawOn: canvas.
-        "fillRectangle: (0@0 extent: 20@20) color: Color blue."
 
     osWindow renderer
         blitForm;

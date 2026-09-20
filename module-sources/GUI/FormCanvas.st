@@ -23,3 +23,13 @@ withTranslation: translatin do: aBlock
         origin := oldOrigin.
     ].
 ].
+
+FormCanvas ![
+scaleFactor
+    ^ scaleFactor
+].
+
+FormCanvas ![
+scaleFactor: aPoint
+    scaleFactor := aPoint
+].

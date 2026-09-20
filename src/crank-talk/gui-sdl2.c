@@ -185,6 +185,26 @@ processSDL2Events(crank_talk_VMContext_t *context)
 }
 
 static crank_talk_oop_t
+crank_talk_OSWindow_extent_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 1);
+
+    crank_talk_oop_t self = arguments[0];
+    crank_talk_OSWindow_t *osWindow = (crank_talk_OSWindow_t *)self;
+    if(!osWindow->handle || !osWindow->handle->address)
+        return (crank_talk_oop_t)osWindow->extent;
+
+    SDL_Window *windowHandle = osWindow->handle->address;
+    int width = 0;
+    int height = 0;
+    SDL_GetWindowSize(windowHandle, &width, &height);
+    osWindow->extent = crank_talk_Point_make(context, crank_talk_oop_encodeSmallInteger(width), crank_talk_oop_encodeSmallInteger(height));
+    return (crank_talk_oop_t)osWindow->extent;
+}
+
+static crank_talk_oop_t
 crank_talk_OSWindow_open_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)closure;
@@ -418,6 +438,7 @@ void
 crank_talk_registerGUIBackendPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.OSWindowClass), "mainLoop", 1, crank_talk_OSWindow_mainLoop_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowClass, "extent", 1, crank_talk_OSWindow_extent_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowClass, "open", 1, crank_talk_OSWindow_open_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowClass, "close", 1, crank_talk_OSWindow_close_primitive);
 
