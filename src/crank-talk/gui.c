@@ -116,6 +116,60 @@ crank_talk_FontFace_default_primitive(crank_talk_VMContext_t *context, crank_tal
     return crank_talk_FontFace_default(context);
 }
 
+static stbtt_bakedchar
+crank_talk_FontFace_readBakedChar(crank_talk_FontBakedChar_t *fontBakedChar)
+{
+    stbtt_bakedchar baked = {0};
+    baked.x0 = crank_talk_oop_decodeSmallInteger(fontBakedChar->x0);
+    baked.y0 = crank_talk_oop_decodeSmallInteger(fontBakedChar->y0);
+    baked.x1 = crank_talk_oop_decodeSmallInteger(fontBakedChar->x1);
+    baked.y1 = crank_talk_oop_decodeSmallInteger(fontBakedChar->y1);
+    baked.xoff = crank_talk_oop_numberAsFloat(fontBakedChar->xoff);
+    baked.yoff = crank_talk_oop_numberAsFloat(fontBakedChar->yoff);
+    baked.xadvance = crank_talk_oop_numberAsFloat(fontBakedChar->advance);
+    return baked;
+}
+
+static crank_talk_oop_t
+crank_talk_FontFace_measureTextExtent_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+
+    crank_talk_FontFace_t *fontFace = (crank_talk_FontFace_t *)arguments[0];
+    crank_talk_String_t *text =  (crank_talk_String_t *)arguments[1];
+
+    int imageWidth = (int)crank_talk_oop_decodeSmallInteger(fontFace->image->width);
+    int imageHeight = (int)crank_talk_oop_decodeSmallInteger(fontFace->image->width);
+
+    float extentX = 0;
+    float extentY = 0;
+    float currentBaselineX = 0;
+    float currentBaselineY = crank_talk_oop_numberAsFloat(fontFace->ascent);
+    size_t textSize = crank_talk_object_getSizeInBytes((crank_talk_oop_t)text);
+    for(size_t i = 0; i < textSize; ++i)
+    {
+        // TODO: Decode UTF-8.
+        char c = text->elements[i];
+        if(c < ' ')
+            continue;
+
+        crank_talk_FontBakedChar_t *fontBakedChar = (crank_talk_FontBakedChar_t *)fontFace->bakedChars->elements[c - 31];
+        stbtt_bakedchar bakedChar = crank_talk_FontFace_readBakedChar(fontBakedChar);
+
+        stbtt_aligned_quad quadToDraw = {};
+        stbtt_GetBakedQuad(&bakedChar, imageWidth, imageHeight, 0, &currentBaselineX, &currentBaselineY, &quadToDraw, true);
+
+        if(quadToDraw.x0 > extentX) extentX = quadToDraw.x0;
+        if(quadToDraw.x1 > extentX) extentX = quadToDraw.x1;
+        if(quadToDraw.y0 > extentY) extentY = quadToDraw.y0;
+        if(quadToDraw.y1 > extentY) extentY = quadToDraw.y1;
+    }
+
+    return (crank_talk_oop_t)crank_talk_Point_make(context, crank_talk_oop_encodeSmallInteger(ceil(extentX)), crank_talk_oop_encodeSmallInteger(ceil(extentY)));
+}
+
 static uint32_t
 crank_talk_Color_encodeBGRA32(crank_talk_Color_t *color)
 {
@@ -286,6 +340,7 @@ crank_talk_registerGUIPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontClass), "default", 3, crank_talk_Font_default_primitive);
     
     crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontFaceClass), "default", 3, crank_talk_FontFace_default_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FontFaceClass, "measureTextExtent:", 2, crank_talk_FontFace_measureTextExtent_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "fillWithColor:", 3, crank_talk_FormCanvas_fillWithColor_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "fillRectangle:color:", 3, crank_talk_FormCanvas_fillRectangleWithColor_primitive);

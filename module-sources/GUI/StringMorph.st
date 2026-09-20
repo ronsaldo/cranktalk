@@ -20,7 +20,7 @@ drawOn: aCanvas
 
 StringMorph ![
 fitSize
-    "By default do nothing"
+    self extent: (FontFace default measureTextExtent: label)
 ].
 
 StringMorph ![
