@@ -73,22 +73,47 @@ visitTextInputEvent: anEvent
 
 SystemWindowMorphEventHandler ![
 visitMouseButtonPressEvent: anEvent
-    Stdio stdout nextPutAll: 'Morph Mouse button press'; lf.
+    systemWindowMorph processEvent: (MouseButtonDownEvent new
+        position: anEvent position;
+        buttonIndex: anEvent button;
+        yourself).
+    anEvent clicks = 1 ifTrue: [
+        systemWindowMorph processEvent: (MouseClickEvent new
+            position: anEvent position;
+            buttonIndex: anEvent button;
+            yourself).
+    ].
+    anEvent clicks = 2 ifTrue: [
+        systemWindowMorph processEvent: (MouseDoubleClickEvent new
+            position: anEvent position;
+            buttonIndex: anEvent button;
+            yourself).
+    ].
 ].
 
 SystemWindowMorphEventHandler ![
 visitMouseButtonReleaseEvent: anEvent
-    Stdio stdout nextPutAll: 'Morph Mouse button release'; lf.
+    systemWindowMorph processEvent: (MouseButtonUpEvent new
+        position: anEvent position;
+        buttonIndex: anEvent button;
+        yourself)
 ].
 
 SystemWindowMorphEventHandler ![
 visitMouseMoveEvent: anEvent
-    Stdio stdout nextPutAll: 'Morph Mouse move '; print: anEvent position; lf.
+    systemWindowMorph processEvent: (MouseMotionEvent new
+        position: anEvent position;
+        delta: anEvent delta;
+        buttonState: anEvent buttonState;
+        yourself)
 ].
 
 SystemWindowMorphEventHandler ![
 visitMouseWheelEvent: anEvent
-    Stdio stdout nextPutAll: 'Morph Mouse wheel'; lf.
+    systemWindowMorph processEvent: (MouseWheelEvent new
+        position: anEvent position;
+        scrollAmount: anEvent scrollHorizontal @ anEvent scrollVertical;
+        yourself)
 ].
 
 SystemWindowMorphEventHandler ![

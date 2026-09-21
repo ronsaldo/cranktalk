@@ -82,6 +82,7 @@ sdl2_onMouseButtonDown(crank_talk_VMContext_t *context, SDL_MouseButtonEvent *ev
     buttonEvent->super.super.position = crank_talk_Point_make(context, crank_talk_oop_encodeSmallInteger(event->x), crank_talk_oop_encodeSmallInteger(event->y));
     buttonEvent->super.super.modifiers = crank_talk_oop_encodeSmallInteger(SDL_GetModState());
     buttonEvent->super.button = crank_talk_oop_encodeSmallInteger(event->button);
+    buttonEvent->super.clicks = crank_talk_oop_encodeSmallInteger(event->clicks);
     
     sdl2_dispatchEvent(context, event->windowID, buttonEventValue);
 }
@@ -95,6 +96,7 @@ sdl2_onMouseButtonUp(crank_talk_VMContext_t *context, SDL_MouseButtonEvent *even
     buttonEvent->super.super.position = crank_talk_Point_make(context, crank_talk_oop_encodeSmallInteger(event->x), crank_talk_oop_encodeSmallInteger(event->y));
     buttonEvent->super.super.modifiers = crank_talk_oop_encodeSmallInteger(SDL_GetModState());
     buttonEvent->super.button = crank_talk_oop_encodeSmallInteger(event->button);
+    buttonEvent->super.clicks = crank_talk_oop_encodeSmallInteger(event->clicks);
     
     sdl2_dispatchEvent(context, event->windowID, buttonEventValue);
 }

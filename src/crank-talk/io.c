@@ -165,6 +165,23 @@ crank_talk_BinaryFileStream_lf(crank_talk_VMContext_t *context, crank_talk_oop_t
     return self;
 }
 
+static crank_talk_oop_t
+crank_talk_BinaryFileStream_space(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    (void)arguments;
+    assert(argumentCount >= 1);
+    crank_talk_oop_t self = arguments[0];
+    
+    crank_talk_BinaryFileStream_t *stream = (crank_talk_BinaryFileStream_t *)self;
+    FILE *file = ((crank_talk_ExternalAddress_t*)stream->handle)->address;
+    fputc(' ', file);
+
+    return self;
+}
+
 void
 crank_talk_registerIOPrimitives(crank_talk_VMContext_t* context)
 {
@@ -177,4 +194,5 @@ crank_talk_registerIOPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.BinaryFileStreamClass, "print:", 2, crank_talk_BinaryFileStream_print);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.BinaryFileStreamClass, "cr", 1, crank_talk_BinaryFileStream_cr);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.BinaryFileStreamClass, "lf", 1, crank_talk_BinaryFileStream_lf);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BinaryFileStreamClass, "space", 1, crank_talk_BinaryFileStream_space);
 }

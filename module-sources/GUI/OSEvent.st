@@ -75,6 +75,11 @@ button
     ^ button
 ].
 
+OSMouseButtonEvent ![
+clicks
+    ^ clicks
+].
+
 "OSMouseButtonPressEvent"
 OSMouseButtonPressEvent ![
 accept: anEventHandler

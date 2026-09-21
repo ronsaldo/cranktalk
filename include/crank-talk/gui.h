@@ -162,6 +162,7 @@ struct crank_talk_OSMouseButtonEvent_s
 {
     crank_talk_OSMouseEvent_t super;
     crank_talk_oop_t button;
+    crank_talk_oop_t clicks;
 };
 
 struct crank_talk_OSMouseButtonPressEvent_s

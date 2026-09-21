@@ -1,5 +1,6 @@
 thisContext 
     loadFile: 'Color.st';
+    loadFile: 'Event.st';
     loadFile: 'Font.st';
     loadFile: 'FontFace.st';
     loadFile: 'Form.st';

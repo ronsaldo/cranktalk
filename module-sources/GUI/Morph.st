@@ -135,4 +135,43 @@ getMouseFocus
 Morph ![
 hasMouseFocus
     ^ self getMouseFocus == self
-]
+].
+
+Morph ![
+processEvent: anEvent
+    anEvent sentToMorph: self
+].
+
+Morph ![
+handleUnknownEvent: anEvent
+].
+
+Morph ![
+handleMouseMotionEvent: anEvent
+    Stdio stdout nextPutAll: 'handleMouseMotionEvent '; print: anEvent position; space; print: anEvent delta; space; print: anEvent buttonState; lf
+].
+
+Morph ![
+handleMouseButtonDownEvent: anEvent
+    Stdio stdout nextPutAll: 'handleMouseButtonDownEvent '; print: anEvent position; space; print: anEvent buttonIndex; lf
+].
+
+Morph ![
+handleMouseButtonUpEvent: anEvent
+    Stdio stdout nextPutAll: 'handleMouseButtonUpEvent '; print: anEvent position; space; print: anEvent buttonIndex; lf
+].
+
+Morph ![
+handleMouseClickEvent: anEvent
+    Stdio stdout nextPutAll: 'handleMouseClickEvent '; print: anEvent position; space; print: anEvent buttonIndex; lf
+].
+
+Morph ![
+handleMouseDoubleClickEvent: anEvent
+    Stdio stdout nextPutAll: 'handleMouseDoubleClickEvent '; print: anEvent position; space; print: anEvent buttonIndex; lf
+].
+
+Morph ![
+handleMouseWheelEvent: anEvent
+    Stdio stdout nextPutAll: 'handleMouseWheelEvent '; print: anEvent position; space; print: anEvent scrollAmount; lf
+].
