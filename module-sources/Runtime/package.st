@@ -1,7 +1,8 @@
 thisContext 
     loadFile: 'Collection.st';
     loadFile: 'SequenceableCollection.st';
-    loadFile: 'Array.st'.
+    loadFile: 'Array.st';
+    loadFile: 'Number.st'.
 
 "Stdio stdout nextPutAll: 'Hello World from Runtime/package.st'; lf.
 [
