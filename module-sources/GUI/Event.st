@@ -3,7 +3,7 @@ Object << #Event
     build.
 
 Event << #KeyboardEvent
-    slots: {#isKeyRepeat . #keySymbol . #scanCode};
+    slots: {#isKeyRepeat . #symbol . #scancode};
     build.
 
 KeyboardEvent << #KeyboardDownEvent
@@ -12,6 +12,10 @@ KeyboardEvent << #KeyboardDownEvent
 
 KeyboardEvent << #KeyboardUpEvent
     slots: {};
+    build.
+
+Event << #TextInputEvent
+    slots: {#text};
     build.
 
 Event << #MouseEvent
@@ -51,6 +55,37 @@ sentToMorph: morph
     ^morph handleUnknownEvent: self
 ].
 
+"KeyboardEvent"
+KeyboardEvent ![
+isKeyRepeat
+    ^ isKeyRepeat
+].
+
+KeyboardEvent ![
+isKeyRepeat: aBoolean
+    isKeyRepeat := aBoolean
+].
+
+KeyboardEvent ![
+symbol
+    ^ symbol
+].
+
+KeyboardEvent ![
+symbol: anInteger
+    symbol := anInteger
+].
+
+KeyboardEvent ![
+scancode
+    ^ scancode
+].
+
+KeyboardEvent ![
+scancode: anInteger
+    scancode := anInteger
+].
+
 KeyboardDownEvent ![
 sentToMorph: morph
     ^morph handleKeyboardDownEvent: self
@@ -59,6 +94,22 @@ sentToMorph: morph
 KeyboardUpEvent ![
 sentToMorph: morph
     ^morph handleKeyboardUpEvent: self
+].
+
+"TextInputEvent"
+TextInputEvent ![
+sentToMorph: morph
+    ^morph handleTextInputEvent: self
+].
+
+TextInputEvent ![
+text
+    ^ text
+].
+
+TextInputEvent ![
+text: aString
+    text := aString
 ].
 
 "Mouse Event"

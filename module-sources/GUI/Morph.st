@@ -147,6 +147,16 @@ handleUnknownEvent: anEvent
 ].
 
 Morph ![
+handleKeyboardDownEvent: anEvent
+    Stdio stdout nextPutAll: 'handleKeyboardDownEvent '; print: anEvent symbol; lf
+].
+
+Morph ![
+handleKeyboardUpEvent: anEvent
+    Stdio stdout nextPutAll: 'handleKeyboardUpEvent '; print: anEvent symbol; lf
+].
+
+Morph ![
 handleMouseMotionEvent: anEvent
     Stdio stdout nextPutAll: 'handleMouseMotionEvent '; print: anEvent position; space; print: anEvent delta; space; print: anEvent buttonState; lf
 ].

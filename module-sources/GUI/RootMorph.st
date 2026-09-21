@@ -13,6 +13,13 @@ getKeyboardFocus
 ].
 
 RootMorph ![
+processKeyboardEvent: aKeyboardEvent
+    currentKeyboardFocus ~~ nil ifTrue: [
+        currentKeyboardFocus processEvent: aKeyboardEvent
+    ].
+].
+
+RootMorph ![
 setNewKeyboardFocus: newKeyboardFocus
     currentKeyboardFocus ~~ nil ifTrue: [
         currentKeyboardFocus lostKeyboardFocus

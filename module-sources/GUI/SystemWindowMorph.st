@@ -58,17 +58,27 @@ systemWindowMorph: aSystemWindowMorph
 
 SystemWindowMorphEventHandler ![
 visitKeyDownEvent: anEvent
-    Stdio stdout nextPutAll: 'Morph Key down '; print: anEvent symbol; lf.
+    systemWindowMorph processKeyboardEvent: (KeyboardDownEvent new
+        isKeyRepeat: anEvent repeat > 1;
+        scancode: anEvent scancode;
+        symbol: anEvent symbol;
+        yourself).
 ].
 
 SystemWindowMorphEventHandler ![
 visitKeyUpEvent: anEvent
-    Stdio stdout nextPutAll: 'Morph Key up '; print: anEvent symbol; lf.
+    systemWindowMorph processKeyboardEvent: (KeyboardUpEvent new
+        isKeyRepeat: anEvent repeat > 1;
+        scancode: anEvent scancode;
+        symbol: anEvent symbol;
+        yourself).
 ].
 
 SystemWindowMorphEventHandler ![
 visitTextInputEvent: anEvent
-    Stdio stdout nextPutAll: 'Morph Text input '; nextPutAll: anEvent text; lf.
+    systemWindowMorph processKeyboardEvent: (TextInputEvent new
+        text: anEvent text;
+        yourself).
 ].
 
 SystemWindowMorphEventHandler ![
