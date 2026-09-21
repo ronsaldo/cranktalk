@@ -28,7 +28,7 @@ setNewKeyboardFocus: newKeyboardFocus
     currentKeyboardFocus := newKeyboardFocus.
 
     currentKeyboardFocus ~~ nil ifTrue: [
-        currentKeyboardFocus gotKeybordFocus
+        currentKeyboardFocus gotKeyboardFocus
     ].
 ].
 

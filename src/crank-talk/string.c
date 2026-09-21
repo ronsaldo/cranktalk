@@ -426,6 +426,18 @@ crank_talk_String_printOn_primitive(crank_talk_VMContext_t *context, crank_talk_
 }
 
 static crank_talk_oop_t
+crank_talk_String_concat_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t left = arguments[0];
+    crank_talk_oop_t right = arguments[1];
+    return crank_talk_String_concat(context, left, right);
+}
+
+static crank_talk_oop_t
 crank_talk_Symbol_asString_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)context;
@@ -535,6 +547,8 @@ void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context)
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "asString", 1, crank_talk_Symbol_asString_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "printOn:", 2, crank_talk_Symbol_printOn_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, ",", 2, crank_talk_String_concat_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "nextPut:", 2, crank_talk_StringStream_nextPut_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "nextPutAll:", 2, crank_talk_StringStream_nextPutAll_primitive);

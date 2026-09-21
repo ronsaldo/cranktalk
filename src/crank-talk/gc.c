@@ -1,6 +1,7 @@
 #include "crank-talk/gc.h"
 #include "crank-talk/context.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 static void
 crank_talk_gc_markPointer(crank_talk_VMContext_t *context, crank_talk_ObjectHeader_t *pointer)

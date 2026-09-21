@@ -3,6 +3,7 @@
 #include "crank-talk/bytes.h"
 #include "crank-talk/context.h"
 #include "crank-talk/errors.h"
+#include "crank-talk/gc.h"
 #include "crank-talk/message.h"
 #include "crank-talk/string.h"
 #define SDL_MAIN_HANDLED
@@ -266,6 +267,8 @@ crank_talk_OSWindow_mainLoop_primitive(crank_talk_VMContext_t *context, crank_ta
     while(!isQuitting)
     {
         processSDL2Events(context);
+        crank_talk_gc_safepoint(context);
+        SDL_Delay(8);
     }
 
     crank_talk_oop_t self = arguments[0];

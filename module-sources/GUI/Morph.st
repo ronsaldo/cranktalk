@@ -151,6 +151,19 @@ takeMouseFocus
 ].
 
 Morph ![
+gotKeyboardFocus
+].
+
+Morph ![
+lostKeyboardFocus
+].
+
+Morph ![
+takeKeyboardFocus
+    ^ self rootMorph setNewKeyboardFocus: self
+].
+
+Morph ![
 changed
     self rootMorph changed
 ].
@@ -166,12 +179,17 @@ handleUnknownEvent: anEvent
 
 Morph ![
 handleKeyboardDownEvent: anEvent
-    Stdio stdout nextPutAll: 'handleKeyboardDownEvent '; print: anEvent symbol; lf
+    self onKeyboardDownEvent: anEvent.
 ].
 
 Morph ![
 handleKeyboardUpEvent: anEvent
-    Stdio stdout nextPutAll: 'handleKeyboardUpEvent '; print: anEvent symbol; lf
+    self onKeyboardUpEvent: anEvent.
+].
+
+Morph ![
+handleTextInputEvent: anEvent
+    self onTextInputEvent: anEvent.
 ].
 
 Morph ![
@@ -244,6 +262,21 @@ handleMouseWheelEvent: anEvent
         ].
         self onMouseWheelEvent: anEvent
     ].
+].
+
+Morph ![
+onKeyboardDownEvent: anEvent
+    "Stdio stdout nextPutAll: 'onMouseMotionEvent '; print: anEvent position; space; print: anEvent delta; lf"
+].
+
+Morph ![
+onKeyboardUpEvent: anEvent
+    "Stdio stdout nextPutAll: 'onMouseMotionEvent '; print: anEvent position; space; print: anEvent delta; lf"
+].
+
+Morph ![
+onTextInputEvent: anEvent
+    "Stdio stdout nextPutAll: 'onMouseMotionEvent '; print: anEvent position; space; print: anEvent delta; lf"
 ].
 
 Morph ![
