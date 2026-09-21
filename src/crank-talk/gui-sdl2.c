@@ -250,6 +250,9 @@ crank_talk_OSWindow_close_primitive(crank_talk_VMContext_t *context, crank_talk_
         osWindow->handle = NULL;
     }
 
+    // TODO: Avoid this hack
+    isQuitting = true;
+
     return self;
 }
 

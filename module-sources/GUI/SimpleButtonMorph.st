@@ -49,9 +49,9 @@ onMouseButtonUpEvent: anEvent
 
 SimpleButtonMorph ![
 onMouseClickEvent: anEvent
-    onClickAction value: self.
     anEvent wasHandled: true.
     self changed
+    onClickAction value: self.
 ].
 
 SimpleButtonMorph ![
