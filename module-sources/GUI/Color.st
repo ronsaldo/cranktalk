@@ -49,5 +49,3 @@ printOn: stream
     nextPutAll: ' b: '; print: b;
     nextPutAll: ' a: '; print: a
 ].
-
-Stdio stdout print: 0.9; lf.
