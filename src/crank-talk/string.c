@@ -139,6 +139,23 @@ crank_talk_String_joinPath(crank_talk_VMContext_t *context, crank_talk_oop_t lef
 }
 
 CRANK_TALK_API crank_talk_oop_t
+crank_talk_String_withoutElementAtIndex(crank_talk_VMContext_t *context, crank_talk_oop_t string, size_t removedIndex)
+{
+    size_t stringSize = crank_talk_object_getSizeInBytes(string);
+    if(removedIndex >= stringSize)
+        return string;
+
+    size_t stringWithoutElementSize = stringSize - 1;
+    crank_talk_oop_t result = crank_talk_String_allocateWithSize(context, stringWithoutElementSize);
+    crank_talk_String_t *sourceString = (crank_talk_String_t *)string;
+    crank_talk_String_t *resultString = (crank_talk_String_t *)result;
+    memcpy(resultString->elements, sourceString->elements, removedIndex);
+    memcpy(resultString->elements + removedIndex, sourceString->elements + removedIndex + 1, stringSize - removedIndex - 1);
+
+    return result;
+}
+
+CRANK_TALK_API crank_talk_oop_t
 crank_talk_Symbol_internWithString(crank_talk_VMContext_t *context, size_t stringSize, const char *stringData)
 {
     // Find an already interned symbol.
@@ -438,6 +455,18 @@ crank_talk_String_concat_primitive(crank_talk_VMContext_t *context, crank_talk_o
 }
 
 static crank_talk_oop_t
+crank_talk_String_withoutElementAtIndex_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t string = arguments[0];
+    intptr_t index = crank_talk_oop_decodeSmallInteger(arguments[1]);
+    return crank_talk_String_withoutElementAtIndex(context, string, index - 1);
+}
+
+static crank_talk_oop_t
 crank_talk_Symbol_asString_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)context;
@@ -549,6 +578,7 @@ void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "printOn:", 2, crank_talk_Symbol_printOn_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, ",", 2, crank_talk_String_concat_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "withoutElementAtIndex:", 2, crank_talk_String_withoutElementAtIndex_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "nextPut:", 2, crank_talk_StringStream_nextPut_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "nextPutAll:", 2, crank_talk_StringStream_nextPutAll_primitive);

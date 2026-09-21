@@ -20,6 +20,7 @@ CRANK_TALK_API crank_talk_oop_t crank_talk_String_substring(crank_talk_VMContext
 CRANK_TALK_API crank_talk_oop_t crank_talk_String_dirname(crank_talk_VMContext_t *context, crank_talk_oop_t path);
 CRANK_TALK_API crank_talk_oop_t crank_talk_String_basename(crank_talk_VMContext_t *context, crank_talk_oop_t path);
 CRANK_TALK_API crank_talk_oop_t crank_talk_String_joinPath(crank_talk_VMContext_t *context, crank_talk_oop_t leftPath, crank_talk_oop_t rightPath);
+CRANK_TALK_API crank_talk_oop_t crank_talk_String_withoutElementAtIndex(crank_talk_VMContext_t *context, crank_talk_oop_t string, size_t removedIndex);
 
 CRANK_TALK_API crank_talk_oop_t crank_talk_Symbol_internWithString(crank_talk_VMContext_t *context, size_t stringSize, const char *string);
 CRANK_TALK_API crank_talk_oop_t crank_talk_Symbol_internWithCString(crank_talk_VMContext_t *context, const char *cstring);
