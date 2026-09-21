@@ -33,6 +33,11 @@ open
         yourself
 ].
 SystemWindowMorph ![
+changed
+    self render
+].
+
+SystemWindowMorph ![
 render
     | canvas windowExtent formExtent scaleFactor|
     osWindow renderer beginFrame.

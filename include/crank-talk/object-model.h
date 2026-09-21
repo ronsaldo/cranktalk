@@ -274,7 +274,7 @@ crank_talk_oop_decodeSmallFloat(crank_talk_oop_t oop)
     decodedOop += ((uint64_t)CRANK_TALK_SMALL_FLOAT_EXPONENT_OFFSET << 53);
 
     // Rotate right the sign bit.
-    decodedOop = (decodedOop >> 1) | (decodedOop << 62);
+    decodedOop = (decodedOop >> 1) | (decodedOop << 63);
 
     // Cast back to float.
     double floatValue = 0.0f;
@@ -291,7 +291,7 @@ crank_talk_oop_encodeSmallFloat(double value)
     memcpy(&valueIEEE754, &value, 8);
 
     // Rotate left the sign.
-    uintptr_t encodedOop = (valueIEEE754 << 1) | (valueIEEE754 >> 62);
+    uintptr_t encodedOop = (valueIEEE754 << 1) | (valueIEEE754 >> 63);
 
     // Offset the exponent
     encodedOop -= ((uint64_t)CRANK_TALK_SMALL_FLOAT_EXPONENT_OFFSET << 53);

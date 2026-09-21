@@ -1,5 +1,5 @@
 Object << #Event
-    slots: {};
+    slots: {#wasHandled};
     build.
 
 Event << #KeyboardEvent
@@ -50,9 +50,26 @@ MouseEvent << #MouseWheelEvent
     slots: {#scrollAmount};
     build.
 
+"Event"
+Event ![
+initialize
+    super initialize.
+    wasHandled := false.
+].
+
 Event ![
 sentToMorph: morph
     ^morph handleUnknownEvent: self
+].
+
+Event ![
+wasHandled
+    ^ wasHandled
+].
+
+Event ![
+wasHandled: aBoolean
+    wasHandled := aBoolean
 ].
 
 "KeyboardEvent"
@@ -121,6 +138,16 @@ position
 MouseEvent ![
 position: aPoint
     position := aPoint
+].
+
+MouseEvent ![
+withTranslationInverse: translation do: aBlock
+    | oldPosition |
+    oldPosition := position.
+    position := position - translation.
+    aBlock ensure: [
+        position := oldPosition
+    ]
 ].
 
 "MouseButtonEvent"

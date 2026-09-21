@@ -138,6 +138,24 @@ hasMouseFocus
 ].
 
 Morph ![
+gotMouseFocus
+].
+
+Morph ![
+lostMouseFocus
+].
+
+Morph ![
+takeMouseFocus
+    ^ self rootMorph setNewMouseFocus: self
+].
+
+Morph ![
+changed
+    self rootMorph changed
+].
+
+Morph ![
 processEvent: anEvent
     anEvent sentToMorph: self
 ].
@@ -158,30 +176,103 @@ handleKeyboardUpEvent: anEvent
 
 Morph ![
 handleMouseMotionEvent: anEvent
-    Stdio stdout nextPutAll: 'handleMouseMotionEvent '; print: anEvent position; space; print: anEvent delta; space; print: anEvent buttonState; lf
+    anEvent withTranslationInverse: self origin do: [
+        submorphs reverseDo: [:each |
+            (each bounds containsPoint: anEvent position) ifTrue: [
+                each processEvent: anEvent
+            ]
+        ].
+        self onMouseMotionEvent: anEvent
+    ].
 ].
 
 Morph ![
 handleMouseButtonDownEvent: anEvent
-    Stdio stdout nextPutAll: 'handleMouseButtonDownEvent '; print: anEvent position; space; print: anEvent buttonIndex; lf
+    anEvent withTranslationInverse: self origin do: [
+        submorphs reverseDo: [:each |
+            (each bounds containsPoint: anEvent position) ifTrue: [
+                each processEvent: anEvent
+            ]
+        ].
+        self onMouseButtonDownEvent: anEvent
+    ].
 ].
 
 Morph ![
 handleMouseButtonUpEvent: anEvent
-    Stdio stdout nextPutAll: 'handleMouseButtonUpEvent '; print: anEvent position; space; print: anEvent buttonIndex; lf
+    anEvent withTranslationInverse: self origin do: [
+        submorphs reverseDo: [:each |
+            (each bounds containsPoint: anEvent position) ifTrue: [
+                each processEvent: anEvent
+            ]
+        ].
+        self onMouseButtonUpEvent: anEvent
+    ].
 ].
 
 Morph ![
 handleMouseClickEvent: anEvent
-    Stdio stdout nextPutAll: 'handleMouseClickEvent '; print: anEvent position; space; print: anEvent buttonIndex; lf
+    anEvent withTranslationInverse: self origin do: [
+        submorphs reverseDo: [:each |
+            (each bounds containsPoint: anEvent position) ifTrue: [
+                each processEvent: anEvent
+            ]
+        ].
+        self onMouseClickEvent: anEvent
+    ].
 ].
 
 Morph ![
 handleMouseDoubleClickEvent: anEvent
-    Stdio stdout nextPutAll: 'handleMouseDoubleClickEvent '; print: anEvent position; space; print: anEvent buttonIndex; lf
+    anEvent withTranslationInverse: self origin do: [
+        submorphs reverseDo: [:each |
+            (each bounds containsPoint: anEvent position) ifTrue: [
+                each processEvent: anEvent
+            ]
+        ].
+        self onMouseDoubleClickEvent: anEvent
+    ].
 ].
 
 Morph ![
 handleMouseWheelEvent: anEvent
-    Stdio stdout nextPutAll: 'handleMouseWheelEvent '; print: anEvent position; space; print: anEvent scrollAmount; lf
+    anEvent withTranslationInverse: self origin do: [
+        submorphs reverseDo: [:each |
+            (each bounds containsPoint: anEvent position) ifTrue: [
+                each processEvent: anEvent
+            ]
+        ].
+        self onMouseWheelEvent: anEvent
+    ].
 ].
+
+Morph ![
+onMouseMotionEvent: anEvent
+    "Stdio stdout nextPutAll: 'onMouseMotionEvent '; print: anEvent position; space; print: anEvent delta; lf"
+].
+
+Morph ![
+onMouseButtonDownEvent: anEvent
+    "Stdio stdout nextPutAll: 'onMouseButtonDownEvent '; print: anEvent position; space; print: anEvent buttonIndex; lf"
+].
+
+Morph ![
+onMouseButtonUpEvent: anEvent
+    "Stdio stdout nextPutAll: 'onMouseButtonUpEvent '; print: anEvent position; space; print: anEvent buttonIndex; lf"
+].
+
+Morph ![
+onMouseClickEvent: anEvent
+    "Stdio stdout nextPutAll: 'onMouseClickEvent '; print: anEvent position; space; print: anEvent buttonIndex; lf"
+].
+
+Morph ![
+onMouseDoubleClickEvent: anEvent
+    "Stdio stdout nextPutAll: 'onMouseDoubleClickEvent '; print: anEvent position; space; print: anEvent buttonIndex; lf"
+].
+
+Morph ![
+onMouseWheelEvent: anEvent
+    "Stdio stdout nextPutAll: 'onMouseWheelEvent '; print: anEvent position; space; print: anEvent scrollAmount; lf"
+].
+    

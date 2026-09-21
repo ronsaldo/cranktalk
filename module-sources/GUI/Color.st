@@ -40,3 +40,14 @@ setR: initRed g: initGreen b: initBlue a: initAlpha
     b := initBlue.
     a := initAlpha.
 ].
+
+Color ![
+printOn: stream
+    stream
+    nextPutAll: 'Color r: '; print: r;
+    nextPutAll: ' g: '; print: g;
+    nextPutAll: ' b: '; print: b;
+    nextPutAll: ' a: '; print: a
+].
+
+Stdio stdout print: 0.9; lf.

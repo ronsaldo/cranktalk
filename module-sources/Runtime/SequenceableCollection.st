@@ -23,6 +23,13 @@ collectWithIndex: aBlock
 ].
 
 SequenceableCollection ![
+reverseDo: aBlock
+    1 to: self size do: [:index |
+        aBlock value: (self at: self size - index + 1)
+    ]
+].
+
+SequenceableCollection ![
 do: aBlock
     1 to: self size do: [:index |
         aBlock value: (self at: index)
