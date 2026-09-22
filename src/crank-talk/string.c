@@ -156,6 +156,26 @@ crank_talk_String_withoutElementAtIndex(crank_talk_VMContext_t *context, crank_t
 }
 
 CRANK_TALK_API crank_talk_oop_t
+crank_talk_String_insertStringAtIndex(crank_talk_VMContext_t *context, crank_talk_oop_t string, crank_talk_oop_t insertedString, size_t insertionIndex)
+{
+    size_t stringSize = crank_talk_object_getSizeInBytes(string);
+    if(insertionIndex >= stringSize)
+        return crank_talk_String_concat(context, string, insertedString);
+    
+    size_t insertedStringSize = crank_talk_object_getSizeInBytes(insertedString);
+    size_t totalSize = stringSize + insertedStringSize;
+    crank_talk_oop_t result = crank_talk_String_allocateWithSize(context, totalSize);
+
+    crank_talk_String_t *sourceStringValue = (crank_talk_String_t *)string;
+    crank_talk_String_t *insertedStringValue = (crank_talk_String_t *)insertedString;
+    crank_talk_String_t *resultStringValue = (crank_talk_String_t *)result;
+    memcpy(resultStringValue->elements, sourceStringValue->elements, insertionIndex);
+    memcpy(resultStringValue->elements + insertionIndex, insertedStringValue->elements, insertedStringSize);
+    memcpy(resultStringValue->elements + insertionIndex + insertedStringSize, sourceStringValue->elements + insertionIndex, stringSize - insertionIndex);
+    return result;
+}
+
+CRANK_TALK_API crank_talk_oop_t
 crank_talk_Symbol_internWithString(crank_talk_VMContext_t *context, size_t stringSize, const char *stringData)
 {
     // Find an already interned symbol.
@@ -467,6 +487,21 @@ crank_talk_String_withoutElementAtIndex_primitive(crank_talk_VMContext_t *contex
 }
 
 static crank_talk_oop_t
+crank_talk_String_insertStringAtIndex_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+{
+    (void)context;
+    (void)closure;
+    (void)argumentCount;
+    assert(argumentCount >= 2);
+    crank_talk_oop_t string = arguments[0];
+    crank_talk_oop_t insertedString = arguments[1];
+    intptr_t index = crank_talk_oop_decodeSmallInteger(arguments[2]);
+    return crank_talk_String_insertStringAtIndex(context, string, insertedString, index - 1);
+}
+
+
+
+static crank_talk_oop_t
 crank_talk_Symbol_asString_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {
     (void)context;
@@ -579,6 +614,7 @@ void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context)
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, ",", 2, crank_talk_String_concat_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "withoutElementAtIndex:", 2, crank_talk_String_withoutElementAtIndex_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "insertString:atIndex:", 3, crank_talk_String_insertStringAtIndex_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "nextPut:", 2, crank_talk_StringStream_nextPut_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "nextPutAll:", 2, crank_talk_StringStream_nextPutAll_primitive);

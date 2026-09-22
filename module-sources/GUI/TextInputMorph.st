@@ -133,7 +133,7 @@ onKeyboardUpEvent: anEvent
 
 TextInputMorph ![
 onTextInputEvent: anEvent
-    text := text , anEvent text.
+    text := text insertString: anEvent text atIndex: cursorIndex.
     cursorIndex := cursorIndex + anEvent text size.
     self changed.
 ].
