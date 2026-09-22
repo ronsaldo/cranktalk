@@ -79,42 +79,42 @@ TextInputMorph ![
 onKeyboardDownEvent: anEvent
     anEvent wasHandled ifTrue: [^ self].
 
-    anEvent symbol == 13 "Return" ifTrue: [
+    anEvent symbol == OSKeySymbols OSK_RETURN ifTrue: [
         ^ onEnterAction value: self
     ].
 
-    anEvent symbol == 27 "Escape" ifTrue: [
+    anEvent symbol == OSKeySymbols OSK_ESCAPE ifTrue: [
         ^ onCancelAction value: self
     ].
 
-    anEvent symbol == 8 "Backspace" ifTrue: [
+    anEvent symbol == OSKeySymbols OSK_BACKSPACE ifTrue: [
         (cursorIndex > 1 and: [text size >= 1]) ifTrue: [
             cursorIndex := cursorIndex - 1.
             text := text withoutElementAtIndex: cursorIndex.
         ]
     ].
 
-    anEvent symbol == 127 "Del" ifTrue: [
+    anEvent symbol == OSKeySymbols OSK_DELETE ifTrue: [
         cursorIndex <= text size ifTrue: [
             text := text withoutElementAtIndex: cursorIndex.
         ]
     ].
 
-    anEvent symbol == 1073741904 "Left arrow" ifTrue: [
+    anEvent symbol == OSKeySymbols OSK_LEFT ifTrue: [
         "Stdio stdout nextPutAll: 'Move cursor left'; lf."
         cursorIndex := cursorIndex - 1 max: 1.
     ].
-    anEvent symbol == 1073741903  "Right arrow" ifTrue: [
+    anEvent symbol == OSKeySymbols OSK_RIGHT ifTrue: [
         "Stdio stdout nextPutAll: 'Move cursor right'; lf."
         cursorIndex := cursorIndex + 1 min: text size + 1.
     ].
 
-    anEvent symbol == 1073741898  "Home" ifTrue: [
+    anEvent symbol == OSKeySymbols OSK_HOME ifTrue: [
         "Stdio stdout nextPutAll: 'Move cursor begining'; lf."
         cursorIndex := 1.
     ].
 
-    anEvent symbol == 1073741901  "End" ifTrue: [
+    anEvent symbol == OSKeySymbols OSK_END ifTrue: [
         "Stdio stdout nextPutAll: 'Move cursor end'; lf."
         cursorIndex := text size + 1.
     ].

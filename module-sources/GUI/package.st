@@ -8,6 +8,7 @@ thisContext
     loadFile: 'Point.st';
     loadFile: 'Rectangle.st';
     loadFile: 'OSEvent.st';
+    loadFile: 'OSKeySymbols.st';
     loadFile: 'OSWindow.st';
     loadFile: 'OSWindowEventHandler.st';
     loadFile: 'OSWindowRenderer.st';
