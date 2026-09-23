@@ -43,7 +43,7 @@ crank_talk_Exception_signal(crank_talk_VMContext_t *context, crank_talk_Exceptio
         }
         else if(actionBlockArgumentCount == 1)
         {
-            crank_talk_oop_t doResult = crank_talk_send1(context, context->roots.valueSymbol, handlingContext->exceptionAction, (crank_talk_oop_t)exception);
+            crank_talk_oop_t doResult = crank_talk_send1(context, context->roots.valueWithSymbol, handlingContext->exceptionAction, (crank_talk_oop_t)exception);
             handlingContext->result = doResult;
         }
         else

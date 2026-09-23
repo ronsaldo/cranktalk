@@ -384,10 +384,10 @@ crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "basicSize", 1, crank_talk_Object_basicSize_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "size", 1, crank_talk_Object_basicSize_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "basicAt:", 1, crank_talk_Object_basicAt_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "basicAt:put:", 2, crank_talk_Object_basicAtPut_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "at:", 1, crank_talk_Object_basicAt_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "at:put:", 2, crank_talk_Object_basicAtPut_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "basicAt:", 2, crank_talk_Object_basicAt_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "basicAt:put:", 3, crank_talk_Object_basicAtPut_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "at:", 2, crank_talk_Object_basicAt_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "at:put:", 3, crank_talk_Object_basicAtPut_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmalltalkImageClass, "garbageCollect", 1, crank_talk_SmalltalkImage_garbageCollect_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmalltalkImageClass, "globals", 1, crank_talk_SmalltalkImage_globals_primitive);

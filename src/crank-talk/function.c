@@ -10,6 +10,7 @@
 #include "crank-talk/ordered-collection.h"
 #include "crank-talk/parse-tree.h"
 #include "crank-talk/stack-frame.h"
+#include "crank-talk/string.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -30,6 +31,14 @@ crank_talk_CompiledFunction_apply(crank_talk_VMContext_t *context, crank_talk_Co
 {
     if(!crank_talk_oop_isNonNullPointer((crank_talk_oop_t)function))
         crank_talk_error(context, "Expected a valid function.");
+
+    size_t expectedArgumentCount = (size_t)crank_talk_oop_decodeSmallInteger(function->argumentCount);
+    if(argumentCount != expectedArgumentCount)
+    {
+        crank_talk_errorPrintf(context, "Function "CRANK_TALK_STRING_FORMAT" expects %d arguments instead of %d.",
+            CRANK_TALK_STRING_FORMAT_ARG(function->name),
+            (int)expectedArgumentCount, (int)argumentCount);
+    }
 
     crank_talk_stackFrameApplicationArgumentsRecord_t rootsRecord = {
         .super.type = CrankTalkStackFrameRecordApplicationArguments,

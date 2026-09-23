@@ -36,5 +36,5 @@ crank_talk_ScriptContext_loadFile_primitive(crank_talk_VMContext_t *context, cra
 void
 crank_talk_registerScriptPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ScriptContextClass, "loadFile:", 1, crank_talk_ScriptContext_loadFile_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ScriptContextClass, "loadFile:", 2, crank_talk_ScriptContext_loadFile_primitive);
 }
