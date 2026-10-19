@@ -213,10 +213,6 @@ crank_talk_FunctionAnalysisEnvironment_lookupReceiverClassRecursively(crank_talk
     return crank_talk_Environment_lookupReceiverClassRecursively(context, environment->super.parent);
 }
 
-//crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.EmptyEnvironmentClass, "lookupIsInnerBlockRecursively", 1, crank_talk_EmptyEnvironment_lookupIsInnerBlockRecursively);
-//crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.LexicalEnvironmentClass, "lookupIsInnerBlockRecursively", 1, crank_talk_LexicalEnvironment_lookupIsInnerBlockRecursively);
-//crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FunctionAnalysisEnvironmentClass, "lookupIsInnerBlockRecursively", 1,  crank_talk_FunctionAnalysisEnvironment_lookupIsInnerBlockRecursively);
-
 static crank_talk_oop_t
 crank_talk_EmptyEnvironment_lookupIsInnerBlockRecursively(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
 {

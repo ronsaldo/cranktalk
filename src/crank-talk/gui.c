@@ -47,24 +47,16 @@ crank_talk_Font_defaultMonospaced(crank_talk_VMContext_t *context)
     return context->roots.defaultMonospacedFont;
 }
 
-static crank_talk_oop_t
-crank_talk_Font_default_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_Font_default_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 1);
-
-    return crank_talk_Font_default(context);
+    return crank_talk_Primitive_return(primContext, crank_talk_Font_default(primContext->context));
 }
 
-static crank_talk_oop_t
-crank_talk_Font_defaultMonospaced_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_Font_defaultMonospaced_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 1);
-
-    return crank_talk_Font_defaultMonospaced(context);
+    return crank_talk_Primitive_return(primContext, crank_talk_Font_defaultMonospaced(primContext->context));
 }
 
 static crank_talk_oop_t
@@ -123,14 +115,10 @@ crank_talk_FontFace_default(crank_talk_VMContext_t *context)
     return context->roots.defaultFontFace;
 }
 
-static crank_talk_oop_t
-crank_talk_FontFace_default_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_FontFace_default_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 1);
-
-    return crank_talk_FontFace_default(context);
+    return crank_talk_Primitive_return(primContext, crank_talk_FontFace_default(primContext->context));
 }
 
 static crank_talk_oop_t
@@ -141,14 +129,10 @@ crank_talk_FontFace_defaultMonospaced(crank_talk_VMContext_t *context)
     return context->roots.defaultMonospacedFontFace;
 }
 
-static crank_talk_oop_t
-crank_talk_FontFace_defaultMonospaced_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_FontFace_defaultMonospaced_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 1);
-
-    return crank_talk_FontFace_defaultMonospaced(context);
+    return crank_talk_Primitive_return(primContext, crank_talk_FontFace_defaultMonospaced(primContext->context));
 }
 
 static stbtt_bakedchar
@@ -203,36 +187,33 @@ crank_talk_FontFace_measureTextExtent(crank_talk_VMContext_t *context, crank_tal
 }
 
 
-static crank_talk_oop_t
-crank_talk_FontFace_measureTextExtent_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_FontFace_measureTextExtent_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
 
-    crank_talk_FontFace_t *fontFace = (crank_talk_FontFace_t *)arguments[0];
-    crank_talk_String_t *text =  (crank_talk_String_t *)arguments[1];
+    crank_talk_FontFace_t *fontFace = (crank_talk_FontFace_t *)primContext->arguments[0];
+    crank_talk_String_t *text =  (crank_talk_String_t *)primContext->arguments[1];
 
     size_t textSize = crank_talk_object_getSizeInBytes((crank_talk_oop_t)text);
 
-    return crank_talk_FontFace_measureTextExtent(context, fontFace, text, 0, textSize);
+    crank_talk_oop_t extent = crank_talk_FontFace_measureTextExtent(primContext->context, fontFace, text, 0, textSize);
+    return crank_talk_Primitive_return(primContext, extent);
 }
 
-static crank_talk_oop_t
-crank_talk_FontFace_measureTextExtentFromTo_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_FontFace_measureTextExtentFromTo_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 4);
+    if(primContext->argumentCount < 4) return crank_talk_Primitive_fail(primContext);
 
-    crank_talk_FontFace_t *fontFace = (crank_talk_FontFace_t *)arguments[0];
-    crank_talk_String_t *text =  (crank_talk_String_t *)arguments[1];
-    size_t startIndex = crank_talk_oop_decodeSmallInteger(arguments[2]);
-    size_t stopIndex = crank_talk_oop_decodeSmallInteger(arguments[3]);
+    crank_talk_FontFace_t *fontFace = (crank_talk_FontFace_t *)primContext->arguments[0];
+    crank_talk_String_t *text =  (crank_talk_String_t *)primContext->arguments[1];
+    size_t startIndex = crank_talk_oop_decodeSmallInteger(primContext->arguments[2]);
+    size_t stopIndex = crank_talk_oop_decodeSmallInteger(primContext->arguments[3]);
 
-    return crank_talk_FontFace_measureTextExtent(context, fontFace, text, startIndex - 1, stopIndex - 1);
+    crank_talk_oop_t extent = crank_talk_FontFace_measureTextExtent(primContext->context, fontFace, text, startIndex - 1, stopIndex - 1);
+    return crank_talk_Primitive_return(primContext, extent);
 }
-
 
 static uint32_t
 crank_talk_Color_encodeBGRA32(crank_talk_Color_t *color)
@@ -244,24 +225,22 @@ crank_talk_Color_encodeBGRA32(crank_talk_Color_t *color)
     return (uint32_t)(b * 255) | ((uint32_t)(g * 255) << 8) | ((uint32_t)(r * 255) << 16) | ((uint32_t)(a * 255) << 24);
 }
 
-static crank_talk_oop_t
-crank_talk_FormCanvas_fillWithColor_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_FormCanvas_fillWithColor_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
 
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t colorValue = arguments[1];
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t colorValue = primContext->arguments[1];
     crank_talk_FormCanvas_t *formCanvas = (crank_talk_FormCanvas_t *)self;
-    if(!crank_talk_oop_isKindOf(context, colorValue, context->roots.ColorClass))
-        crank_talk_error(context, "Expected a color.");
+    if(!crank_talk_oop_isKindOf(primContext->context, colorValue, primContext->context->roots.ColorClass))
+        crank_talk_error(primContext->context, "Expected a color.");
 
     crank_talk_Color_t *color = (crank_talk_Color_t*)colorValue;
 
     crank_talk_Form_t *form = formCanvas->form;
     if(crank_talk_oop_decodeSmallInteger(form->depth) != 32)
-        crank_talk_error(context, "Only 32 bit forms are supported.");
+        crank_talk_error(primContext->context, "Only 32 bit forms are supported.");
     
     size_t formWidth = (size_t)crank_talk_oop_decodeSmallInteger(form->width);
     size_t formHeight = (size_t)crank_talk_oop_decodeSmallInteger(form->height);
@@ -273,7 +252,7 @@ crank_talk_FormCanvas_fillWithColor_primitive(crank_talk_VMContext_t *context, c
     for(size_t i = 0; i < pixelCount; ++i)
         pixel[i] = fillColor;
     
-    return self;
+    return crank_talk_Primitive_return(primContext, self);
 }
 
 static void
@@ -388,28 +367,26 @@ crank_talk_FormCanvas_drawCharacterRectangleWithColor(crank_talk_VMContext_t *co
     }
 }
 
-static crank_talk_oop_t
-crank_talk_FormCanvas_fillRectangleWithColor_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_FormCanvas_fillRectangleWithColor_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 3);
+    if(primContext->argumentCount < 3) return crank_talk_Primitive_fail(primContext);
 
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t rectangleValue = arguments[1];
-    crank_talk_oop_t colorValue = arguments[2];
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t rectangleValue = primContext->arguments[1];
+    crank_talk_oop_t colorValue = primContext->arguments[2];
     crank_talk_FormCanvas_t *formCanvas = (crank_talk_FormCanvas_t *)self;
-    if(!crank_talk_oop_isKindOf(context, rectangleValue, context->roots.RectangleClass))
-        crank_talk_error(context, "Expected a rectangle.");
-    if(!crank_talk_oop_isKindOf(context, colorValue, context->roots.ColorClass))
-        crank_talk_error(context, "Expected a color.");
+    if(!crank_talk_oop_isKindOf(primContext->context, rectangleValue, primContext->context->roots.RectangleClass))
+        crank_talk_error(primContext->context, "Expected a rectangle.");
+    if(!crank_talk_oop_isKindOf(primContext->context, colorValue, primContext->context->roots.ColorClass))
+        crank_talk_error(primContext->context, "Expected a color.");
 
     crank_talk_Rectangle_t *rectangle = (crank_talk_Rectangle_t*)rectangleValue;
     crank_talk_Color_t *color = (crank_talk_Color_t*)colorValue;
 
     crank_talk_Form_t *form = formCanvas->form;
     if(crank_talk_oop_decodeSmallInteger(form->depth) != 32)
-        crank_talk_error(context, "Only 32 bit forms are supported.");
+        crank_talk_error(primContext->context, "Only 32 bit forms are supported.");
     
     // Fetch the rectangle corners.
     float originX = (float)crank_talk_oop_numberAsFloat(formCanvas->origin->x);
@@ -423,33 +400,31 @@ crank_talk_FormCanvas_fillRectangleWithColor_primitive(crank_talk_VMContext_t *c
     float fMaxY = ((float)crank_talk_oop_numberAsFloat(rectangle->corner->y) + originY) * scaleY;
 
     uint32_t fillColor = crank_talk_Color_encodeBGRA32(color);
-    crank_talk_FormCanvas_fillRectangleWithColor(context, form, fMinX, fMinY, fMaxX, fMaxY, fillColor);
-    return self;
+    crank_talk_FormCanvas_fillRectangleWithColor(primContext->context, form, fMinX, fMinY, fMaxX, fMaxY, fillColor);
+    return crank_talk_Primitive_return(primContext, self);
 }
 
-static crank_talk_oop_t
-crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 3);
+    if(primContext->argumentCount < 4) return crank_talk_Primitive_fail(primContext);
 
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t rectangleValue = arguments[1];
-    crank_talk_oop_t borderWidthValue = arguments[2];
-    crank_talk_oop_t colorValue = arguments[3];
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t rectangleValue = primContext->arguments[1];
+    crank_talk_oop_t borderWidthValue = primContext->arguments[2];
+    crank_talk_oop_t colorValue = primContext->arguments[3];
     crank_talk_FormCanvas_t *formCanvas = (crank_talk_FormCanvas_t *)self;
-    if(!crank_talk_oop_isKindOf(context, rectangleValue, context->roots.RectangleClass))
-        crank_talk_error(context, "Expected a rectangle.");
-    if(!crank_talk_oop_isKindOf(context, colorValue, context->roots.ColorClass))
-        crank_talk_error(context, "Expected a color.");
+    if(!crank_talk_oop_isKindOf(primContext->context, rectangleValue, primContext->context->roots.RectangleClass))
+        crank_talk_error(primContext->context, "Expected a rectangle.");
+    if(!crank_talk_oop_isKindOf(primContext->context, colorValue, primContext->context->roots.ColorClass))
+        crank_talk_error(primContext->context, "Expected a color.");
 
     crank_talk_Rectangle_t *rectangle = (crank_talk_Rectangle_t*)rectangleValue;
     crank_talk_Color_t *color = (crank_talk_Color_t*)colorValue;
 
     crank_talk_Form_t *form = formCanvas->form;
     if(crank_talk_oop_decodeSmallInteger(form->depth) != 32)
-        crank_talk_error(context, "Only 32 bit forms are supported.");
+        crank_talk_error(primContext->context, "Only 32 bit forms are supported.");
     
 
     float borderWidth = (float)crank_talk_oop_numberAsFloat(borderWidthValue);
@@ -468,38 +443,36 @@ crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive(crank_talk_VMC
     uint32_t fillColor = crank_talk_Color_encodeBGRA32(color);
 
     // Left
-    crank_talk_FormCanvas_fillRectangleWithColor(context, form, fMinX, fMinY, fMinX + borderWidth, fMaxY, fillColor);
+    crank_talk_FormCanvas_fillRectangleWithColor(primContext->context, form, fMinX, fMinY, fMinX + borderWidth, fMaxY, fillColor);
     // Right
-    crank_talk_FormCanvas_fillRectangleWithColor(context, form, fMaxX - borderWidth, fMinY, fMaxX, fMaxY, fillColor);
+    crank_talk_FormCanvas_fillRectangleWithColor(primContext->context, form, fMaxX - borderWidth, fMinY, fMaxX, fMaxY, fillColor);
 
     // Top
-    crank_talk_FormCanvas_fillRectangleWithColor(context, form, fMinX, fMinY, fMaxX, fMinY + borderWidth, fillColor);
+    crank_talk_FormCanvas_fillRectangleWithColor(primContext->context, form, fMinX, fMinY, fMaxX, fMinY + borderWidth, fillColor);
     // Bottom
-    crank_talk_FormCanvas_fillRectangleWithColor(context, form, fMinX, fMaxY - borderWidth, fMaxX, fMaxY, fillColor);
+    crank_talk_FormCanvas_fillRectangleWithColor(primContext->context, form, fMinX, fMaxY - borderWidth, fMaxX, fMaxY, fillColor);
 
-    return self;
+    return crank_talk_Primitive_return(primContext, self);
 }
 
-static crank_talk_oop_t
-crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 7);
+    if(primContext->argumentCount < 7) return crank_talk_Primitive_fail(primContext);
 
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_String_t *string = (crank_talk_String_t *)arguments[1];
-    intptr_t stringStartIndex = crank_talk_oop_decodeSmallInteger(arguments[2]);
-    intptr_t stringStopIndex = crank_talk_oop_decodeSmallInteger(arguments[3]);
-    crank_talk_Point_t *baselineStart = (crank_talk_Point_t *)arguments[4];
-    crank_talk_FontFace_t *fontFace = (crank_talk_FontFace_t *)arguments[5];
-    crank_talk_Color_t *color = (crank_talk_Color_t *)arguments[6];
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_String_t *string = (crank_talk_String_t *)primContext->arguments[1];
+    intptr_t stringStartIndex = crank_talk_oop_decodeSmallInteger(primContext->arguments[2]);
+    intptr_t stringStopIndex = crank_talk_oop_decodeSmallInteger(primContext->arguments[3]);
+    crank_talk_Point_t *baselineStart = (crank_talk_Point_t *)primContext->arguments[4];
+    crank_talk_FontFace_t *fontFace = (crank_talk_FontFace_t *)primContext->arguments[5];
+    crank_talk_Color_t *color = (crank_talk_Color_t *)primContext->arguments[6];
     uint32_t fillColor = crank_talk_Color_encodeBGRA32(color);
     
     crank_talk_FormCanvas_t *formCanvas = (crank_talk_FormCanvas_t *)self;
     crank_talk_Form_t *form = formCanvas->form;
     if(crank_talk_oop_decodeSmallInteger(form->depth) != 32)
-        crank_talk_error(context, "Only 32 bit forms are supported.");
+        crank_talk_error(primContext->context, "Only 32 bit forms are supported.");
         
     crank_talk_Form_t *fontForm = fontFace->image;
     int fontImageWidth  = (int)crank_talk_oop_decodeSmallInteger(fontForm->width);
@@ -520,29 +493,29 @@ crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive(crank_talk_VM
         stbtt_GetBakedQuad(&bakedChar, fontImageWidth, fontImageHeight, 0, &currentBaselineX, &currentBaselineY, &quadToDraw, true);
 
         //crank_talk_FormCanvas_fillRectangleWithColor(context, form, quadToDraw.x0, quadToDraw.y0, quadToDraw.x1, quadToDraw.y1, fillColor);
-        crank_talk_FormCanvas_drawCharacterRectangleWithColor(context,
+        crank_talk_FormCanvas_drawCharacterRectangleWithColor(primContext->context,
             form, quadToDraw.x0, quadToDraw.y0, quadToDraw.x1, quadToDraw.y1,
             fontForm, quadToDraw.s0, quadToDraw.t0, quadToDraw.s1, quadToDraw.t1,
             fillColor);
     }
 
-    return self;
+    return crank_talk_Primitive_return(primContext, self);
 }
 
 void
 crank_talk_registerGUIPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetNativePrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontClass), "default", 1, crank_talk_Font_default_primitive);
-    crank_talk_createAndSetNativePrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontClass), "defaultMonospaced", 1, crank_talk_Font_defaultMonospaced_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontClass), "default", 1, "Font::default", crank_talk_Font_default_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontClass), "defaultMonospaced", 1, "Font::defaultMonospaced", crank_talk_Font_defaultMonospaced_primitive);
     
-    crank_talk_createAndSetNativePrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontFaceClass), "default", 1, crank_talk_FontFace_default_primitive);
-    crank_talk_createAndSetNativePrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontFaceClass), "defaultMonospaced", 1, crank_talk_FontFace_defaultMonospaced_primitive);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FontFaceClass, "measureTextExtent:", 2, crank_talk_FontFace_measureTextExtent_primitive);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FontFaceClass, "measureTextExtent:from:to:", 4, crank_talk_FontFace_measureTextExtentFromTo_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontFaceClass), "default", 1, "FontFace::default", crank_talk_FontFace_default_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontFaceClass), "defaultMonospaced", 1, "FontFace::defaultMonospaced", crank_talk_FontFace_defaultMonospaced_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FontFaceClass, "measureTextExtent:", 2, "FontFace::measureTextExtent:", crank_talk_FontFace_measureTextExtent_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FontFaceClass, "measureTextExtent:from:to:", 4, "FontFace::measureTextExtent:from:to:", crank_talk_FontFace_measureTextExtentFromTo_primitive);
 
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FormCanvasClass, "fillWithColor:", 3, crank_talk_FormCanvas_fillWithColor_primitive);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FormCanvasClass, "fillRectangle:color:", 3, crank_talk_FormCanvas_fillRectangleWithColor_primitive);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FormCanvasClass, "frameRectangle:borderWidth:color:", 4, crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FormCanvasClass, "drawString:from:to:at:font:color:", 7, crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "fillWithColor:", 3, "FormCanvas::fillWithColor:", crank_talk_FormCanvas_fillWithColor_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "fillRectangle:color:", 3, "FormCanvas::fillRectangle:color:", crank_talk_FormCanvas_fillRectangleWithColor_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "frameRectangle:borderWidth:color:", 4, "FormCanvas::frameRectangle:borderWidth:color:", crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "drawString:from:to:at:font:color:", 7, "FormCanvas::drawString:from:to:at:font:color:", crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive);
 }
 
