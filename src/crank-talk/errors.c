@@ -115,61 +115,57 @@ crank_talk_errorPrintfAtSourcePosition(crank_talk_VMContext_t *context, crank_ta
     crank_talk_errorAtSourcePosition(context, sourcePosition, buffer);
 }
 
-static crank_talk_oop_t
-crank_talk_Object_assert_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_Object_assert_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t assertValue = arguments[1];
-    if(assertValue != context->roots.trueValue)
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t assertValue = primContext->arguments[1];
+    if(assertValue != primContext->context->roots.trueValue)
     {        
-        crank_talk_AssertionFailure_t *assertionFailure = (crank_talk_AssertionFailure_t *)CrankAllocateValuesObjectWithClassName(context, AssertionFailure);
-        assertionFailure->super.super.messageText = crank_talk_String_createWithCString(context, "Assertion failed");
-        crank_talk_Exception_signal(context, &assertionFailure->super.super);
+        crank_talk_AssertionFailure_t *assertionFailure = (crank_talk_AssertionFailure_t *)CrankAllocateValuesObjectWithClassName(primContext->context, AssertionFailure);
+        assertionFailure->super.super.messageText = crank_talk_String_createWithCString(primContext->context, "Assertion failed");
+        crank_talk_Exception_signal(primContext->context, &assertionFailure->super.super);
         abort();
     }
 
-    return self;
+    return crank_talk_Primitive_return(primContext, self);
 }
 
-static crank_talk_oop_t
-crank_talk_Object_assertWithDescription_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_Object_assertWithDescription_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t assertValue = arguments[1];
-    crank_talk_oop_t description = arguments[2];
-    if(assertValue != context->roots.trueValue)
+    if(primContext->argumentCount < 3) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t assertValue = primContext->arguments[1];
+    crank_talk_oop_t description = primContext->arguments[2];
+    if(assertValue != primContext->context->roots.trueValue)
     {        
-        crank_talk_AssertionFailure_t *assertionFailure = (crank_talk_AssertionFailure_t *)CrankAllocateValuesObjectWithClassName(context, AssertionFailure);
+        crank_talk_AssertionFailure_t *assertionFailure = (crank_talk_AssertionFailure_t *)CrankAllocateValuesObjectWithClassName(primContext->context, AssertionFailure);
         assertionFailure->super.super.messageText = description;
-        crank_talk_Exception_signal(context, &assertionFailure->super.super);
+        crank_talk_Exception_signal(primContext->context, &assertionFailure->super.super);
         abort();
     }
 
-    return self;
+    return crank_talk_Primitive_return(primContext, self);
 }
 
-static crank_talk_oop_t
-crank_talk_BlockClosure_onDo_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_BlockClosure_onDo_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 3);
+    if(primContext->argumentCount < 3) return crank_talk_Primitive_fail(primContext);
 
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t exceptionClass = arguments[1];
-    crank_talk_oop_t exceptionAction = arguments[2];
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t exceptionClass = primContext->arguments[1];
+    crank_talk_oop_t exceptionAction = primContext->arguments[2];
 
-    if(!crank_talk_oop_isKindOf(context, exceptionClass, context->roots.BehaviorClass))
-        crank_talk_error(context, "Expected a behavior for on:do:");
+    if(!crank_talk_oop_isKindOf(primContext->context, exceptionClass, primContext->context->roots.BehaviorClass))
+        crank_talk_error(primContext->context, "Expected a behavior for on:do:");
 
-    if(!crank_talk_oop_isKindOf(context, exceptionAction, context->roots.BlockClosureClass))
-        crank_talk_error(context, "Expected a block closure for on:do:");
+    if(!crank_talk_oop_isKindOf(primContext->context, exceptionAction, primContext->context->roots.BlockClosureClass))
+        crank_talk_error(primContext->context, "Expected a block closure for on:do:");
 
     crank_talk_stackFrameOnDoRecord_t onDoRecord = {
         .super.type = CrankTalkStackFrameRecordOnDoRecord,
@@ -181,21 +177,19 @@ crank_talk_BlockClosure_onDo_primitive(crank_talk_VMContext_t *context, crank_ta
     crank_talk_stackFrame_pushRecord(&onDoRecord.super);
 
     if(!_setjmp(onDoRecord.jmpbuffer))
-        onDoRecord.result = crank_talk_send0(context, context->roots.valueSymbol, self);
+        onDoRecord.result = crank_talk_send0(primContext->context, primContext->context->roots.valueSymbol, self);
 
     crank_talk_stackFrame_popRecord(&onDoRecord.super);
-    return onDoRecord.result;
+    return crank_talk_Primitive_return(primContext, onDoRecord.result);
 }
 
-static crank_talk_oop_t
-crank_talk_BlockClosure_ensure_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_BlockClosure_ensure_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
 
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t ensureBlock = arguments[1];
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t ensureBlock = primContext->arguments[1];
 
     crank_talk_stackFrameEnsureRecord_t ensureRecord = {
         .super.type = CrankTalkStackFrameRecordEnsureRecord,
@@ -204,47 +198,43 @@ crank_talk_BlockClosure_ensure_primitive(crank_talk_VMContext_t *context, crank_
 
     crank_talk_stackFrame_pushRecord(&ensureRecord.super);
 
-    crank_talk_oop_t result = crank_talk_send0(context, context->roots.valueSymbol, self);
+    crank_talk_oop_t result = crank_talk_send0(primContext->context, primContext->context->roots.valueSymbol, self);
 
     crank_talk_stackFrame_popRecord(&ensureRecord.super);
-    return result;
+    return crank_talk_Primitive_return(primContext, result);
 }
 
-static crank_talk_oop_t
-crank_talk_Exception_signal_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_Exception_signal_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 1);
+    if(primContext->argumentCount < 1) return crank_talk_Primitive_fail(primContext);
 
-    crank_talk_Exception_t *exception = (crank_talk_Exception_t *)arguments[0];
-    crank_talk_Exception_signal(context, exception);
-    return exception->resumeValue;
+    crank_talk_Exception_t *exception = (crank_talk_Exception_t *)primContext->arguments[0];
+    crank_talk_Exception_signal(primContext->context, exception);
+    return crank_talk_Primitive_return(primContext, exception->resumeValue);
 }
 
-static crank_talk_oop_t
-crank_talk_Exception_signalWith_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_Exception_signalWith_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
 
-    crank_talk_Exception_t *exception = (crank_talk_Exception_t *)arguments[0];
-    exception->messageText = arguments[1];
+    crank_talk_Exception_t *exception = (crank_talk_Exception_t *)primContext->arguments[0];
+    exception->messageText = primContext->arguments[1];
 
-    crank_talk_Exception_signal(context, exception);
-    return exception->resumeValue;
+    crank_talk_Exception_signal(primContext->context, exception);
+    return crank_talk_Primitive_return(primContext, exception->resumeValue);
 }
 
 void
 crank_talk_registerErrorPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "assert:", 2, crank_talk_Object_assert_primitive);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "assert:description:", 3, crank_talk_Object_assertWithDescription_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "assert:", 2, "Object::assert:", crank_talk_Object_assert_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "assert:description:", 3, "Object::assert:description:", crank_talk_Object_assertWithDescription_primitive);
 
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BlockClosureClass, "on:do:", 3, crank_talk_BlockClosure_onDo_primitive);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BlockClosureClass, "ensure:", 2, crank_talk_BlockClosure_ensure_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "on:do:", 3, "BlockClosure::on:do:", crank_talk_BlockClosure_onDo_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "ensure:", 2, "BlockClosure::ensure:", crank_talk_BlockClosure_ensure_primitive);
 
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ExceptionClass, "signal", 1, crank_talk_Exception_signal_primitive);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ExceptionClass, "signal:", 2, crank_talk_Exception_signalWith_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ExceptionClass, "signal", 1, "Exception::signal", crank_talk_Exception_signal_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ExceptionClass, "signal:", 2, "Exception::signal:", crank_talk_Exception_signalWith_primitive);
 }
