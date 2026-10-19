@@ -778,33 +778,33 @@ crank_talk_ParseTreeToByDoNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *co
 void
 crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.LiteralVariableClass, "analyzeAndEvaluateIdentifierReference:with:", 3, crank_talk_ParseTreeLiteralVariableNode_analyzeAndEvaluateIdentifierReferenceWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.LiteralVariableClass, "analyzeAndEvaluateIdentifierReference:with:", 3, crank_talk_ParseTreeLiteralVariableNode_analyzeAndEvaluateIdentifierReferenceWith);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeAssignmentNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeAssignmentNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeBlockNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeNilReference_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeFalseReference_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeTrueReference_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSelfReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSelfReference_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSuperReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSuperReference_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeThisContextReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeThisContextReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeAssignmentNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeAssignmentNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeBlockNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeNilReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeFalseReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeTrueReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeSelfReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSelfReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeSuperReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSuperReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeThisContextReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeThisContextReference_analyzeAndEvaluateWith);
     
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeCascadedMessageNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeCascadedMessageNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageCascadeNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeMessageCascadeNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeMessageSendNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSequenceNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeArrayNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeArrayNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeReturnNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeReturnNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeAddMethodNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeAddMethodNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMethodDefinitionNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeMethodDefinitionNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeVariableDefinitionNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeCascadedMessageNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeCascadedMessageNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeMessageCascadeNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeMessageCascadeNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeMessageSendNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSequenceNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeArrayNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeArrayNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeReturnNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeReturnNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeAddMethodNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeAddMethodNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeMethodDefinitionNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeMethodDefinitionNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeVariableDefinitionNode_analyzeAndEvaluateWith);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeCullBlockNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeCullNodeNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIfSelectionNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeIfSelectionNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeWhileNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeWhileNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeDoWhileNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeDoWhileNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeCullBlockNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeCullNodeNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeIfSelectionNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeIfSelectionNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeWhileNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeWhileNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeDoWhileNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeDoWhileNode_analyzeAndEvaluateWith);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeToByDoNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeToByDoNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeToByDoNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeToByDoNode_analyzeAndEvaluateWith);
 }

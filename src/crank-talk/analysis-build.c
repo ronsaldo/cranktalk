@@ -944,40 +944,40 @@ crank_talk_ToByDoNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank
 void
 crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.LiteralVariableClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_LiteralVariable_analyzeAndBuildAssignmentWithWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_HIRVariable_analyzeAndBuildAssignmentWithWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_HIRAlloca_analyzeAndBuildAssignmentWithWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRCaptureClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_HIRCapture_analyzeAndBuildAssignmentWithWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SlotClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_Slot_analyzeAndBuildAssignmentWithWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.LiteralVariableClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_LiteralVariable_analyzeAndBuildAssignmentWithWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRVariableClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_HIRVariable_analyzeAndBuildAssignmentWithWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_HIRAlloca_analyzeAndBuildAssignmentWithWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRCaptureClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_HIRCapture_analyzeAndBuildAssignmentWithWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SlotClass, "analyzeAndBuildAssignment:withValue:with:", 4, crank_talk_Slot_analyzeAndBuildAssignmentWithWith);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.LiteralVariableClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_LiteralVariable_analyzeAndBuildIdentifierReferenceWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRVariable_analyzeAndBuildIdentifierReferenceWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRValueClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRValue_analyzeAndBuildIdentifierReferenceWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRAllocaInstruction_analyzeAndBuildIdentifierReferenceWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRCaptureClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRCaptureInstruction_analyzeAndBuildIdentifierReferenceWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SlotClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_Slot_analyzeAndBuildIdentifierReferenceWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.LiteralVariableClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_LiteralVariable_analyzeAndBuildIdentifierReferenceWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRVariableClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRVariable_analyzeAndBuildIdentifierReferenceWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRValueClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRValue_analyzeAndBuildIdentifierReferenceWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRAllocaInstruction_analyzeAndBuildIdentifierReferenceWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRCaptureClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRCaptureInstruction_analyzeAndBuildIdentifierReferenceWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SlotClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_Slot_analyzeAndBuildIdentifierReferenceWith);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeAssignmentNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeAssignmentNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeBlockNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeBlockNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeLiteralNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeNilReferenceNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeFalseReferenceNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeTrueReferenceNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSelfReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeSelfReferenceNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSuperReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeSuperReferenceNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeThisContextReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeThisContextReferenceNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeAssignmentNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeAssignmentNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeBlockNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeBlockNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeLiteralNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeNilReferenceNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeFalseReferenceNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeTrueReferenceNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeSelfReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeSelfReferenceNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeSuperReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeSuperReferenceNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeThisContextReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeThisContextReferenceNode_analyzeAndBuildWith);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageCascadeNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeReturnNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeReturnNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeSequenceNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeVariableDefinitionNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeMessageCascadeNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeReturnNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeReturnNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeSequenceNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeVariableDefinitionNode_analyzeAndBuildWith);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeCullBlockNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeCullBlockNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIfSelectionNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeIfSelectionNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeWhileNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeWhileNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeDoWhileNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeDoWhileNode_analyzeAndBuildWith);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeToByDoNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ToByDoNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeCullBlockNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeCullBlockNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeIfSelectionNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeIfSelectionNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeWhileNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeWhileNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeDoWhileNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeDoWhileNode_analyzeAndBuildWith);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeToByDoNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ToByDoNode_analyzeAndBuildWith);
 }
 

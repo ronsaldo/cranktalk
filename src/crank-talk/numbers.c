@@ -456,42 +456,42 @@ crank_talk_SmallInteger_greaterOrEquals_primitive(crank_talk_VMContext_t *contex
 void
 crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.NumberClass, "asFloat", 1, crank_talk_Number_asFloat_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.NumberClass, "asFloat", 1, crank_talk_Number_asFloat_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "printOn:", 2, crank_talk_Float_printOn_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "printOn:", 2, crank_talk_Float_printOn_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "negated", 1, crank_talk_Float_negated_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "sqrt", 1, crank_talk_Float_sqrt_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "negated", 1, crank_talk_Float_negated_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "sqrt", 1, crank_talk_Float_sqrt_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "+", 2, crank_talk_Float_add_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "-", 2, crank_talk_Float_minus_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "*", 2, crank_talk_Float_times_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "/", 2, crank_talk_Float_divide_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "+", 2, crank_talk_Float_add_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "-", 2, crank_talk_Float_minus_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "*", 2, crank_talk_Float_times_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "/", 2, crank_talk_Float_divide_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "=",  2, crank_talk_Float_equals_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "~=", 2, crank_talk_Float_notEquals_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "<",  2, crank_talk_Float_lessThan_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "<=", 2, crank_talk_Float_lessOrEquals_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, ">",  2, crank_talk_Float_greaterThan_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, ">=", 2, crank_talk_Float_greaterOrEquals_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "=",  2, crank_talk_Float_equals_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "~=", 2, crank_talk_Float_notEquals_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "<",  2, crank_talk_Float_lessThan_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "<=", 2, crank_talk_Float_lessOrEquals_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, ">",  2, crank_talk_Float_greaterThan_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, ">=", 2, crank_talk_Float_greaterOrEquals_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "exp", 1, crank_talk_Float_exp_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "ln",  1, crank_talk_Float_ln_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "cos", 1, crank_talk_Float_cos_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FloatClass, "sin", 1, crank_talk_Float_sin_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "exp", 1, crank_talk_Float_exp_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "ln",  1, crank_talk_Float_ln_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "cos", 1, crank_talk_Float_cos_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FloatClass, "sin", 1, crank_talk_Float_sin_primitive);
     
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "printOn:", 2, crank_talk_SmallInteger_printOn_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmallIntegerClass, "printOn:", 2, crank_talk_SmallInteger_printOn_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "negated", 1, crank_talk_SmallInteger_negated_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "+", 2, crank_talk_SmallInteger_add_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "-", 2, crank_talk_SmallInteger_minus_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "*", 2, crank_talk_SmallInteger_times_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "//", 2, crank_talk_SmallInteger_divide_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmallIntegerClass, "negated", 1, crank_talk_SmallInteger_negated_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmallIntegerClass, "+", 2, crank_talk_SmallInteger_add_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmallIntegerClass, "-", 2, crank_talk_SmallInteger_minus_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmallIntegerClass, "*", 2, crank_talk_SmallInteger_times_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmallIntegerClass, "//", 2, crank_talk_SmallInteger_divide_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "=", 2, crank_talk_SmallInteger_equals_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "~=", 2, crank_talk_SmallInteger_notEquals_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "<", 2, crank_talk_SmallInteger_lessThan_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "<=", 2, crank_talk_SmallInteger_lessOrEquals_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, ">", 2, crank_talk_SmallInteger_greaterThan_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, ">=", 2, crank_talk_SmallInteger_greaterOrEquals_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmallIntegerClass, "=", 2, crank_talk_SmallInteger_equals_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmallIntegerClass, "~=", 2, crank_talk_SmallInteger_notEquals_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmallIntegerClass, "<", 2, crank_talk_SmallInteger_lessThan_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmallIntegerClass, "<=", 2, crank_talk_SmallInteger_lessOrEquals_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmallIntegerClass, ">", 2, crank_talk_SmallInteger_greaterThan_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmallIntegerClass, ">=", 2, crank_talk_SmallInteger_greaterOrEquals_primitive);
 }

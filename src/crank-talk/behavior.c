@@ -354,23 +354,23 @@ crank_talk_Symbol_asSlot_primitive(crank_talk_VMContext_t *context, crank_talk_o
 void
 crank_talk_registerBehaviorPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BehaviorClass, "basicNew", 1, crank_talk_Behavior_basicNew_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BehaviorClass, "basicNew:", 2, crank_talk_Behavior_basicNewWith_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BehaviorClass, "new", 1, crank_talk_Behavior_new_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BehaviorClass, "new:", 2, crank_talk_Behavior_newWith_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BehaviorClass, "basicNew", 1, crank_talk_Behavior_basicNew_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BehaviorClass, "basicNew:", 2, crank_talk_Behavior_basicNewWith_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BehaviorClass, "new", 1, crank_talk_Behavior_new_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BehaviorClass, "new:", 2, crank_talk_Behavior_newWith_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BehaviorClass, "environment", 1, crank_talk_Behavior_environment_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ClassClass, "environment", 1, crank_talk_Class_environment_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.MetaclassClass, "environment", 1, crank_talk_Metaclass_environment_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BehaviorClass, "environment", 1, crank_talk_Behavior_environment_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ClassClass, "environment", 1, crank_talk_Class_environment_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.MetaclassClass, "environment", 1, crank_talk_Metaclass_environment_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BehaviorClass, "<<", 2, crank_talk_Behavior_makeClassBuilder_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BehaviorClass, "<<", 2, crank_talk_Behavior_makeClassBuilder_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ShiftClassBuilderClass, "slots:", 2, crank_talk_ShiftClassBuilder_slots_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ShiftClassBuilderClass, "tag:", 2, crank_talk_ShiftClassBuilder_tag_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ShiftClassBuilderClass, "package:", 2, crank_talk_ShiftClassBuilder_package_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ShiftClassBuilderClass, "build", 1, crank_talk_ShiftClassBuilder_build_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ShiftClassBuilderClass, "slots:", 2, crank_talk_ShiftClassBuilder_slots_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ShiftClassBuilderClass, "tag:", 2, crank_talk_ShiftClassBuilder_tag_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ShiftClassBuilderClass, "package:", 2, crank_talk_ShiftClassBuilder_package_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ShiftClassBuilderClass, "build", 1, crank_talk_ShiftClassBuilder_build_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SlotClass, "asSlot", 1, crank_talk_Slot_asSlot_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "asSlot", 1, crank_talk_Symbol_asSlot_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SlotClass, "asSlot", 1, crank_talk_Slot_asSlot_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SymbolClass, "asSlot", 1, crank_talk_Symbol_asSlot_primitive);
 }
 

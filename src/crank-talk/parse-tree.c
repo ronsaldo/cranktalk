@@ -439,22 +439,22 @@ crank_talk_ParseTreeVariableDefinitionNode_traverseAndCollectErrorsInto(crank_ta
 
 void crank_talk_registerParseTreePrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeParseErrorNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeParseErrorNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeAssignmentNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeAssignmentNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeIdentifierReferenceNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreePseudoVariableReferenceNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreePseudoVariableReference_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeParseErrorNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeParseErrorNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeAssignmentNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeAssignmentNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeIdentifierReferenceNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreePseudoVariableReferenceNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreePseudoVariableReference_traverseAndCollectErrorsInto);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeArgumentDefinitionNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeArgumentDefinitionNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeBlockNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeBlockNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeLiteralNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeCascadedMessageNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeCascadedMessageNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageCascadeNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeMessageCascadeNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeMessageSendNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeSequenceNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeArrayNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeArrayNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeReturnNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeReturnNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeAddMethodNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeAddMethodNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMethodDefinitionNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeMethodDefinitionNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreePragmaNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreePragmaNode_traverseAndCollectErrorsInto);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeVariableDefinitionNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeArgumentDefinitionNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeArgumentDefinitionNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeBlockNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeBlockNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeLiteralNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeCascadedMessageNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeCascadedMessageNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeMessageCascadeNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeMessageCascadeNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeMessageSendNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeSequenceNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeArrayNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeArrayNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeReturnNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeReturnNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeAddMethodNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeAddMethodNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeMethodDefinitionNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeMethodDefinitionNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreePragmaNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreePragmaNode_traverseAndCollectErrorsInto);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "traverseAndCollectErrorsInto:", 2, crank_talk_ParseTreeVariableDefinitionNode_traverseAndCollectErrorsInto);
 }

@@ -27,6 +27,7 @@ set(CrankTalk_Sources
     ordered-collection.c
     parse-tree.c
     parser.c
+    primitives.c
     scanner.c
     script.c
     set.c

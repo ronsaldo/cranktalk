@@ -165,6 +165,10 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
 
 typedef crank_talk_oop_t (*crank_talk_CompiledFunctionNativeEntryPoint_t)(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments);
 
+typedef struct crank_talk_PrimitiveContext_s crank_talk_PrimitiveContext_t;
+typedef void (*crank_talk_PrimitiveFunction_t)(crank_talk_PrimitiveContext_t *primContext);
+
+
 struct crank_talk_ObjectHeader_s {
     crank_talk_ObjectHeader_t *nextObject;
     crank_talk_Behavior_t* behavior;

@@ -239,12 +239,12 @@ crank_talk_Exception_signalWith_primitive(crank_talk_VMContext_t *context, crank
 void
 crank_talk_registerErrorPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "assert:", 2, crank_talk_Object_assert_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "assert:description:", 3, crank_talk_Object_assertWithDescription_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "assert:", 2, crank_talk_Object_assert_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "assert:description:", 3, crank_talk_Object_assertWithDescription_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "on:do:", 3, crank_talk_BlockClosure_onDo_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "ensure:", 2, crank_talk_BlockClosure_ensure_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BlockClosureClass, "on:do:", 3, crank_talk_BlockClosure_onDo_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BlockClosureClass, "ensure:", 2, crank_talk_BlockClosure_ensure_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ExceptionClass, "signal", 1, crank_talk_Exception_signal_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ExceptionClass, "signal:", 2, crank_talk_Exception_signalWith_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ExceptionClass, "signal", 1, crank_talk_Exception_signal_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ExceptionClass, "signal:", 2, crank_talk_Exception_signalWith_primitive);
 }

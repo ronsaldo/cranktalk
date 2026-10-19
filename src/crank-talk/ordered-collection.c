@@ -171,10 +171,10 @@ crank_talk_OrderedCollection_size_primitive(crank_talk_VMContext_t *context, cra
 void
 crank_talk_registerOrderedCollectionPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "initialize", 1, crank_talk_OrderedCollection_initialize_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "add:", 2, crank_talk_OrderedCollection_add_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "asArray", 1, crank_talk_OrderedCollection_asArray_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "at:", 2, crank_talk_OrderedCollection_at_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "at:put:", 3, crank_talk_OrderedCollection_atPut_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OrderedCollectionClass, "size", 1, crank_talk_OrderedCollection_size_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OrderedCollectionClass, "initialize", 1, crank_talk_OrderedCollection_initialize_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OrderedCollectionClass, "add:", 2, crank_talk_OrderedCollection_add_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OrderedCollectionClass, "asArray", 1, crank_talk_OrderedCollection_asArray_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OrderedCollectionClass, "at:", 2, crank_talk_OrderedCollection_at_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OrderedCollectionClass, "at:put:", 3, crank_talk_OrderedCollection_atPut_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OrderedCollectionClass, "size", 1, crank_talk_OrderedCollection_size_primitive);
 }

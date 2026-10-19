@@ -185,14 +185,14 @@ crank_talk_BinaryFileStream_space(crank_talk_VMContext_t *context, crank_talk_oo
 void
 crank_talk_registerIOPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.StdioClass), "stdin", 1, crank_talk_Stdio_stdin_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.StdioClass), "stdout", 1, crank_talk_Stdio_stdout_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.StdioClass), "stderr", 1, crank_talk_Stdio_stderr_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.StdioClass), "stdin", 1, crank_talk_Stdio_stdin_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.StdioClass), "stdout", 1, crank_talk_Stdio_stdout_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.StdioClass), "stderr", 1, crank_talk_Stdio_stderr_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BinaryFileStreamClass, "nextPut:", 2, crank_talk_BinaryFileStream_nextPut);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BinaryFileStreamClass, "nextPutAll:", 2, crank_talk_BinaryFileStream_nextPutAll);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BinaryFileStreamClass, "print:", 2, crank_talk_BinaryFileStream_print);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BinaryFileStreamClass, "cr", 1, crank_talk_BinaryFileStream_cr);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BinaryFileStreamClass, "lf", 1, crank_talk_BinaryFileStream_lf);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BinaryFileStreamClass, "space", 1, crank_talk_BinaryFileStream_space);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BinaryFileStreamClass, "nextPut:", 2, crank_talk_BinaryFileStream_nextPut);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BinaryFileStreamClass, "nextPutAll:", 2, crank_talk_BinaryFileStream_nextPutAll);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BinaryFileStreamClass, "print:", 2, crank_talk_BinaryFileStream_print);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BinaryFileStreamClass, "cr", 1, crank_talk_BinaryFileStream_cr);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BinaryFileStreamClass, "lf", 1, crank_talk_BinaryFileStream_lf);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BinaryFileStreamClass, "space", 1, crank_talk_BinaryFileStream_space);
 }

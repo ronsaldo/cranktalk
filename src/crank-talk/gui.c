@@ -532,17 +532,17 @@ crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive(crank_talk_VM
 void
 crank_talk_registerGUIPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontClass), "default", 1, crank_talk_Font_default_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontClass), "defaultMonospaced", 1, crank_talk_Font_defaultMonospaced_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontClass), "default", 1, crank_talk_Font_default_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontClass), "defaultMonospaced", 1, crank_talk_Font_defaultMonospaced_primitive);
     
-    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontFaceClass), "default", 1, crank_talk_FontFace_default_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontFaceClass), "defaultMonospaced", 1, crank_talk_FontFace_defaultMonospaced_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FontFaceClass, "measureTextExtent:", 2, crank_talk_FontFace_measureTextExtent_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FontFaceClass, "measureTextExtent:from:to:", 4, crank_talk_FontFace_measureTextExtentFromTo_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontFaceClass), "default", 1, crank_talk_FontFace_default_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.FontFaceClass), "defaultMonospaced", 1, crank_talk_FontFace_defaultMonospaced_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FontFaceClass, "measureTextExtent:", 2, crank_talk_FontFace_measureTextExtent_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FontFaceClass, "measureTextExtent:from:to:", 4, crank_talk_FontFace_measureTextExtentFromTo_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "fillWithColor:", 3, crank_talk_FormCanvas_fillWithColor_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "fillRectangle:color:", 3, crank_talk_FormCanvas_fillRectangleWithColor_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "frameRectangle:borderWidth:color:", 4, crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "drawString:from:to:at:font:color:", 7, crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FormCanvasClass, "fillWithColor:", 3, crank_talk_FormCanvas_fillWithColor_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FormCanvasClass, "fillRectangle:color:", 3, crank_talk_FormCanvas_fillRectangleWithColor_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FormCanvasClass, "frameRectangle:borderWidth:color:", 4, crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FormCanvasClass, "drawString:from:to:at:font:color:", 7, crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive);
 }
 

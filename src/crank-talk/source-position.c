@@ -83,5 +83,5 @@ crank_talk_SourcePosition_printOn_primitive(crank_talk_VMContext_t *context, cra
 
 void crank_talk_registerSourcePositionPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SourcePositionClass, "printOn:", 2, crank_talk_SourcePosition_printOn_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SourcePositionClass, "printOn:", 2, crank_talk_SourcePosition_printOn_primitive);
 }

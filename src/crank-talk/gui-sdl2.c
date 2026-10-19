@@ -445,17 +445,17 @@ crank_talk_SDL2Shutdown(crank_talk_VMContext_t* context)
 void
 crank_talk_registerGUIBackendPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.OSWindowClass), "mainLoop", 1, crank_talk_OSWindow_mainLoop_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowClass, "extent", 1, crank_talk_OSWindow_extent_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowClass, "open", 1, crank_talk_OSWindow_open_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowClass, "close", 1, crank_talk_OSWindow_close_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.OSWindowClass), "mainLoop", 1, crank_talk_OSWindow_mainLoop_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OSWindowClass, "extent", 1, crank_talk_OSWindow_extent_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OSWindowClass, "open", 1, crank_talk_OSWindow_open_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OSWindowClass, "close", 1, crank_talk_OSWindow_close_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowClass, "newFormRenderer", 1, crank_talk_OSWindow_newFormRenderer_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OSWindowClass, "newFormRenderer", 1, crank_talk_OSWindow_newFormRenderer_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowRendererClass, "beginFrame", 1, crank_talk_OSWindowRenderer_beginFrame_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowRendererClass, "endFrame", 1, crank_talk_OSWindowRenderer_endFrame_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OSWindowRendererClass, "beginFrame", 1, crank_talk_OSWindowRenderer_beginFrame_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OSWindowRendererClass, "endFrame", 1, crank_talk_OSWindowRenderer_endFrame_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowFormRendererClass, "close", 1, crank_talk_OSWindowFormRenderer_close_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowFormRendererClass, "beginFrame", 1, crank_talk_OSWindowFormRenderer_beginFrame_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.OSWindowFormRendererClass, "blitForm", 1, crank_talk_OSWindowFormRenderer_blitForm_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OSWindowFormRendererClass, "close", 1, crank_talk_OSWindowFormRenderer_close_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OSWindowFormRendererClass, "beginFrame", 1, crank_talk_OSWindowFormRenderer_beginFrame_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.OSWindowFormRendererClass, "blitForm", 1, crank_talk_OSWindowFormRenderer_blitForm_primitive);
 }

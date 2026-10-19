@@ -593,33 +593,33 @@ crank_talk_StringStream_lf_primitive(crank_talk_VMContext_t *context, crank_talk
 
 void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "asString", 1, crank_talk_Object_asString_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "printString", 1, crank_talk_Object_printString_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "printOn:", 2, crank_talk_Object_printOn_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "fullPrintOn:", 2, crank_talk_Object_fullPrintOn_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "asString", 1, crank_talk_Object_asString_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "printString", 1, crank_talk_Object_printString_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "printOn:", 2, crank_talk_Object_printOn_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "fullPrintOn:", 2, crank_talk_Object_fullPrintOn_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ClassClass, "printOn:", 2, crank_talk_Class_printOn_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ClassClass, "printOn:", 2, crank_talk_Class_printOn_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.MetaclassClass, "printOn:", 2, crank_talk_Metaclass_printOn_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.MetaclassClass, "printOn:", 2, crank_talk_Metaclass_printOn_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.UndefinedObjectClass, "printOn:", 2, crank_talk_UndefinedObject_printOn_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FalseClass, "printOn:", 2, crank_talk_False_printOn_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.TrueClass, "printOn:", 2, crank_talk_True_printOn_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.UndefinedObjectClass, "printOn:", 2, crank_talk_UndefinedObject_printOn_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.FalseClass, "printOn:", 2, crank_talk_False_printOn_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.TrueClass, "printOn:", 2, crank_talk_True_printOn_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "asString", 1, crank_talk_String_asString_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "printOn:", 2, crank_talk_String_printOn_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringClass, "asString", 1, crank_talk_String_asString_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringClass, "printOn:", 2, crank_talk_String_printOn_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "asString", 1, crank_talk_Symbol_asString_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "printOn:", 2, crank_talk_Symbol_printOn_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SymbolClass, "asString", 1, crank_talk_Symbol_asString_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SymbolClass, "printOn:", 2, crank_talk_Symbol_printOn_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, ",", 2, crank_talk_String_concat_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "withoutElementAtIndex:", 2, crank_talk_String_withoutElementAtIndex_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "insertString:atIndex:", 3, crank_talk_String_insertStringAtIndex_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringClass, ",", 2, crank_talk_String_concat_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringClass, "withoutElementAtIndex:", 2, crank_talk_String_withoutElementAtIndex_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringClass, "insertString:atIndex:", 3, crank_talk_String_insertStringAtIndex_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "nextPut:", 2, crank_talk_StringStream_nextPut_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "nextPutAll:", 2, crank_talk_StringStream_nextPutAll_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "print:", 2, crank_talk_StringStream_print_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "space", 1, crank_talk_StringStream_space_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "lf", 1, crank_talk_StringStream_lf_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringStreamClass, "nextPut:", 2, crank_talk_StringStream_nextPut_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringStreamClass, "nextPutAll:", 2, crank_talk_StringStream_nextPutAll_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringStreamClass, "print:", 2, crank_talk_StringStream_print_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringStreamClass, "space", 1, crank_talk_StringStream_space_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringStreamClass, "lf", 1, crank_talk_StringStream_lf_primitive);
 
 }

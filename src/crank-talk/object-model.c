@@ -368,28 +368,28 @@ crank_talk_SmalltalkImage_printStackTrace_primitive(crank_talk_VMContext_t *cont
 void
 crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "class", 1, crank_talk_ProtoObject_class_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "==", 2, crank_talk_ProtoObject_identityEquals_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "~~", 2, crank_talk_ProtoObject_identityNotEquals_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "identityHash", 2, crank_talk_ProtoObject_identityHash_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "initialize", 1, crank_talk_ProtoObject_initialize_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "yourself", 1, crank_talk_ProtoObject_yourself_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ProtoObjectClass, "class", 1, crank_talk_ProtoObject_class_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ProtoObjectClass, "==", 2, crank_talk_ProtoObject_identityEquals_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ProtoObjectClass, "~~", 2, crank_talk_ProtoObject_identityNotEquals_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ProtoObjectClass, "identityHash", 2, crank_talk_ProtoObject_identityHash_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ProtoObjectClass, "initialize", 1, crank_talk_ProtoObject_initialize_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ProtoObjectClass, "yourself", 1, crank_talk_ProtoObject_yourself_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "=", 2, crank_talk_Object_equals_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "~=", 2, crank_talk_Object_notEquals_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "hash", 2, crank_talk_Object_hash_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "species", 1, crank_talk_Object_species_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "isKindOf:", 2, crank_talk_Object_isKindOf_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "=", 2, crank_talk_Object_equals_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "~=", 2, crank_talk_Object_notEquals_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "hash", 2, crank_talk_Object_hash_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "species", 1, crank_talk_Object_species_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "isKindOf:", 2, crank_talk_Object_isKindOf_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "basicSize", 1, crank_talk_Object_basicSize_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "size", 1, crank_talk_Object_basicSize_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "basicSize", 1, crank_talk_Object_basicSize_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "size", 1, crank_talk_Object_basicSize_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "basicAt:", 2, crank_talk_Object_basicAt_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "basicAt:put:", 3, crank_talk_Object_basicAtPut_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "at:", 2, crank_talk_Object_basicAt_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "at:put:", 3, crank_talk_Object_basicAtPut_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "basicAt:", 2, crank_talk_Object_basicAt_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "basicAt:put:", 3, crank_talk_Object_basicAtPut_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "at:", 2, crank_talk_Object_basicAt_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ObjectClass, "at:put:", 3, crank_talk_Object_basicAtPut_primitive);
 
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmalltalkImageClass, "garbageCollect", 1, crank_talk_SmalltalkImage_garbageCollect_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmalltalkImageClass, "globals", 1, crank_talk_SmalltalkImage_globals_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmalltalkImageClass, "printStackTrace", 1, crank_talk_SmalltalkImage_printStackTrace_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmalltalkImageClass, "garbageCollect", 1, crank_talk_SmalltalkImage_garbageCollect_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmalltalkImageClass, "globals", 1, crank_talk_SmalltalkImage_globals_primitive);
+    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SmalltalkImageClass, "printStackTrace", 1, crank_talk_SmalltalkImage_printStackTrace_primitive);
 }
