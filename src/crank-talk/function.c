@@ -377,22 +377,21 @@ crank_talk_Functional_dumpToConsole(crank_talk_VMContext_t *context, crank_talk_
         crank_talk_error(context, "Expected a functional for dumping.");
 }
 
-static crank_talk_oop_t
-crank_talk_BlockClosure_value_primitives(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_BlockClosure_value_primitives(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount > 0);
-    crank_talk_oop_t self = arguments[0];
-    return crank_talk_apply(context, self, argumentCount - 1, arguments + 1);
+    if(primContext->argumentCount < 1) return crank_talk_Primitive_fail(primContext);
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t result = crank_talk_apply(primContext->context, self, primContext->argumentCount - 1, primContext->arguments + 1);
+    return crank_talk_Primitive_return(primContext, result);
 }
 
 void
 crank_talk_registerFunctionalPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BlockClosureClass, "value", 1, crank_talk_BlockClosure_value_primitives);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BlockClosureClass, "value:", 2, crank_talk_BlockClosure_value_primitives);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BlockClosureClass, "value:value:", 3, crank_talk_BlockClosure_value_primitives);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BlockClosureClass, "value:value:value:", 4, crank_talk_BlockClosure_value_primitives);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.BlockClosureClass, "value:value:value:value:", 5, crank_talk_BlockClosure_value_primitives);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "value",                    1, "BlockClosure::value",                    crank_talk_BlockClosure_value_primitives);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "value:",                   2, "BlockClosure::value:",                   crank_talk_BlockClosure_value_primitives);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "value:value:",             3, "BlockClosure::value:value:",             crank_talk_BlockClosure_value_primitives);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "value:value:value:",       4, "BlockClosure::value:value:value:",       crank_talk_BlockClosure_value_primitives);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "value:value:value:value:", 5, "BlockClosure::value:value:value:value:", crank_talk_BlockClosure_value_primitives);
 }
