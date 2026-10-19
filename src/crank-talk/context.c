@@ -325,6 +325,10 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(CompiledFunction, bytecode),
         CrankTalkSlotDef(CompiledFunction, literalVector),
         CrankTalkSlotDef(CompiledFunction, sourcePositions),
+
+        CrankTalkSlotDef(CompiledFunction, primitiveName),
+        CrankTalkSlotDef(CompiledFunction, primitiveEntryPoint),
+    
         CrankTalkSlotDef(CompiledFunction, isBlock),
         CrankTalkSlotDef(CompiledFunction, isInnerBlock),
         CrankTalkSlotDef(CompiledFunction, definitionEnvironment),
@@ -993,6 +997,7 @@ CRANK_TALK_API crank_talk_VMContext_t*
 crank_talk_vm_createContext(void)
 {
     crank_talk_VMContext_t *context = calloc(1, sizeof(crank_talk_VMContext_t));
+    crank_talk_PrimitiveTables_initialize(&context->primitiveTable);
     crank_talk_heap_initialize(&context->heap);
     crank_talk_dynarray_initialize(&context->markingStack, sizeof(crank_talk_oop_t), 1<<17);
     crank_talk_context_createCoreDefinitions(context);
@@ -1011,5 +1016,6 @@ crank_talk_vm_destroyContext(crank_talk_VMContext_t *context)
     crank_talk_SDL2Shutdown(context);
     crank_talk_dynarray_destroy(&context->markingStack);
     crank_talk_heap_freeAll(&context->heap);
+    crank_talk_PrimitiveTables_destroy(&context->primitiveTable);
     free(context);
 }

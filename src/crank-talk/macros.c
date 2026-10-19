@@ -10,7 +10,7 @@ static void
 crank_talk_createAndSetMessageMacro(crank_talk_VMContext_t *context, const char *messageSelector, crank_talk_CompiledFunctionNativeEntryPoint_t entryPoint)
 {
     crank_talk_oop_t name = crank_talk_Symbol_internWithCString(context, messageSelector);
-    crank_talk_oop_t compiledFunction = (crank_talk_oop_t)crank_talk_CompiledFunction_createForPrimitive(context, name, 1, entryPoint);
+    crank_talk_oop_t compiledFunction = (crank_talk_oop_t)crank_talk_CompiledFunction_createForNativePrimitive(context, name, 1, entryPoint);
     crank_talk_IdentityDictionary_atPut(context, context->roots.messageSendMacroDictionary, name, compiledFunction);
 }
 

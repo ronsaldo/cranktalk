@@ -426,6 +426,9 @@ struct crank_talk_CompiledFunction_s {
     crank_talk_Array_t *literalVector;
     crank_talk_Array_t *sourcePositions;
 
+    crank_talk_Symbol_t *primitiveName;
+    crank_talk_ExternalAddress_t *primitiveEntryPoint;
+
     crank_talk_oop_t isBlock;
     crank_talk_oop_t isInnerBlock;
     crank_talk_oop_t definitionEnvironment;

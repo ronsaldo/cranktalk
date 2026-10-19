@@ -4,6 +4,7 @@
 #include "object-model.h"
 #include "heap.h"
 #include "dynarray.h"
+#include "primitives.h"
 
 #define CrankAllocateVariadicObjectWithClassName(context, objectClassName, dataType, variadicByteSize) \
     crank_talk_heap_allocateOopWithSizeAndType(&context->heap, sizeof(crank_talk_ ## objectClassName##_t) + variadicByteSize, dataType, context->roots.objectClassName##Class)
@@ -296,6 +297,7 @@ struct crank_talk_VMContextRoots_s
 
 struct crank_talk_VMContext_s
 {
+    crank_talk_PrimitivesTable_t primitiveTable;
     crank_talk_VMContextRoots_t roots;
     crank_talk_heap_t heap;
 

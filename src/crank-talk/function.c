@@ -15,7 +15,7 @@
 #include <stdio.h>
 
 CRANK_TALK_API crank_talk_CompiledFunction_t*
-crank_talk_CompiledFunction_createForPrimitive(crank_talk_VMContext_t *context, crank_talk_oop_t name, size_t argumentCount, crank_talk_CompiledFunctionNativeEntryPoint_t entryPoint)
+crank_talk_CompiledFunction_createForNativePrimitive(crank_talk_VMContext_t *context, crank_talk_oop_t name, size_t argumentCount, crank_talk_CompiledFunctionNativeEntryPoint_t entryPoint)
 {
     crank_talk_ExternalAddress_t *entryPointAddress = (crank_talk_ExternalAddress_t*)crank_talk_ExternalAddress_make(context, entryPoint);
 
@@ -23,6 +23,24 @@ crank_talk_CompiledFunction_createForPrimitive(crank_talk_VMContext_t *context, 
     primitiveFunction->name = name;
     primitiveFunction->argumentCount = crank_talk_oop_encodeSmallInteger(argumentCount);
     primitiveFunction->nativeEntryPoint = entryPointAddress;
+    return primitiveFunction; 
+}
+
+CRANK_TALK_API crank_talk_CompiledFunction_t*
+crank_talk_CompiledFunction_createForPrimitive(crank_talk_VMContext_t *context, crank_talk_oop_t name, size_t argumentCount, const char *primitiveName, crank_talk_PrimitiveFunction_t primitiveEntryPoint)
+{
+
+    crank_talk_CompiledFunction_t *primitiveFunction = (crank_talk_CompiledFunction_t*)CrankAllocateValuesObjectWithClassName(context, CompiledFunction);
+    primitiveFunction->name = name;
+    primitiveFunction->argumentCount = crank_talk_oop_encodeSmallInteger(argumentCount);
+    primitiveFunction->primitiveName = (crank_talk_Symbol_t*)crank_talk_Symbol_internWithCString(context, primitiveName);
+
+    if(primitiveEntryPoint)
+    {
+        crank_talk_ExternalAddress_t *entryPointAddress = (crank_talk_ExternalAddress_t*)crank_talk_ExternalAddress_make(context, primitiveEntryPoint);
+        primitiveFunction->primitiveEntryPoint = entryPointAddress;
+    }
+
     return primitiveFunction; 
 }
 
@@ -51,6 +69,42 @@ crank_talk_CompiledFunction_apply(crank_talk_VMContext_t *context, crank_talk_Co
     crank_talk_stackFrame_pushRecord(&rootsRecord.super);
 
     crank_talk_CompiledFunction_ensureAnalysis(context, function);
+
+    if(function->primitiveName)
+    {
+        // Find the primitive entry point
+        if(!function->primitiveEntryPoint)
+        {
+            crank_talk_PrimitiveFunction_t entryPoint = crank_talk_PrimitiveTables_lookupWithString(&context->primitiveTable, crank_talk_object_getSizeInBytes((crank_talk_oop_t)function->primitiveName), function->primitiveName->elements);
+            if(entryPoint)
+            {
+                function->primitiveEntryPoint = (crank_talk_ExternalAddress_t*)crank_talk_ExternalAddress_make(context, entryPoint);
+            }
+        }
+
+        // Evaluate the primitive.
+        if(function->primitiveEntryPoint)
+        {
+            crank_talk_PrimitiveContext_t primitiveContext = {
+                .context = context,
+                .closure = (crank_talk_oop_t)closure,
+                .argumentCount = argumentCount,
+                .arguments = arguments,
+                .resultValue = crank_talk_oop_nil(),
+                .failed = false,
+            };
+        
+            crank_talk_PrimitiveFunction_t entryPoint = (crank_talk_PrimitiveFunction_t)function->primitiveEntryPoint->address;
+            entryPoint(&primitiveContext);
+
+            if(!primitiveContext.failed)
+            {
+                crank_talk_stackFrame_popRecord(&rootsRecord.super);
+                return primitiveContext.resultValue;
+            }
+        }
+    }
+
 
     if(function->nativeEntryPoint)
     {
@@ -267,7 +321,7 @@ crank_talk_CompiledFunction_ensureBytecodeGenerationAnalysis(crank_talk_VMContex
 CRANK_TALK_API void
 crank_talk_CompiledFunction_ensureAnalysis(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction)
 {
-    if(compiledFunction->hirFunction || compiledFunction->bytecode || compiledFunction->nativeEntryPoint)
+    if(compiledFunction->hirFunction || compiledFunction->bytecode || compiledFunction->nativeEntryPoint || compiledFunction->primitiveEntryPoint)
         return;
 
     crank_talk_CompiledFunction_ensureHIRAnalysis(context, compiledFunction);
