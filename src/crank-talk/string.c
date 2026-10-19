@@ -500,69 +500,60 @@ crank_talk_Symbol_printOn_primitive(crank_talk_PrimitiveContext_t *primContext)
     return crank_talk_Primitive_return(primContext, receiver);
 }
 
-static crank_talk_oop_t
-crank_talk_StringStream_nextPut_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_StringStream_nextPut_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)context;
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t stream = arguments[0];
-    crank_talk_oop_t character = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t stream = primContext->arguments[0];
+    crank_talk_oop_t character = primContext->arguments[1];
     if(!crank_talk_oop_isCharacter(character))
-        crank_talk_errorPrintf(context, "Expected a character for nextPut:.");
-    crank_talk_StringStream_insertCharacter(context, stream, crank_talk_oop_decodeCharacter(character));
-    return stream;
+        crank_talk_errorPrintf(primContext->context, "Expected a character for nextPut:.");
+
+    crank_talk_StringStream_insertCharacter(primContext->context, stream, crank_talk_oop_decodeCharacter(character));
+    return crank_talk_Primitive_return(primContext, stream);
 }
 
-static crank_talk_oop_t
-crank_talk_StringStream_nextPutAll_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_StringStream_nextPutAll_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)context;
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t stream = arguments[0];
-    crank_talk_oop_t bytes = arguments[1];
-    crank_talk_StringStream_insertBytesObject(context, stream, bytes);
-    return stream;
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t stream = primContext->arguments[0];
+    crank_talk_oop_t bytes = primContext->arguments[1];
+    crank_talk_StringStream_insertBytesObject(primContext->context, stream, bytes);
+    return crank_talk_Primitive_return(primContext, stream);
 }
 
-static crank_talk_oop_t
-crank_talk_StringStream_print_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_StringStream_print_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)context;
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t stream = arguments[0];
-    crank_talk_oop_t object = arguments[1];
-    crank_talk_StringStream_print(context, stream, object);
-    return stream;
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t stream = primContext->arguments[0];
+    crank_talk_oop_t object = primContext->arguments[1];
+    crank_talk_StringStream_print(primContext->context, stream, object);
+    return crank_talk_Primitive_return(primContext, stream);
 }
 
-static crank_talk_oop_t
-crank_talk_StringStream_space_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_StringStream_space_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)context;
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 1);
-    crank_talk_oop_t stream = arguments[0];
-    crank_talk_StringStream_insertCharacter(context, stream, ' ');
-    return stream;
+    if(primContext->argumentCount < 1) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t stream = primContext->arguments[0];
+    crank_talk_StringStream_insertCharacter(primContext->context, stream, ' ');
+    return  crank_talk_Primitive_return(primContext, stream);
 }
 
-static crank_talk_oop_t
-crank_talk_StringStream_lf_primitive(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_StringStream_lf_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)context;
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 1);
-    crank_talk_oop_t stream = arguments[0];
-    crank_talk_StringStream_insertCharacter(context, stream, '\n');
-    return stream;
+    if(primContext->argumentCount < 1) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t stream = primContext->arguments[0];
+    crank_talk_StringStream_insertCharacter(primContext->context, stream, '\n');
+    return  crank_talk_Primitive_return(primContext, stream);
 }
 
 void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context)
@@ -590,10 +581,9 @@ void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "asString", 1, "Symbol::asString", crank_talk_Symbol_asString_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "printOn:", 2, "Symbol::printOn:", crank_talk_Symbol_printOn_primitive);
 
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringStreamClass, "nextPut:", 2, crank_talk_StringStream_nextPut_primitive);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringStreamClass, "nextPutAll:", 2, crank_talk_StringStream_nextPutAll_primitive);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringStreamClass, "print:", 2, crank_talk_StringStream_print_primitive);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringStreamClass, "space", 1, crank_talk_StringStream_space_primitive);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.StringStreamClass, "lf", 1, crank_talk_StringStream_lf_primitive);
-
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "nextPut:", 2, "StringStream::nextPut:", crank_talk_StringStream_nextPut_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "nextPutAll:", 2, "StringStream::nextPutAll:", crank_talk_StringStream_nextPutAll_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "print:", 2, "StringStream::print:", crank_talk_StringStream_print_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "space", 1, "StringStream::space", crank_talk_StringStream_space_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "lf", 1, "StringStream::lf", crank_talk_StringStream_lf_primitive);
 }
