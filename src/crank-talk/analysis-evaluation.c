@@ -58,42 +58,40 @@ crank_talk_ParseTreeAnalyzeAndEvaluate(crank_talk_VMContext_t *context, crank_ta
     return crank_talk_send1(context, context->roots.analyzeAndEvaluateWithSymbol, parseTreeNode, evaluationContext);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeAssignmentNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeAssignmentNode_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t evaluationContextValue = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t evaluationContextValue = primContext->arguments[1];
 
     crank_talk_ParseTreeAssignmentNode_t *node = (crank_talk_ParseTreeAssignmentNode_t*)self;
     crank_talk_AnalysisAndEvaluationContext_t *evaluationContext = (crank_talk_AnalysisAndEvaluationContext_t*)evaluationContextValue;
    
-    if(!crank_talk_oop_isKindOf(context, (crank_talk_oop_t)node->store, (crank_talk_oop_t)context->roots.ParseTreeIdentifierReferenceNodeClass))
-        crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->store->sourcePosition, "Expected an identifier with the variable name to assign.");
+    if(!crank_talk_oop_isKindOf(primContext->context, (crank_talk_oop_t)node->store, (crank_talk_oop_t)primContext->context->roots.ParseTreeIdentifierReferenceNodeClass))
+        crank_talk_errorAtSourcePosition(primContext->context, (crank_talk_oop_t)node->store->sourcePosition, "Expected an identifier with the variable name to assign.");
 
     crank_talk_ParseTreeIdentifierReferenceNode_t *storeIdentifer = (crank_talk_ParseTreeIdentifierReferenceNode_t*)node->store;
-    crank_talk_oop_t foundBinding = crank_talk_Environment_lookupSymbolRecursively(context, evaluationContext->lexicalEnvironment, (crank_talk_oop_t)storeIdentifer->symbol);
+    crank_talk_oop_t foundBinding = crank_talk_Environment_lookupSymbolRecursively(primContext->context, evaluationContext->lexicalEnvironment, (crank_talk_oop_t)storeIdentifer->symbol);
     if(crank_talk_oop_isNil(foundBinding))
-        crank_talk_errorPrintfAtSourcePosition(context, (crank_talk_oop_t)node->super.sourcePosition, "Binding not found for symbol #" CRANK_TALK_STRING_FORMAT, CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)storeIdentifer->symbol));
+        crank_talk_errorPrintfAtSourcePosition(primContext->context, (crank_talk_oop_t)node->super.sourcePosition, "Binding not found for symbol #" CRANK_TALK_STRING_FORMAT, CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)storeIdentifer->symbol));
 
-    crank_talk_oop_t valueToStore = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->value, evaluationContextValue);
+    crank_talk_oop_t valueToStore = crank_talk_ParseTreeAnalyzeAndEvaluate(primContext->context, (crank_talk_oop_t)node->value, evaluationContextValue);
 
     //// TODO: Use a message here.
-    assert(crank_talk_oop_isKindOf(context, foundBinding, context->roots.LiteralVariableClass));
+    assert(crank_talk_oop_isKindOf(primContext->context, foundBinding, primContext->context->roots.LiteralVariableClass));
     ((crank_talk_LiteralVariable_t*)foundBinding)->value = valueToStore;
-    return valueToStore;
+    return crank_talk_Primitive_return(primContext, valueToStore);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t evaluationContextValue = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t evaluationContextValue = primContext->arguments[1];
 
     crank_talk_ParseTreeBlockNode_t *node = (crank_talk_ParseTreeBlockNode_t*)self;
     crank_talk_AnalysisAndEvaluationContext_t *evaluationContext = (crank_talk_AnalysisAndEvaluationContext_t*)evaluationContextValue;
@@ -105,26 +103,26 @@ crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *con
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
 
     // Compile the function
-    gcFrame.compiledFunctionValue = CrankAllocateValuesObjectWithClassName(context, CompiledFunction);
+    gcFrame.compiledFunctionValue = CrankAllocateValuesObjectWithClassName(primContext->context, CompiledFunction);
     crank_talk_CompiledFunction_t *compiledFunction = (crank_talk_CompiledFunction_t*)gcFrame.compiledFunctionValue;
     compiledFunction->argumentCount = crank_talk_oop_encodeSmallInteger(crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments));
-    compiledFunction->isBlock = crank_talk_oop_fromBoolean(context, true);
-    compiledFunction->isInnerBlock = crank_talk_oop_fromBoolean(context, false);
+    compiledFunction->isBlock = crank_talk_oop_fromBoolean(primContext->context, true);
+    compiledFunction->isInnerBlock = crank_talk_oop_fromBoolean(primContext->context, false);
     compiledFunction->definitionEnvironment = evaluationContext->lexicalEnvironment;
     compiledFunction->definitionArguments = (crank_talk_Array_t*)node->arguments;
     compiledFunction->definitionBody = (crank_talk_oop_t)node->body;
-    crank_talk_CompiledFunction_ensureAnalysis(context, compiledFunction);
+    crank_talk_CompiledFunction_ensureAnalysis(primContext->context, compiledFunction);
 
     // Create the captureless block closure
     assert(crank_talk_object_getSizeInSlots((crank_talk_oop_t)((crank_talk_HIRFunction_t*)compiledFunction->hirFunction)->captures) == 0);
-    gcFrame.blockClosureValue = CrankAllocateValuesObjectWithClassName(context, BlockClosure);
+    gcFrame.blockClosureValue = CrankAllocateValuesObjectWithClassName(primContext->context, BlockClosure);
     crank_talk_BlockClosure_t *blockClosure = (crank_talk_BlockClosure_t *)gcFrame.blockClosureValue;
-    blockClosure->captureVector = (crank_talk_Array_t*)crank_talk_Array_create(context, 0);
+    blockClosure->captureVector = (crank_talk_Array_t*)crank_talk_Array_create(primContext->context, 0);
     blockClosure->function = compiledFunction;
 
     CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
 
-    return gcFrame.blockClosureValue;
+    return crank_talk_Primitive_return(primContext, gcFrame.blockClosureValue);
 }
 
 static void
@@ -141,108 +139,89 @@ crank_talk_ParseTreeLiteralVariableNode_analyzeAndEvaluateIdentifierReferenceWit
 }
 
 
-static crank_talk_oop_t
-crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t evaluationContextValue = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t evaluationContextValue = primContext->arguments[1];
 
     crank_talk_ParseTreeIdentifierReferenceNode_t *node = (crank_talk_ParseTreeIdentifierReferenceNode_t*)self;
     crank_talk_AnalysisAndEvaluationContext_t *evaluationContext = (crank_talk_AnalysisAndEvaluationContext_t*)evaluationContextValue;
-    crank_talk_oop_t foundBinding = crank_talk_Environment_lookupSymbolRecursively(context, evaluationContext->lexicalEnvironment, (crank_talk_oop_t)node->symbol);
+    crank_talk_oop_t foundBinding = crank_talk_Environment_lookupSymbolRecursively(primContext->context, evaluationContext->lexicalEnvironment, (crank_talk_oop_t)node->symbol);
     if(crank_talk_oop_isNil(foundBinding))
-        crank_talk_errorPrintfAtSourcePosition(context, (crank_talk_oop_t)node->super.sourcePosition, "Binding not found for symbol #" CRANK_TALK_STRING_FORMAT, CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)node->symbol));
+        crank_talk_errorPrintfAtSourcePosition(primContext->context, (crank_talk_oop_t)node->super.sourcePosition, "Binding not found for symbol #" CRANK_TALK_STRING_FORMAT, CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)node->symbol));
 
-    return crank_talk_send2(context, context->roots.analyzeAndEvaluateIdentifierReferenceWithSymbol, foundBinding, self, evaluationContextValue);
+    crank_talk_oop_t result = crank_talk_send2(primContext->context, primContext->context->roots.analyzeAndEvaluateIdentifierReferenceWithSymbol, foundBinding, self, evaluationContextValue);
+    return crank_talk_Primitive_return(primContext, result);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)context;
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t self = arguments[0];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
     crank_talk_ParseTreeLiteralNode_t *node = (crank_talk_ParseTreeLiteralNode_t*)self;
-    return node->value;
+    return crank_talk_Primitive_return(primContext, node->value);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeNilReference_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeNilReference_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)context;
-    (void)closure;
-    (void)arguments;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    return crank_talk_oop_nil();
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_nil());
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeFalseReference_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeFalseReference_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)arguments;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    return context->roots.falseValue;
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    return crank_talk_Primitive_return(primContext, primContext->context->roots.falseValue);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeTrueReference_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeTrueReference_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)arguments;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    return context->roots.trueValue;
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    return crank_talk_Primitive_return(primContext, primContext->context->roots.trueValue);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeSelfReference_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeSelfReference_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)context;
-    (void)argumentCount;
-    (void)arguments;
-    assert(argumentCount >= 2);
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
 
-    return crank_talk_oop_nil();
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_nil());
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeSuperReference_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeSuperReference_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)context;
-    (void)argumentCount;
-    (void)arguments;
-    assert(argumentCount >= 2);
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
 
-    return crank_talk_oop_nil();
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_nil());
 }
 
 
-static crank_talk_oop_t
-crank_talk_ParseTreeThisContextReference_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeThisContextReference_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
 
     //crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t evaluationContextValue = arguments[1];
+    crank_talk_oop_t evaluationContextValue = primContext->arguments[1];
 
     crank_talk_AnalysisAndEvaluationContext_t *evaluationContext = (crank_talk_AnalysisAndEvaluationContext_t*)evaluationContextValue;
 
-    crank_talk_oop_t scriptContextValue = CrankAllocateValuesObjectWithClassName(context, ScriptContext);
+    crank_talk_oop_t scriptContextValue = CrankAllocateValuesObjectWithClassName(primContext->context, ScriptContext);
     crank_talk_ScriptContext_t *scriptContext = (crank_talk_ScriptContext_t *)scriptContextValue;
     scriptContext->lexicalEnvironment = evaluationContext->lexicalEnvironment;
-    return scriptContextValue;
+    return crank_talk_Primitive_return(primContext, scriptContextValue);
 }
 
 static crank_talk_oop_t
@@ -778,16 +757,16 @@ crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* conte
 {
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.LiteralVariableClass, "analyzeAndEvaluateIdentifierReference:with:", 3, "LiteralVariable::analyzeAndEvaluateIdentifierReference:with:", crank_talk_ParseTreeLiteralVariableNode_analyzeAndEvaluateIdentifierReferenceWith);
 
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeAssignmentNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeAssignmentNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeBlockNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeNilReference_analyzeAndEvaluateWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeFalseReference_analyzeAndEvaluateWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeTrueReference_analyzeAndEvaluateWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeSelfReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSelfReference_analyzeAndEvaluateWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeSuperReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeSuperReference_analyzeAndEvaluateWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeThisContextReferenceNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeThisContextReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeAssignmentNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeAssignmentNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeAssignmentNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeBlockNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeBlockNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeIdentifierReferenceNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeLiteralNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeNilReferenceNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeNilReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeFalseReferenceNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeFalseReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeTrueReferenceNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeTrueReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSelfReferenceNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeSelfReferenceNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeSelfReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSuperReferenceNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeSuperReferenceNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeSuperReference_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeThisContextReferenceNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeThisContextReferenceNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeThisContextReference_analyzeAndEvaluateWith);
     
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeCascadedMessageNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeCascadedMessageNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeMessageCascadeNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeMessageCascadeNode_analyzeAndEvaluateWith);
