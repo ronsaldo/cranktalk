@@ -113,6 +113,9 @@ crank_talk_ScannerState_stringEquals(crank_talk_ScannerState_t* state, crank_tal
 {
     const char* scannerString = initialState->text + initialState->position;
     size_t scannerStringSize = state->position - initialState->position;
+    size_t stringSize = strlen(string);
+    if(scannerStringSize != stringSize)
+        return false;
     return memcmp(scannerString, string, scannerStringSize) == 0;
 }
 

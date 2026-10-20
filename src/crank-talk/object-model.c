@@ -123,6 +123,16 @@ crank_talk_Object_isKindOf_primitive(crank_talk_PrimitiveContext_t *primContext)
 }
 
 static void
+crank_talk_Object_isMemberOf_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t object = primContext->arguments[0];
+    crank_talk_oop_t clazz = primContext->arguments[1];
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, (crank_talk_oop_t)crank_talk_oop_getClass(primContext->context, object) == clazz));
+}
+
+static void
 crank_talk_ProtoObject_yourself_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
     if(primContext->argumentCount < 1) return crank_talk_Primitive_fail(primContext);
@@ -351,6 +361,7 @@ crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "hash", 2, "Object::hash", crank_talk_Object_hash_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "species", 1, "Object::species", crank_talk_Object_species_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "isKindOf:", 2, "Object::isKindOf:", crank_talk_Object_isKindOf_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "isMemberOf:", 2, "Object::isMemberOf:", crank_talk_Object_isMemberOf_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "basicSize", 1, "Object::basicSize", crank_talk_Object_basicSize_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "size", 1, "Object::size", crank_talk_Object_basicSize_primitive);

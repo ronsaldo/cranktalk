@@ -291,6 +291,49 @@ crank_talk_SmallInteger_divide_primitive(crank_talk_PrimitiveContext_t *primCont
 
     intptr_t value = crank_talk_oop_decodeSmallInteger(self);
     intptr_t operandValue = crank_talk_oop_decodeSmallInteger(operand);
+
+    // Division by zero.
+    if (operandValue == 0) return crank_talk_Primitive_fail(primContext);
+
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_encodeSmallInteger(value / operandValue));
+}
+
+static void
+crank_talk_SmallInteger_modulo_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t operand = primContext->arguments[1];
+
+    if(!crank_talk_oop_isSmallInteger(operand)) return crank_talk_Primitive_fail(primContext);
+
+    intptr_t value = crank_talk_oop_decodeSmallInteger(self);
+    intptr_t operandValue = crank_talk_oop_decodeSmallInteger(operand);
+
+    // Division by zero.
+    if (operandValue == 0) return crank_talk_Primitive_fail(primContext);
+
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_encodeSmallInteger(value % operandValue));
+}
+
+static void
+crank_talk_SmallInteger_divideFraction_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t operand = primContext->arguments[1];
+
+    if(!crank_talk_oop_isSmallInteger(operand)) return crank_talk_Primitive_fail(primContext);
+
+    intptr_t value = crank_talk_oop_decodeSmallInteger(self);
+    intptr_t operandValue = crank_talk_oop_decodeSmallInteger(operand);
+
+    // Division by zero.
+    if (operandValue == 0) return crank_talk_Primitive_fail(primContext);
+
+    // Is the division exact?
+    if (value % operandValue != 0) return crank_talk_Primitive_fail(primContext);
+
     return crank_talk_Primitive_return(primContext, crank_talk_oop_encodeSmallInteger(value / operandValue));
 }
 
@@ -413,7 +456,9 @@ crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "-", 2,  "SmallInteger::-",  crank_talk_SmallInteger_minus_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "*", 2,  "SmallInteger::*",  crank_talk_SmallInteger_times_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "//", 2, "SmallInteger:://", crank_talk_SmallInteger_divide_primitive);
-
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "\\\\", 2, "SmallInteger::\\", crank_talk_SmallInteger_modulo_primitive);
+crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "/", 2,  "SmallInteger::/",  crank_talk_SmallInteger_divideFraction_primitive);
+    
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "=",  2, "SmallInteger::=",  crank_talk_SmallInteger_equals_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "~=", 2, "SmallInteger::~=", crank_talk_SmallInteger_notEquals_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "<",  2, "SmallInteger::<",  crank_talk_SmallInteger_lessThan_primitive);

@@ -62,6 +62,16 @@ void scanner_runTests(void)
         AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
     }
 
+    // Single letter identifier
+    {
+        crank_talk_oop_t tokensValue = scanString(context, "n");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindIdentifier, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+
     // Identifier
     {
         crank_talk_oop_t tokensValue = scanString(context, "helloIdentifier");
