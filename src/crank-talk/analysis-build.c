@@ -145,14 +145,13 @@ crank_talk_ParseTreeAssignmentNode_analyzeAndBuildWith(crank_talk_PrimitiveConte
     return crank_talk_Primitive_return(primContext, result);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeBlockNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeBlockNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t buildContextValue = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t buildContextValue = primContext->arguments[1];
 
     crank_talk_ParseTreeBlockNode_t *node = (crank_talk_ParseTreeBlockNode_t*)self;
     crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t*)buildContextValue;
@@ -164,15 +163,15 @@ crank_talk_ParseTreeBlockNode_analyzeAndBuildWith(crank_talk_VMContext_t *contex
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
 
     // Compile the function
-    gcFrame.compiledFunctionValue = CrankAllocateValuesObjectWithClassName(context, CompiledFunction);
+    gcFrame.compiledFunctionValue = CrankAllocateValuesObjectWithClassName(primContext->context, CompiledFunction);
     crank_talk_CompiledFunction_t *compiledFunction = (crank_talk_CompiledFunction_t*)gcFrame.compiledFunctionValue;
     compiledFunction->argumentCount = crank_talk_oop_encodeSmallInteger(crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments));
-    compiledFunction->isBlock = crank_talk_oop_fromBoolean(context, true);
-    compiledFunction->isInnerBlock = crank_talk_oop_fromBoolean(context, true);
+    compiledFunction->isBlock = crank_talk_oop_fromBoolean(primContext->context, true);
+    compiledFunction->isInnerBlock = crank_talk_oop_fromBoolean(primContext->context, true);
     compiledFunction->definitionEnvironment = buildContext->builder->lexicalEnvironment;
     compiledFunction->definitionArguments = (crank_talk_Array_t*)node->arguments;
     compiledFunction->definitionBody = (crank_talk_oop_t)node->body;
-    crank_talk_CompiledFunction_ensureAnalysis(context, compiledFunction);
+    crank_talk_CompiledFunction_ensureAnalysis(primContext->context, compiledFunction);
 
     crank_talk_HIRFunction_t *hirFunction = (crank_talk_HIRFunction_t *)compiledFunction->hirFunction;
     size_t captureCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)hirFunction->captures);
@@ -180,117 +179,120 @@ crank_talk_ParseTreeBlockNode_analyzeAndBuildWith(crank_talk_VMContext_t *contex
     {
         // FIXME: create a captureless block closure if it does not have a non-local return
         // Create the captureless block closure
-        gcFrame.blockClosureValue = CrankAllocateValuesObjectWithClassName(context, BlockClosure);
+        gcFrame.blockClosureValue = CrankAllocateValuesObjectWithClassName(primContext->context, BlockClosure);
         crank_talk_BlockClosure_t *blockClosure = (crank_talk_BlockClosure_t *)gcFrame.blockClosureValue;
-        blockClosure->captureVector = (crank_talk_Array_t*)crank_talk_Array_create(context, 0);
+        blockClosure->captureVector = (crank_talk_Array_t*)crank_talk_Array_create(primContext->context, 0);
         blockClosure->function = compiledFunction;
 
+        crank_talk_oop_t result = crank_talk_HIRConstantLiteralValue_create(primContext->context, gcFrame.blockClosureValue, (crank_talk_oop_t)node->super.sourcePosition);
         CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-        return crank_talk_HIRConstantLiteralValue_create(context, gcFrame.blockClosureValue, (crank_talk_oop_t)node->super.sourcePosition);
+        return crank_talk_Primitive_return(primContext, result);
     }
     else
     {
-        crank_talk_Array_t *capturedValues = (crank_talk_Array_t*)crank_talk_Array_create(context, captureCount);
+        crank_talk_Array_t *capturedValues = (crank_talk_Array_t*)crank_talk_Array_create(primContext->context, captureCount);
         for(size_t i = 0; i < captureCount; ++i)
         {
             crank_talk_HIRCapture_t *capture = (crank_talk_HIRCapture_t*)hirFunction->captures->elements[i];
             capturedValues->elements[i] = (crank_talk_oop_t)capture->capturedValue;
         }
 
+        crank_talk_oop_t result = crank_talk_HIRBuilder_makeClosure(primContext->context, buildContext->builder, compiledFunction, capturedValues, (crank_talk_oop_t)node->super.sourcePosition);
         CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-        return crank_talk_HIRBuilder_makeClosure(context, buildContext->builder, compiledFunction, capturedValues, (crank_talk_oop_t)node->super.sourcePosition);
+        return crank_talk_Primitive_return(primContext, result);
     }
 }
 
-static crank_talk_oop_t
-crank_talk_LiteralVariable_analyzeAndBuildIdentifierReferenceWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_LiteralVariable_analyzeAndBuildIdentifierReferenceWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t referenceNode = arguments[1];
-    crank_talk_oop_t buildContextValue = arguments[2];
+    if(primContext->argumentCount < 3) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t referenceNode = primContext->arguments[1];
+    crank_talk_oop_t buildContextValue = primContext->arguments[2];
 
     crank_talk_ParseTreeIdentifierReferenceNode_t *node = (crank_talk_ParseTreeIdentifierReferenceNode_t*)referenceNode;
     crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t*)buildContextValue;
 
-    crank_talk_HIRValue_t *variableValue = (crank_talk_HIRValue_t *)crank_talk_HIRConstantLiteralValue_create(context, self, (crank_talk_oop_t)node->super.sourcePosition);
-    return crank_talk_HIRBuilder_variableLoad(context, buildContext->builder, variableValue, (crank_talk_oop_t)node->super.sourcePosition);
+    crank_talk_HIRValue_t *variableValue = (crank_talk_HIRValue_t *)crank_talk_HIRConstantLiteralValue_create(primContext->context, self, (crank_talk_oop_t)node->super.sourcePosition);
+    crank_talk_oop_t result = crank_talk_HIRBuilder_variableLoad(primContext->context, buildContext->builder, variableValue, (crank_talk_oop_t)node->super.sourcePosition);
+    return crank_talk_Primitive_return(primContext, result);
 }
 
-static crank_talk_oop_t
-crank_talk_HIRVariable_analyzeAndBuildIdentifierReferenceWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRVariable_analyzeAndBuildIdentifierReferenceWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t referenceNode = arguments[1];
-    crank_talk_oop_t buildContextValue = arguments[2];
+    if(primContext->argumentCount < 3) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t referenceNode = primContext->arguments[1];
+    crank_talk_oop_t buildContextValue = primContext->arguments[2];
 
     crank_talk_HIRVariable_t *hirVariable = (crank_talk_HIRVariable_t *)self;
-    return crank_talk_send2(context, context->roots.analyzeAndBuildIdentifierReferenceWithSymbol, hirVariable->value, referenceNode, buildContextValue);
+    crank_talk_oop_t result = crank_talk_send2(primContext->context, primContext->context->roots.analyzeAndBuildIdentifierReferenceWithSymbol, hirVariable->value, referenceNode, buildContextValue);
+    return crank_talk_Primitive_return(primContext, result);
 }
 
-static crank_talk_oop_t
-crank_talk_HIRValue_analyzeAndBuildIdentifierReferenceWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRValue_analyzeAndBuildIdentifierReferenceWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)context;
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t self = arguments[0];
+    if(primContext->argumentCount < 3) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
     //crank_talk_oop_t referenceNode = arguments[1];
     //crank_talk_oop_t buildContextValue = arguments[2];
 
-    return self;
+    return crank_talk_Primitive_return(primContext, self);
 }
 
-static crank_talk_oop_t
-crank_talk_HIRAllocaInstruction_analyzeAndBuildIdentifierReferenceWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRAllocaInstruction_analyzeAndBuildIdentifierReferenceWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_HIRValue_t *self = (crank_talk_HIRValue_t*)arguments[0];
-    crank_talk_oop_t referenceNode = arguments[1];
-    crank_talk_oop_t buildContextValue = arguments[2];
+    if(primContext->argumentCount < 3) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_HIRValue_t *self = (crank_talk_HIRValue_t*)primContext->arguments[0];
+    crank_talk_oop_t referenceNode = primContext->arguments[1];
+    crank_talk_oop_t buildContextValue = primContext->arguments[2];
     
     crank_talk_ParseTreeIdentifierReferenceNode_t *node = (crank_talk_ParseTreeIdentifierReferenceNode_t*)referenceNode;
     crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t*)buildContextValue;
 
-    return crank_talk_HIRBuilder_variableLoad(context, buildContext->builder, self, (crank_talk_oop_t)node->super.sourcePosition);
+    crank_talk_oop_t result = crank_talk_HIRBuilder_variableLoad(primContext->context, buildContext->builder, self, (crank_talk_oop_t)node->super.sourcePosition);
+    return crank_talk_Primitive_return(primContext, result);
 }
 
-static crank_talk_oop_t
-crank_talk_HIRCaptureInstruction_analyzeAndBuildIdentifierReferenceWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRCaptureInstruction_analyzeAndBuildIdentifierReferenceWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_HIRCapture_t *self = (crank_talk_HIRCapture_t*)arguments[0];
-    crank_talk_oop_t referenceNode = arguments[1];
-    crank_talk_oop_t buildContextValue = arguments[2];
+    if(primContext->argumentCount < 3) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_HIRCapture_t *self = (crank_talk_HIRCapture_t*)primContext->arguments[0];
+    crank_talk_oop_t referenceNode = primContext->arguments[1];
+    crank_talk_oop_t buildContextValue = primContext->arguments[2];
     
     crank_talk_ParseTreeIdentifierReferenceNode_t *node = (crank_talk_ParseTreeIdentifierReferenceNode_t*)referenceNode;
     crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t*)buildContextValue;
 
-    if(crank_talk_oop_asBoolean(context, self->isVariable))
-        return crank_talk_HIRBuilder_variableLoad(context, buildContext->builder, &self->super.super, (crank_talk_oop_t)node->super.sourcePosition);
+    if(crank_talk_oop_asBoolean(primContext->context, self->isVariable))
+    {
+        crank_talk_oop_t result = crank_talk_HIRBuilder_variableLoad(primContext->context, buildContext->builder, &self->super.super, (crank_talk_oop_t)node->super.sourcePosition);
+        return crank_talk_Primitive_return(primContext, result);
+    }
     else
-        return (crank_talk_oop_t)self;
+    {
+        return crank_talk_Primitive_return(primContext, (crank_talk_oop_t)self);
+    }
 }
 
-static crank_talk_oop_t
-crank_talk_Slot_analyzeAndBuildIdentifierReferenceWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_Slot_analyzeAndBuildIdentifierReferenceWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_Slot_t *self = (crank_talk_Slot_t*)arguments[0];
-    crank_talk_oop_t referenceNode = arguments[1];
-    crank_talk_oop_t buildContextValue = arguments[2];
+    if(primContext->argumentCount < 3) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_Slot_t *self = (crank_talk_Slot_t*)primContext->arguments[0];
+    crank_talk_oop_t referenceNode = primContext->arguments[1];
+    crank_talk_oop_t buildContextValue = primContext->arguments[2];
     
     crank_talk_ParseTreeIdentifierReferenceNode_t *node = (crank_talk_ParseTreeIdentifierReferenceNode_t*)referenceNode;
     crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t*)buildContextValue;
@@ -298,30 +300,31 @@ crank_talk_Slot_analyzeAndBuildIdentifierReferenceWith(crank_talk_VMContext_t *c
     //return crank_talk_HIRBuilder_variableLoad(context, buildContext->builder, self, (crank_talk_oop_t)node->super.sourcePosition);
     size_t slotIndex = crank_talk_oop_decodeSmallInteger(self->index);
 
-    crank_talk_oop_t receiverVariable = crank_talk_Environment_lookupReceiverRecursively(context, buildContext->builder->lexicalEnvironment);
-    crank_talk_oop_t receiverValue = crank_talk_send2(context, context->roots.analyzeAndBuildIdentifierReferenceWithSymbol, receiverVariable, referenceNode, buildContextValue);
-    assert(crank_talk_oop_isKindOf(context, receiverValue, context->roots.HIRValueClass));
+    crank_talk_oop_t receiverVariable = crank_talk_Environment_lookupReceiverRecursively(primContext->context, buildContext->builder->lexicalEnvironment);
+    crank_talk_oop_t receiverValue = crank_talk_send2(primContext->context, primContext->context->roots.analyzeAndBuildIdentifierReferenceWithSymbol, receiverVariable, referenceNode, buildContextValue);
+    assert(crank_talk_oop_isKindOf(primContext->context, receiverValue, primContext->context->roots.HIRValueClass));
 
-    return crank_talk_HIRBuilder_slotLoad(context, buildContext->builder, (crank_talk_HIRValue_t*)receiverValue, slotIndex, (crank_talk_oop_t)node->super.sourcePosition);
+    crank_talk_oop_t result = crank_talk_HIRBuilder_slotLoad(primContext->context, buildContext->builder, (crank_talk_HIRValue_t*)receiverValue, slotIndex, (crank_talk_oop_t)node->super.sourcePosition);
+    return crank_talk_Primitive_return(primContext, result);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t buildContextValue = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t buildContextValue = primContext->arguments[1];
 
     crank_talk_ParseTreeIdentifierReferenceNode_t *node = (crank_talk_ParseTreeIdentifierReferenceNode_t*)self;
     crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t*)buildContextValue;
 
-    crank_talk_oop_t foundBinding = crank_talk_Environment_lookupSymbolRecursively(context, buildContext->builder->lexicalEnvironment, (crank_talk_oop_t)node->symbol);
+    crank_talk_oop_t foundBinding = crank_talk_Environment_lookupSymbolRecursively(primContext->context, buildContext->builder->lexicalEnvironment, (crank_talk_oop_t)node->symbol);
     if(crank_talk_oop_isNil(foundBinding))
-        crank_talk_errorPrintfAtSourcePosition(context, (crank_talk_oop_t)node->super.sourcePosition, "Binding not found for symbol #" CRANK_TALK_STRING_FORMAT, CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)node->symbol));
+        crank_talk_errorPrintfAtSourcePosition(primContext->context, (crank_talk_oop_t)node->super.sourcePosition, "Binding not found for symbol #" CRANK_TALK_STRING_FORMAT, CRANK_TALK_STRING_FORMAT_ARG((crank_talk_oop_t)node->symbol));
     
-    return crank_talk_send2(context, context->roots.analyzeAndBuildIdentifierReferenceWithSymbol, foundBinding, self, buildContextValue);
+    crank_talk_oop_t result = crank_talk_send2(primContext->context, primContext->context->roots.analyzeAndBuildIdentifierReferenceWithSymbol, foundBinding, self, buildContextValue);
+    return crank_talk_Primitive_return(primContext, result);
 }
 
 static crank_talk_oop_t
@@ -946,16 +949,16 @@ crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRCaptureClass, "analyzeAndBuildAssignment:withValue:with:", 4, "HIRCapture::analyzeAndBuildAssignment:withValue:with:", crank_talk_HIRCapture_analyzeAndBuildAssignmentWithWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SlotClass, "analyzeAndBuildAssignment:withValue:with:", 4, "Slot::analyzeAndBuildAssignment:withValue:with:", crank_talk_Slot_analyzeAndBuildAssignmentWithWith);
 
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.LiteralVariableClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_LiteralVariable_analyzeAndBuildIdentifierReferenceWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRVariableClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRVariable_analyzeAndBuildIdentifierReferenceWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRValueClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRValue_analyzeAndBuildIdentifierReferenceWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRAllocaInstruction_analyzeAndBuildIdentifierReferenceWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRCaptureClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_HIRCaptureInstruction_analyzeAndBuildIdentifierReferenceWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.SlotClass, "analyzeAndBuildIdentifierReference:with:", 3, crank_talk_Slot_analyzeAndBuildIdentifierReferenceWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.LiteralVariableClass, "analyzeAndBuildIdentifierReference:with:", 3, "LiteralVariable::analyzeAndBuildIdentifierReference:with:", crank_talk_LiteralVariable_analyzeAndBuildIdentifierReferenceWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableClass, "analyzeAndBuildIdentifierReference:with:", 3, "HIRVariable::analyzeAndBuildIdentifierReference:with:", crank_talk_HIRVariable_analyzeAndBuildIdentifierReferenceWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRValueClass, "analyzeAndBuildIdentifierReference:with:", 3, "HIRValue::analyzeAndBuildIdentifierReference:with:", crank_talk_HIRValue_analyzeAndBuildIdentifierReferenceWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "analyzeAndBuildIdentifierReference:with:", 3, "HIRAllocaInstruction::analyzeAndBuildIdentifierReference:with:", crank_talk_HIRAllocaInstruction_analyzeAndBuildIdentifierReferenceWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRCaptureClass, "analyzeAndBuildIdentifierReference:with:", 3, "HIRCapture::analyzeAndBuildIdentifierReference:with:", crank_talk_HIRCaptureInstruction_analyzeAndBuildIdentifierReferenceWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SlotClass, "analyzeAndBuildIdentifierReference:with:", 3, "Slot::analyzeAndBuildIdentifierReference:with:", crank_talk_Slot_analyzeAndBuildIdentifierReferenceWith);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeAssignmentNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeAssignmentNode::analyzeAndBuildWith:", crank_talk_ParseTreeAssignmentNode_analyzeAndBuildWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeBlockNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeBlockNode_analyzeAndBuildWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeBlockNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeBlockNode::analyzeAndBuildWith:", crank_talk_ParseTreeBlockNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeIdentifierReferenceNode::analyzeAndBuildWith:", crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeLiteralNode_analyzeAndBuildWith);
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeNilReferenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeFalseReferenceNode_analyzeAndBuildWith);
