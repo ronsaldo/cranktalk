@@ -426,6 +426,9 @@ crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(size_t bytecodesSize, siz
 CRANK_TALK_API crank_talk_oop_t
 crank_talk_vm_BytecodeFunction_apply(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction, crank_talk_BlockClosure_t *closureValue, size_t argumentCount, crank_talk_oop_t *arguments)
 {
+    if(!compiledFunction->bytecode)
+        crank_talk_errorPrintf(context, "Cannot activate function without bytecode.");
+        
     crank_talk_stackFrameBytecodeFunctionActivationRecord_t activationRecord = {
         .super.type = CrankTalkStackFrameRecordBytecodeFunctionActivationRecord
     };
