@@ -92,6 +92,7 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
     typedef struct crank_talk_CompiledFunction_s crank_talk_CompiledFunction_t;
     typedef struct crank_talk_BlockClosure_s crank_talk_BlockClosure_t;
     typedef struct crank_talk_Message_s crank_talk_Message_t;
+    typedef struct crank_talk_Pragma_s crank_talk_Pragma_t;
 
     typedef struct crank_talk_Magnitude_s crank_talk_Magnitude_t;
         typedef struct crank_talk_Character_s crank_talk_Character_t;
@@ -426,6 +427,8 @@ struct crank_talk_CompiledFunction_s {
     crank_talk_Array_t *literalVector;
     crank_talk_Array_t *sourcePositions;
 
+    crank_talk_Array_t *pragmas;
+
     crank_talk_Symbol_t *primitiveName;
     crank_talk_ExternalAddress_t *primitiveEntryPoint;
 
@@ -452,6 +455,11 @@ struct crank_talk_Message_s {
     crank_talk_Behavior_t *lookupClass;
 };
 
+struct crank_talk_Pragma_s {
+    crank_talk_Object_t super;
+    crank_talk_Symbol_t *selector;
+    crank_talk_Array_t *arguments;
+};
 
 struct crank_talk_Magnitude_s {
     crank_talk_Object_t super;

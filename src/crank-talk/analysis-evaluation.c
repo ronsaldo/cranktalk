@@ -507,6 +507,38 @@ crank_talk_ParseTreeMethodDefinitionNode_analyzeAndEvaluateWith(crank_talk_Primi
 }
 
 static void
+crank_talk_ParseTreePragmaNode_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t evaluationContextValue = primContext->arguments[1];
+
+    crank_talk_ParseTreePragmaNode_t *node = (crank_talk_ParseTreePragmaNode_t*)self;
+
+    struct {
+        crank_talk_Array_t *arguments;
+        crank_talk_oop_t result;
+    } gcFrame = {};
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    // Evaluate the arguments
+    size_t argumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments);
+    gcFrame.arguments = (crank_talk_Array_t*)crank_talk_Array_create(primContext->context, argumentCount);
+    for(size_t i = 0; i < argumentCount; ++i)
+        gcFrame.arguments->elements[i] = crank_talk_ParseTreeAnalyzeAndEvaluate(primContext->context, node->arguments->elements[i], evaluationContextValue);
+
+    // Make the result.
+    gcFrame.result = CrankAllocateValuesObjectWithClassName(primContext->context, Pragma);
+    crank_talk_Pragma_t *result = (crank_talk_Pragma_t *)gcFrame.result;
+    result->selector = node->selector;
+    result->arguments = gcFrame.arguments;
+
+    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+    return crank_talk_Primitive_return(primContext, gcFrame.result);
+}
+
+static void
 crank_talk_ParseTreeVariableDefinitionNode_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
 {
     if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
@@ -762,6 +794,7 @@ crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* conte
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeReturnNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeReturnNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeReturnNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeAddMethodNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeAddMethodNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeAddMethodNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMethodDefinitionNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeMethodDefinitionNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeMethodDefinitionNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreePragmaNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreePragmaNode::analyzeAndEvaluateWith:", crank_talk_ParseTreePragmaNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeVariableDefinitionNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeVariableDefinitionNode_analyzeAndEvaluateWith);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeCullBlockNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeCullBlockNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeCullNodeNode_analyzeAndEvaluateWith);

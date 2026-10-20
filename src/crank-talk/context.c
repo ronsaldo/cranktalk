@@ -148,6 +148,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.CompiledFunctionClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_CompiledFunction_t), CrankTalkGCObjectDataTypeOops);
     context->roots.BlockClosureClass     = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_BlockClosure_t),     CrankTalkGCObjectDataTypeOops);
     context->roots.MessageClass          = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_Message_t),          CrankTalkGCObjectDataTypeOops);
+    context->roots.PragmaClass           = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_Pragma_t),           CrankTalkGCObjectDataTypeOops);
 
     // Magnitudes and numbers
     context->roots.MagnitudeClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_Magnitude_t), CrankTalkGCObjectDataTypeOops);
@@ -292,6 +293,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     context->roots.processEventSymbol = crank_talk_Symbol_internWithCString(context, "processEvent:");
 
+    context->roots.primitiveSymbol = crank_talk_Symbol_internWithCString(context, "primitive:");
+
     // Message send macro dictionary.
     context->roots.messageSendMacroDictionary = crank_talk_IdentityDictionary_create(context);
 
@@ -326,6 +329,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(CompiledFunction, literalVector),
         CrankTalkSlotDef(CompiledFunction, sourcePositions),
 
+        CrankTalkSlotDef(CompiledFunction, pragmas),
+
         CrankTalkSlotDef(CompiledFunction, primitiveName),
         CrankTalkSlotDef(CompiledFunction, primitiveEntryPoint),
     
@@ -345,6 +350,10 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(Message, selector),
         CrankTalkSlotDef(Message, arguments),
         CrankTalkSlotDef(Message, lookupClass),
+        NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.PragmaClass, "Pragma",
+        CrankTalkSlotDef(Pragma, selector),
+        CrankTalkSlotDef(Pragma, arguments),
         NULL);
 
     crank_talk_context_setClassTypeMetadata(context, context->roots.MagnitudeClass, "Magnitude", NULL);
@@ -484,6 +493,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_Behavior_createClassTables(context, context->roots.CompiledFunctionClass);
     crank_talk_Behavior_createClassTables(context, context->roots.BlockClosureClass);
     crank_talk_Behavior_createClassTables(context, context->roots.MessageClass);
+    crank_talk_Behavior_createClassTables(context, context->roots.PragmaClass);
 
     crank_talk_Behavior_createClassTables(context, context->roots.MagnitudeClass);
     crank_talk_Behavior_createClassTables(context, context->roots.CharacterClass);

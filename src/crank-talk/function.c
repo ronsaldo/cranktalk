@@ -1,5 +1,6 @@
 #include "crank-talk/function.h"
 #include "crank-talk/analysis-build.h"
+#include "crank-talk/analysis-evaluation.h"
 #include "crank-talk/array.h"
 #include "crank-talk/bytecode.h"
 #include "crank-talk/context.h"
@@ -152,6 +153,8 @@ crank_talk_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, c
     crank_talk_oop_t sourcePosition = (crank_talk_oop_t)((crank_talk_ParseTreeNode_t*)compiledFunction->definitionBody)->sourcePosition;
 
     struct {
+        crank_talk_Array_t *pragmas;
+        crank_talk_oop_t pragmaEvaluationContext;
         crank_talk_HIRBasicBlock_t *allocaBlock;
         crank_talk_HIRBuilder_t *allocaBuilder;
         crank_talk_HIRBasicBlock_t *entryBlock;
@@ -163,6 +166,40 @@ crank_talk_CompiledFunction_ensureHIRAnalysis(crank_talk_VMContext_t *context, c
     } gcFrame = {0};
 
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    // Evaluate the pragmas
+    if(crank_talk_isParseTreeSequenceNode(context, compiledFunction->definitionBody))
+    {
+        crank_talk_ParseTreeSequenceNode_t *sequenceNode = (crank_talk_ParseTreeSequenceNode_t *)compiledFunction->definitionBody;
+        size_t pragmaCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)sequenceNode->pragmas);
+        gcFrame.pragmas = (crank_talk_Array_t*)crank_talk_Array_create(context, pragmaCount);
+        if(pragmaCount > 0)
+        {
+            gcFrame.pragmaEvaluationContext = crank_talk_createTopLevelAnalysisAndEvaluationContext(context, crank_talk_oop_nil());
+            for(size_t i = 0; i < pragmaCount; ++i)
+            {
+                crank_talk_oop_t pragmaNode = sequenceNode->pragmas->elements[i];
+                crank_talk_Pragma_t *pragma = (crank_talk_Pragma_t *)crank_talk_ParseTreeAnalyzeAndEvaluate(context, pragmaNode, gcFrame.pragmaEvaluationContext);
+                gcFrame.pragmas->elements[i] = (crank_talk_oop_t)pragma;
+
+                if((crank_talk_oop_t)pragma->selector == context->roots.primitiveSymbol
+                && crank_talk_object_getSizeInSlots((crank_talk_oop_t)pragma->arguments) == 1)
+                {
+                    crank_talk_oop_t primitiveName = pragma->arguments->elements[0];
+                    if(crank_talk_oop_isKindOf(context, primitiveName, context->roots.SymbolClass))
+                        compiledFunction->primitiveName = (crank_talk_Symbol_t*)primitiveName;
+                }
+                
+            }
+            
+        }
+    }
+    else
+    {
+        gcFrame.pragmas = (crank_talk_Array_t*)crank_talk_Array_create(context, 0);
+    }
+
+    compiledFunction->pragmas = gcFrame.pragmas;
 
     // Create the function analysis environment.
     gcFrame.lexicalEnvironment = crank_talk_FunctionAnalysisEnvironment_create(context, compiledFunction->definitionEnvironment);

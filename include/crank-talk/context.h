@@ -30,6 +30,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t CompiledFunctionClass;
     crank_talk_oop_t BlockClosureClass;
     crank_talk_oop_t MessageClass;
+    crank_talk_oop_t PragmaClass;
 
     crank_talk_oop_t MagnitudeClass;
     crank_talk_oop_t CharacterClass;
@@ -154,6 +155,8 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t lessOrEqualsSymbol;
 
     crank_talk_oop_t processEventSymbol;
+
+    crank_talk_oop_t primitiveSymbol;
 
     // Message send macro dictionary.
     crank_talk_oop_t messageSendMacroDictionary;
