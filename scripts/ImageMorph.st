@@ -1,5 +1,7 @@
 | image |
 image := Form fromFileNamed: 'assets/images/clouds.png'.
-image asMorph openInWindow.
+image asMorph
+    extent: 512@512;
+    openInWindow.
 
 OSWindow mainLoop.

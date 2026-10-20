@@ -44,6 +44,21 @@ translucentImage: aForm at: aPoint sourceRect: sourceRect
 ].
 
 FormCanvas ![
+translucentImage: aForm at: aPoint sourceRect: sourceRect color: blendColor
+    self translucentImage: aForm atRect: (aPoint extent: aForm extent) sourceRect: sourceRect color: blendColor
+].
+
+FormCanvas ![
+translucentImage: aForm atRect: aPoint
+    self translucentImage: aForm atRect: aPoint sourceRect: aForm boundingBox
+].
+
+FormCanvas ![
+translucentImage: aForm atRect: targetRectangle sourceRect: sourceRect
+    self translucentImage: aForm atRect: targetRectangle sourceRect: sourceRect color: Color white
+].
+
+FormCanvas ![
 setForm: aForm
     form := aForm
 ].

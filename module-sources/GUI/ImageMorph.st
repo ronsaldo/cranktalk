@@ -5,7 +5,7 @@ Morph << #ImageMorph
 ImageMorph ![
 drawOn: aCanvas
     form ~~ nil ifTrue: [
-        aCanvas translucentImage: form at: 0@0
+        aCanvas translucentImage: form atRect: self localBounds
     ]
 ].
 

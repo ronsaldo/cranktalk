@@ -289,7 +289,7 @@ crank_talk_FormCanvas_fillWithColor_primitive(crank_talk_PrimitiveContext_t *pri
 static void
 crank_talk_FormCanvas_fillRectangleWithColor(crank_talk_VMContext_t *context, crank_talk_Form_t *form,
     float fMinX, float fMinY, float fMaxX, float fMaxY,
-    uint32_t fillColor )
+    uint32_t fillColor)
 {
     // Fetch the form parameters
     int formWidth = (int)crank_talk_oop_decodeSmallInteger(form->width);
@@ -312,7 +312,9 @@ crank_talk_FormCanvas_fillRectangleWithColor(crank_talk_VMContext_t *context, cr
     {
         uint32_t *row = (uint32_t*)(formBits + formPitch*y);
         for(int x = minX; x < maxX; ++x)
+        {
             row[x] = fillColor;
+        }
     }
 }
 
@@ -386,13 +388,14 @@ crank_talk_FormCanvas_drawCharacterRectangleWithColor(crank_talk_VMContext_t *co
             uint8_t destColorB = destColor & 0xFF;
             uint8_t destColorG = (destColor >> 8) & 0xFF;
             uint8_t destColorR = (destColor >> 16) & 0xFF;
-            //uint8_t destColorA = (destColor >> 24) & 0xFF;
+            uint8_t destColorA = (destColor >> 24) & 0xFF;
 
             float blendColorB = fillColorB*sourceAlpha + destColorB*(1.0f - sourceAlpha);
             float blendColorG = fillColorG*sourceAlpha + destColorG*(1.0f - sourceAlpha);
             float blendColorR = fillColorR*sourceAlpha + destColorR*(1.0f - sourceAlpha);
+            float blendColorA = sourceAlpha + destColorA*(1.0f - sourceAlpha);
 
-            row[x] = ((uint32_t)blendColorB) | ((uint32_t)blendColorG << 8) | ((uint32_t)blendColorR << 16);
+            row[x] = ((uint32_t)blendColorB) | ((uint32_t)blendColorG << 8) | ((uint32_t)blendColorR << 16) | ((uint32_t)blendColorA << 24);
         }
             
     }
@@ -430,12 +433,14 @@ crank_talk_FormCanvas_drawTranslucentImage(crank_talk_VMContext_t *context,
     for(int y = minY; y < maxY; ++y)
     {
         float alphaY = (y - fMinY) / (fMaxY - fMinY);
+        alphaY = alphaY - floorf(alphaY);
         //printf("alphaY %f: %f\n", alphaY, t);
         
         uint32_t *row = (uint32_t*)(formBits + formPitch*y);
         for(int x = minX; x < maxX; ++x)
         {
             float alphaX = (x - fMinX) / (fMaxX - fMinX);
+            alphaX = alphaX - floorf(alphaX);
 
             float sourceS = sourceFormWidth*alphaX;
             float sourceT = sourceFormHeight*alphaY;
@@ -465,7 +470,7 @@ crank_talk_FormCanvas_drawTranslucentImage(crank_talk_VMContext_t *context,
             float blendedColorB = blendedSourceColorB*blendedSourceColorA + destColorB*(1.0f - blendedSourceColorA);
             float blendedColorG = blendedSourceColorG*blendedSourceColorA + destColorG*(1.0f - blendedSourceColorA);
             float blendedColorR = blendedSourceColorR*blendedSourceColorA + destColorR*(1.0f - blendedSourceColorA);
-            float blendedColorA = destColorA*blendedSourceColorA;
+            float blendedColorA = blendedSourceColorA + destColorA*(1.0f - blendedSourceColorA);
 
             row[x] = ((uint32_t)(blendedColorB*255)) | ((uint32_t)(blendedColorG*255) << 8) | ((uint32_t)(blendedColorR*255) << 16) | ((uint32_t)(blendedColorA*255) << 24);
         }
@@ -598,7 +603,6 @@ crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive(crank_talk_Pr
         stbtt_aligned_quad quadToDraw = {};
         stbtt_GetBakedQuad(&bakedChar, fontImageWidth, fontImageHeight, 0, &currentBaselineX, &currentBaselineY, &quadToDraw, true);
 
-        //crank_talk_FormCanvas_fillRectangleWithColor(context, form, quadToDraw.x0, quadToDraw.y0, quadToDraw.x1, quadToDraw.y1, fillColor);
         crank_talk_FormCanvas_drawCharacterRectangleWithColor(primContext->context,
             form, quadToDraw.x0, quadToDraw.y0, quadToDraw.x1, quadToDraw.y1,
             fontForm, quadToDraw.s0, quadToDraw.t0, quadToDraw.s1, quadToDraw.t1,
@@ -616,7 +620,7 @@ crank_talk_FormCanvas_translucenImageAtSourceRectWithColor_primitive(crank_talk_
     crank_talk_oop_t self = primContext->arguments[0];
     crank_talk_FormCanvas_t *formCanvas = (crank_talk_FormCanvas_t *)self;
     crank_talk_Form_t *form = (crank_talk_Form_t*)primContext->arguments[1];
-    crank_talk_Point_t *targetPosition = (crank_talk_Point_t*)primContext->arguments[2];
+    crank_talk_Rectangle_t *targetRect = (crank_talk_Rectangle_t*)primContext->arguments[2];
     crank_talk_Rectangle_t *sourceRect = (crank_talk_Rectangle_t *)primContext->arguments[3];
     crank_talk_Color_t *blendColor = (crank_talk_Color_t *)primContext->arguments[4];
 
@@ -624,18 +628,16 @@ crank_talk_FormCanvas_translucenImageAtSourceRectWithColor_primitive(crank_talk_
     float sourceMinY = (float)crank_talk_oop_numberAsFloat(sourceRect->origin->y);
     float sourceMaxX = (float)crank_talk_oop_numberAsFloat(sourceRect->corner->x);
     float sourceMaxY = (float)crank_talk_oop_numberAsFloat(sourceRect->corner->y);
-    float sourceWidth = sourceMaxX - sourceMinX;
-    float sourceHeight = sourceMaxY - sourceMinY;
 
     float originX = (float)crank_talk_oop_numberAsFloat(formCanvas->origin->x);
     float originY = (float)crank_talk_oop_numberAsFloat(formCanvas->origin->y);
     float scaleX = (float)crank_talk_oop_numberAsFloat(formCanvas->scaleFactor->x);
     float scaleY = (float)crank_talk_oop_numberAsFloat(formCanvas->scaleFactor->y);
 
-    float targetMinX = (float)crank_talk_oop_numberAsFloat(targetPosition->x)*scaleX + originX;
-    float targetMinY = (float)crank_talk_oop_numberAsFloat(targetPosition->y)*scaleY + originY;
-    float targetMaxX = targetMinX + sourceWidth*scaleX;
-    float targetMaxY = targetMinY + sourceHeight*scaleY;
+    float targetMinX = (float)crank_talk_oop_numberAsFloat(targetRect->origin->x)*scaleX + originX;
+    float targetMinY = (float)crank_talk_oop_numberAsFloat(targetRect->origin->y)*scaleY + originY;
+    float targetMaxX = (float)crank_talk_oop_numberAsFloat(targetRect->corner->x)*scaleX + originX;
+    float targetMaxY = (float)crank_talk_oop_numberAsFloat(targetRect->corner->y)*scaleY + originY;
 
     float blendColorR = crank_talk_oop_numberAsFloat(blendColor->r);
     float blendColorG = crank_talk_oop_numberAsFloat(blendColor->g);
@@ -668,6 +670,6 @@ crank_talk_registerGUIPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "fillRectangle:color:", 3, "FormCanvas::fillRectangle:color:", crank_talk_FormCanvas_fillRectangleWithColor_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "frameRectangle:borderWidth:color:", 4, "FormCanvas::frameRectangle:borderWidth:color:", crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "drawString:from:to:at:font:color:", 7, "FormCanvas::drawString:from:to:at:font:color:", crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "translucentImage:at:sourceRect:color:", 5, "FormCanvas::translucentImage:at:sourceRect:color:", crank_talk_FormCanvas_translucenImageAtSourceRectWithColor_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "translucentImage:atRect:sourceRect:color:", 5, "FormCanvas::translucentImage:atRect:sourceRect:color:", crank_talk_FormCanvas_translucenImageAtSourceRectWithColor_primitive);
 }
 
