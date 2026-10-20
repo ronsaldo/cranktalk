@@ -15,6 +15,8 @@ CRANK_TALK_API crank_talk_oop_t crank_talk_String_createWithString(crank_talk_VM
 CRANK_TALK_API crank_talk_oop_t crank_talk_String_createWithCString(crank_talk_VMContext_t *context, const char *cstring);
 CRANK_TALK_API bool crank_talk_String_equalsCString(crank_talk_oop_t left, const char *right);
 
+CRANK_TALK_API char *crank_talk_String_asCString(crank_talk_oop_t string);
+
 CRANK_TALK_API crank_talk_oop_t crank_talk_String_concat(crank_talk_VMContext_t *context, crank_talk_oop_t leftString,  crank_talk_oop_t rightString);
 CRANK_TALK_API crank_talk_oop_t crank_talk_String_substring(crank_talk_VMContext_t *context, crank_talk_oop_t string, size_t startIndex, size_t count);
 CRANK_TALK_API crank_talk_oop_t crank_talk_String_dirname(crank_talk_VMContext_t *context, crank_talk_oop_t path);

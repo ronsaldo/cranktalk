@@ -33,6 +33,7 @@ set(CrankTalk_Sources
     set.c
     source-position.c
     stack-frame.c
+    stb-impls.c
     string.c
 )
 

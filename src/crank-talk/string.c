@@ -73,6 +73,18 @@ crank_talk_String_equalsCString(crank_talk_oop_t left, const char *right)
     return memcmp(crank_talk_oop_getBytesData(left), right, leftSize) == 0;
 }
 
+CRANK_TALK_API char *
+crank_talk_String_asCString(crank_talk_oop_t string)
+{
+    size_t stringSize = crank_talk_object_getSizeInBytes(string);
+
+    char *cstring = malloc(stringSize + 1);
+
+    memcpy(cstring, crank_talk_oop_getBytesData(string), stringSize);
+    cstring[stringSize] = 0;
+    return cstring;
+}
+
 CRANK_TALK_API crank_talk_oop_t
 crank_talk_String_concat(crank_talk_VMContext_t *context, crank_talk_oop_t leftString, crank_talk_oop_t rightString)
 {

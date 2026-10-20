@@ -17,6 +17,7 @@ thisContext
     loadFile: 'BorderedMorph.st';
     loadFile: 'RootMorph.st';
     loadFile: 'StringMorph.st';
+    loadFile: 'ImageMorph.st';
     loadFile: 'SimpleButtonMorph.st';
     loadFile: 'TextInputMorph.st';
     loadFile: 'SystemWindowMorph.st'

@@ -29,6 +29,21 @@ drawString: aString from: startIndex to: stopIndex inRectangle: aRectangle font:
 ].
 
 FormCanvas ![
+translucentImage: aForm at: aPoint
+    self translucentImage: aForm at: aPoint sourceRect: aForm boundingBox
+].
+
+FormCanvas ![
+translucentImage: aForm at: aPoint color: aColor
+    self translucentImage: aForm at: aPoint sourceRect: aForm boundingBox color: aColor
+].
+
+FormCanvas ![
+translucentImage: aForm at: aPoint sourceRect: sourceRect
+    self translucentImage: aForm at: aPoint sourceRect: aForm boundingBox color: Color white
+].
+
+FormCanvas ![
 setForm: aForm
     form := aForm
 ].
