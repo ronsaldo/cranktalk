@@ -805,149 +805,101 @@ crank_talk_HIRUnreachableInstruction_isTerminator(crank_talk_PrimitiveContext_t 
     return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRAllocaInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRAllocaInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, true);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRBranchInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRBranchInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, false);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, false));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRConditionalBranchInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRConditionalBranchInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, false);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, false));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRMakeClosureInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRMakeClosureInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, true);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRPhiInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRPhiInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, true);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRPhiSourceInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRPhiSourceInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, false);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, false));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRNonLocalReturnInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRNonLocalReturnInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, false);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, false));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRReturnInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRReturnInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, false);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, false));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRSendInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRSendInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, true);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRSuperSendInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRSuperSendInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, true);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRSlotLoadInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRSlotLoadInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, true);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
 
-static crank_talk_oop_t
-crank_talk_HIRSlotStoreInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRSlotStoreInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, false);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, false));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRThisContextInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRThisContextInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, true);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRUnreachableInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRUnreachableInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, false);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, false));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRVariableLoadInstruction_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRVariableLoadInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, true);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRVariableStoreInstructionClass_hasResultValue(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRVariableStoreInstructionClass_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, false);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, false));
 }
 
 static crank_talk_oop_t
@@ -1340,22 +1292,22 @@ crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRReturnInstructionClass, "isTerminator", 1, "HIRReturnInstruction::isTerminator", crank_talk_HIRReturnInstruction_isTerminator);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRUnreachableInstructionClass, "isTerminator", 1, "HIRUnreachableInstruction::isTerminator", crank_talk_HIRUnreachableInstruction_isTerminator);
 
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "hasResultValue", 1, crank_talk_HIRAllocaInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "hasResultValue", 1, crank_talk_HIRBranchInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRConditionalBranchInstructionClass, "hasResultValue", 1, crank_talk_HIRConditionalBranchInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRMakeClosureInstructionClass, "hasResultValue", 1, crank_talk_HIRMakeClosureInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRPhiInstructionClass, "hasResultValue", 1, crank_talk_HIRPhiInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRPhiSourceInstructionClass, "hasResultValue", 1, crank_talk_HIRPhiSourceInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRNonLocalReturnInstructionClass, "hasResultValue", 1, crank_talk_HIRNonLocalReturnInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRReturnInstructionClass, "hasResultValue", 1, crank_talk_HIRReturnInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRSendInstructionClass, "hasResultValue", 1, crank_talk_HIRSendInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRSuperSendInstructionClass, "hasResultValue", 1, crank_talk_HIRSuperSendInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRSlotLoadInstructionClass, "hasResultValue", 1, crank_talk_HIRSlotLoadInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRSlotStoreInstructionClass, "hasResultValue", 1, crank_talk_HIRSlotStoreInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRThisContextInstructionClass, "hasResultValue", 1, crank_talk_HIRThisContextInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRUnreachableInstructionClass, "hasResultValue", 1, crank_talk_HIRUnreachableInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRVariableLoadInstructionClass, "hasResultValue", 1, crank_talk_HIRVariableLoadInstruction_hasResultValue);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRVariableStoreInstructionClass, "hasResultValue", 1, crank_talk_HIRVariableStoreInstructionClass_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "hasResultValue", 1, "HIRAllocaInstruction::hasResultValue", crank_talk_HIRAllocaInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "hasResultValue", 1, "HIRBranchInstruction::hasResultValue", crank_talk_HIRBranchInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRConditionalBranchInstructionClass, "hasResultValue", 1, "HIRConditionalBranchInstruction::hasResultValue", crank_talk_HIRConditionalBranchInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRMakeClosureInstructionClass, "hasResultValue", 1, "HIRMakeClosureInstruction::hasResultValue", crank_talk_HIRMakeClosureInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRPhiInstructionClass, "hasResultValue", 1, "HIRPhiInstruction::hasResultValue", crank_talk_HIRPhiInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRPhiSourceInstructionClass, "hasResultValue", 1, "HIRPhiSourceInstruction::hasResultValue", crank_talk_HIRPhiSourceInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRNonLocalReturnInstructionClass, "hasResultValue", 1, "HIRNonLocalReturnInstruction::hasResultValue", crank_talk_HIRNonLocalReturnInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRReturnInstructionClass, "hasResultValue", 1, "HIRReturnInstruction::hasResultValue", crank_talk_HIRReturnInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRSendInstructionClass, "hasResultValue", 1, "HIRSendInstruction::hasResultValue", crank_talk_HIRSendInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRSuperSendInstructionClass, "hasResultValue", 1, "HIRSuperSendInstruction::hasResultValue", crank_talk_HIRSuperSendInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRSlotLoadInstructionClass, "hasResultValue", 1, "HIRSlotLoadInstruction::hasResultValue", crank_talk_HIRSlotLoadInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRSlotStoreInstructionClass, "hasResultValue", 1, "HIRSlotStoreInstruction::hasResultValue", crank_talk_HIRSlotStoreInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRThisContextInstructionClass, "hasResultValue", 1, "HIRThisContextInstruction::hasResultValue", crank_talk_HIRThisContextInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRUnreachableInstructionClass, "hasResultValue", 1, "HIRUnreachableInstruction::hasResultValue", crank_talk_HIRUnreachableInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableLoadInstructionClass, "hasResultValue", 1, "HIRVariableLoadInstruction::hasResultValue", crank_talk_HIRVariableLoadInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableStoreInstructionClass, "hasResultValue", 1, "HIRVariableStoreInstruction::hasResultValue", crank_talk_HIRVariableStoreInstructionClass_hasResultValue);
 
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRValueClass, "isHIRVariable", 1, crank_talk_HIRValue_isHIRVariable);
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "isHIRVariable", 1, crank_talk_HIRAllocaInstruction_isHIRVariable);
