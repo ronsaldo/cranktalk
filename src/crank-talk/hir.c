@@ -902,54 +902,45 @@ crank_talk_HIRVariableStoreInstructionClass_hasResultValue(crank_talk_PrimitiveC
     return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, false));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRValue_isHIRVariable(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRValue_isHIRVariable(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, false);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, false));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRAllocaInstruction_isHIRVariable(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRAllocaInstruction_isHIRVariable(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, true);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRCapture_isHIRVariable(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRCapture_isHIRVariable(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    crank_talk_HIRCapture_t *self = (crank_talk_HIRCapture_t *)arguments[0];
-    return self->isVariable;
+    if(primContext->argumentCount < 1) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_HIRCapture_t *self = (crank_talk_HIRCapture_t *)primContext->arguments[0];
+    return crank_talk_Primitive_return(primContext, self->isVariable);
 }
 
-static crank_talk_oop_t
-crank_talk_HIRConstantLiteralValue_getBytecodeAssemblyOperandWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRConstantLiteralValue_getBytecodeAssemblyOperandWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount == 2);
-    crank_talk_HIRConstantLiteralValue_t *literal = (crank_talk_HIRConstantLiteralValue_t*)arguments[0];
-    crank_talk_BytecodeAssembler_t *assembler = (crank_talk_BytecodeAssembler_t *)arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
 
-    return crank_talk_oop_encodeSmallInteger(crank_talk_BytecodeAssembler_getOrCreateLiteral(context, assembler, literal->value));
+    crank_talk_HIRConstantLiteralValue_t *literal = (crank_talk_HIRConstantLiteralValue_t*)primContext->arguments[0];
+    crank_talk_BytecodeAssembler_t *assembler = (crank_talk_BytecodeAssembler_t *)primContext->arguments[1];
+
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_encodeSmallInteger(crank_talk_BytecodeAssembler_getOrCreateLiteral(primContext->context, assembler, literal->value)));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRFunctionLocal_getBytecodeAssemblyOperandWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRFunctionLocal_getBytecodeAssemblyOperandWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)context;
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount == 2);
-    crank_talk_HIRFunctionLocal_t *functionLocal = (crank_talk_HIRFunctionLocal_t*)arguments[0];
-    return functionLocal->bytecodeVectorIndex;
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_HIRFunctionLocal_t *functionLocal = (crank_talk_HIRFunctionLocal_t*)primContext->arguments[0];
+    return crank_talk_Primitive_return(primContext, functionLocal->bytecodeVectorIndex);
 }
 
 static crank_talk_oop_t
@@ -1309,13 +1300,12 @@ crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableLoadInstructionClass, "hasResultValue", 1, "HIRVariableLoadInstruction::hasResultValue", crank_talk_HIRVariableLoadInstruction_hasResultValue);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableStoreInstructionClass, "hasResultValue", 1, "HIRVariableStoreInstruction::hasResultValue", crank_talk_HIRVariableStoreInstructionClass_hasResultValue);
 
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRValueClass, "isHIRVariable", 1, crank_talk_HIRValue_isHIRVariable);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "isHIRVariable", 1, crank_talk_HIRAllocaInstruction_isHIRVariable);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRCaptureClass, "isHIRVariable", 1, crank_talk_HIRCapture_isHIRVariable);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRValueClass, "isHIRVariable", 1, "HIRValue::isHIRVariable", crank_talk_HIRValue_isHIRVariable);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "isHIRVariable", 1, "HIRAllocaInstruction::isHIRVariable", crank_talk_HIRAllocaInstruction_isHIRVariable);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRCaptureClass, "isHIRVariable", 1, "HIRCapture::isHIRVariable", crank_talk_HIRCapture_isHIRVariable);
 
-
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRConstantLiteralValueClass, "getBytecodeAssemblyOperandWith:", 2, crank_talk_HIRConstantLiteralValue_getBytecodeAssemblyOperandWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRFunctionLocalClass, "getBytecodeAssemblyOperandWith:", 2, crank_talk_HIRFunctionLocal_getBytecodeAssemblyOperandWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRConstantLiteralValueClass, "getBytecodeAssemblyOperandWith:", 2, "HIRConstantLiteralValue::getBytecodeAssemblyOperandWith:", crank_talk_HIRConstantLiteralValue_getBytecodeAssemblyOperandWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRFunctionLocalClass, "getBytecodeAssemblyOperandWith:", 2, "HIRFunctionLocal::getBytecodeAssemblyOperandWith:", crank_talk_HIRFunctionLocal_getBytecodeAssemblyOperandWith);
 
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRAllocaInstruction_emitBytecodeAssemblyWith);
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "emitBytecodeAssemblyWith:", 2, crank_talk_HIRBranchInstruction_emitBytecodeAssemblyWith);
