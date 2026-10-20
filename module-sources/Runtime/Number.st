@@ -92,6 +92,16 @@ setNumerator: n denominator: d
 ].
 
 Fraction ![
+numerator
+    ^ numerator
+].
+
+Fraction ![
+denominator
+    ^ denominator
+].
+
+Fraction ![
 reduced
     | gcd n d|
     numerator = 0 ifTrue: [^ 0].
@@ -107,9 +117,11 @@ reduced
 
 Fraction ![
 printOn: aStream
+    aStream nextPut: $(.
     aStream print: numerator.
     aStream nextPut: $/.
     aStream print: denominator.
+    aStream nextPut: $).
 ].
 
 "Integer arithmetic"
@@ -199,7 +211,8 @@ SmallInteger ![
         ifFalse: [super / other]
 ].
 
-"Stdio stdout print: 1 // 2; lf.
+"
+Stdio stdout print: 1 // 2; lf.
 Stdio stdout print: 1 \\ 2; lf.
 
 Stdio stdout print: 1 / 2; lf.

@@ -26,10 +26,11 @@
     self assert: (1.0 - 1) = 0.0.
 ] value.
 
-"Stdio stdout print: 1 // 2; lf.
-Stdio stdout print: 1 \\ 2; lf.
+"Fraction tests"
+[
+    self assert: (1/2) printString = '(1/2)'.
+    self assert: (1/4) printString ~= '(1/2)'.
 
-Stdio stdout print: 1 / 2; lf.
-Stdio stdout print: 1 / 2.0; lf.
-Stdio stdout print: 1.0 / 2; lf.
-"
+    self assert: (1/2) numerator = 1.
+    self assert: (1/2) denominator = 2.
+] value.

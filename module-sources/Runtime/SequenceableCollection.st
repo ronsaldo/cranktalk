@@ -54,7 +54,7 @@ hasEqualElements: otherCollection
     size := self size.
     size = otherCollection size ifFalse: [^ false ].
     1 to: size do: [:index |
-        (self at: size) = (otherCollection at: size) ifFalse: [
+        (self at: index) = (otherCollection at: index) ifFalse: [
             ^ false
         ]
     ].
