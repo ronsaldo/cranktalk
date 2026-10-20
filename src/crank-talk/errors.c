@@ -167,6 +167,21 @@ crank_talk_Object_error_primitive(crank_talk_PrimitiveContext_t *primContext)
 }
 
 static void
+crank_talk_Object_subclassResponsibility_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 1) return crank_talk_Primitive_fail(primContext);
+
+    //crank_talk_oop_t self = primContext->arguments[0];
+
+    crank_talk_SubclassResponsibility_t *error = (crank_talk_SubclassResponsibility_t *)CrankAllocateValuesObjectWithClassName(primContext->context, SubclassResponsibility);
+    error->super.super.messageText = crank_talk_String_createWithCString(primContext->context, "SubclassResponsibility");
+    error->selector = crank_talk_Symbol_internWithCString(primContext->context, "subclassResponsibility");
+    crank_talk_Exception_signal(primContext->context, &error->super.super);
+    abort();
+}
+
+
+static void
 crank_talk_BlockClosure_onDo_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
     if(primContext->argumentCount < 3) return crank_talk_Primitive_fail(primContext);
@@ -246,7 +261,9 @@ crank_talk_registerErrorPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "assert:", 2, "Object::assert:", crank_talk_Object_assert_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "assert:description:", 3, "Object::assert:description:", crank_talk_Object_assertWithDescription_primitive);
 
-        crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "error:", 2, "Object::error:", crank_talk_Object_error_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "error:", 2, "Object::error:", crank_talk_Object_error_primitive);
+    
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "subclassResponsibility", 1, "Object::subclassResponsibility", crank_talk_Object_subclassResponsibility_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "on:do:", 3, "BlockClosure::on:do:", crank_talk_BlockClosure_onDo_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.BlockClosureClass, "ensure:", 2, "BlockClosure::ensure:", crank_talk_BlockClosure_ensure_primitive);

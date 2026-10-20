@@ -9,6 +9,8 @@ typedef struct crank_talk_Exception_s crank_talk_Exception_t;
 typedef struct crank_talk_Error_s crank_talk_Error_t;
 typedef struct crank_talk_AssertionFailure_s crank_talk_AssertionFailure_t;
 typedef struct crank_talk_MessageNotUnderstood_s crank_talk_MessageNotUnderstood_t;
+typedef struct crank_talk_SelectorException_s crank_talk_SelectorException_t;
+typedef struct crank_talk_SubclassResponsibility_s crank_talk_SubclassResponsibility_t;
 
 struct crank_talk_Exception_s
 {
@@ -33,6 +35,17 @@ struct crank_talk_MessageNotUnderstood_s
     crank_talk_oop_t message;
 };
 
+struct crank_talk_SelectorException_s
+{
+    crank_talk_Error_t super;
+    crank_talk_oop_t selector;
+};
+
+struct crank_talk_SubclassResponsibility_s
+{
+    crank_talk_Error_t super;
+    crank_talk_oop_t selector;
+};
 
 CRANK_TALK_API void crank_talk_Exception_signal(crank_talk_VMContext_t *context, crank_talk_Exception_t *exception);
 

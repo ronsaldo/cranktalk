@@ -870,6 +870,10 @@ crank_talk_context_createExceptionsDefinitions(crank_talk_VMContext_t* context)
     context->roots.MessageNotUnderstoodClass = crank_talk_context_createClassAndMetaclass(context, "MessageNotUnderstood", context->roots.ErrorClass, sizeof(crank_talk_MessageNotUnderstood_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(MessageNotUnderstood, message),
         NULL);
+    context->roots.SelectorExceptionClass = crank_talk_context_createClassAndMetaclass(context, "SelectorException", context->roots.ErrorClass, sizeof(crank_talk_SelectorException_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(SelectorException, selector),
+        NULL);
+    context->roots.SubclassResponsibilityClass = crank_talk_context_createClassAndMetaclass(context, "SubclassResponsibility", context->roots.SelectorExceptionClass, sizeof(crank_talk_SubclassResponsibility_t), CrankTalkGCObjectDataTypeOops, NULL);
 }
 
 static void 

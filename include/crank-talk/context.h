@@ -257,6 +257,8 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t ErrorClass;
     crank_talk_oop_t AssertionFailureClass;
     crank_talk_oop_t MessageNotUnderstoodClass;
+    crank_talk_oop_t SelectorExceptionClass;
+    crank_talk_oop_t SubclassResponsibilityClass;
 
     // GUI
     crank_talk_oop_t ColorClass;
