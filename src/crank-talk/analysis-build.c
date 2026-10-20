@@ -874,13 +874,13 @@ crank_talk_ParseTree_cullInlineBlock(crank_talk_VMContext_t *context, crank_talk
 
 }
 
-static crank_talk_oop_t
-crank_talk_ToByDoNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ToByDoNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    assert(argumentCount >= 2);
-    crank_talk_ParseTreeToByDoNode_t *node = (crank_talk_ParseTreeToByDoNode_t*)arguments[0];
-    crank_talk_oop_t buildContextValue = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_ParseTreeToByDoNode_t *node = (crank_talk_ParseTreeToByDoNode_t*)primContext->arguments[0];
+    crank_talk_oop_t buildContextValue = primContext->arguments[1];
 
     crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)buildContextValue;
     crank_talk_HIRBuilder_t *builder = buildContext->builder;
@@ -900,33 +900,33 @@ crank_talk_ToByDoNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
 
     // Fetch the parameters
-    gcFrame.startValue = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->startExpression, buildContextValue);
-    gcFrame.stopValue = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->stopExpression, buildContextValue);
-    gcFrame.stepValue = (crank_talk_HIRValue_t*)crank_talk_HIRConstantLiteralValue_create(context, crank_talk_oop_encodeSmallInteger(1), (crank_talk_oop_t)node->super.sourcePosition);
+    gcFrame.startValue = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)node->startExpression, buildContextValue);
+    gcFrame.stopValue = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)node->stopExpression, buildContextValue);
+    gcFrame.stepValue = (crank_talk_HIRValue_t*)crank_talk_HIRConstantLiteralValue_create(primContext->context, crank_talk_oop_encodeSmallInteger(1), (crank_talk_oop_t)node->super.sourcePosition);
     if(node->stepExpression)
-        gcFrame.stepValue = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->stepExpression, buildContextValue);
+        gcFrame.stepValue = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)node->stepExpression, buildContextValue);
 
     // Alloca the current number
-    gcFrame.currentNumberVariable = (crank_talk_HIRValue_t*)crank_talk_HIRBuilder_alloca(context, builder->allocaBuilder, (crank_talk_oop_t)node->super.sourcePosition);
-    crank_talk_HIRBuilder_variableStore(context, builder, gcFrame.currentNumberVariable, gcFrame.startValue, (crank_talk_oop_t)node->super.sourcePosition);
+    gcFrame.currentNumberVariable = (crank_talk_HIRValue_t*)crank_talk_HIRBuilder_alloca(primContext->context, builder->allocaBuilder, (crank_talk_oop_t)node->super.sourcePosition);
+    crank_talk_HIRBuilder_variableStore(primContext->context, builder, gcFrame.currentNumberVariable, gcFrame.startValue, (crank_talk_oop_t)node->super.sourcePosition);
 
     // Create the basic blocks.
-    gcFrame.loopHeader = crank_talk_HIRBasicBlock_createNamed(context, "toDoHeader");
-    gcFrame.loopBody = crank_talk_HIRBasicBlock_createNamed(context, "toDoBody");
-    gcFrame.loopMerge = crank_talk_HIRBasicBlock_createNamed(context, "toDoMerge");
+    gcFrame.loopHeader = crank_talk_HIRBasicBlock_createNamed(primContext->context, "toDoHeader");
+    gcFrame.loopBody = crank_talk_HIRBasicBlock_createNamed(primContext->context, "toDoBody");
+    gcFrame.loopMerge = crank_talk_HIRBasicBlock_createNamed(primContext->context, "toDoMerge");
 
     // Loop header
-    crank_talk_HIRBuilder_branch(context, builder, gcFrame.loopHeader, (crank_talk_oop_t)node->super.sourcePosition);
+    crank_talk_HIRBuilder_branch(primContext->context, builder, gcFrame.loopHeader, (crank_talk_oop_t)node->super.sourcePosition);
     builder->basicBlock = gcFrame.loopHeader;
     
     crank_talk_HIRFunction_addBasicBlock(builder->hirFunction, gcFrame.loopHeader);
 
-    crank_talk_oop_t currentNumber = crank_talk_HIRBuilder_variableLoad(context, builder, gcFrame.currentNumberVariable, (crank_talk_oop_t)node->super.sourcePosition);
+    crank_talk_oop_t currentNumber = crank_talk_HIRBuilder_variableLoad(primContext->context, builder, gcFrame.currentNumberVariable, (crank_talk_oop_t)node->super.sourcePosition);
 
     {
-        crank_talk_oop_t lessOrEqualsSelector = crank_talk_HIRConstantLiteralValue_create(context, context->roots.lessOrEqualsSymbol, (crank_talk_oop_t)node->super.sourcePosition);
-        crank_talk_oop_t continueCondition = crank_talk_HIRBuilder_send(context, builder, (crank_talk_HIRValue_t*)lessOrEqualsSelector, (crank_talk_Array_t*)crank_talk_Array_WithWith(context, currentNumber, (crank_talk_oop_t)gcFrame.stopValue), (crank_talk_oop_t)node->super.sourcePosition);
-        crank_talk_HIRBuilder_conditionalBranch(context, builder, (crank_talk_HIRValue_t*)continueCondition, gcFrame.loopBody, gcFrame.loopMerge, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_oop_t lessOrEqualsSelector = crank_talk_HIRConstantLiteralValue_create(primContext->context, primContext->context->roots.lessOrEqualsSymbol, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_oop_t continueCondition = crank_talk_HIRBuilder_send(primContext->context, builder, (crank_talk_HIRValue_t*)lessOrEqualsSelector, (crank_talk_Array_t*)crank_talk_Array_WithWith(primContext->context, currentNumber, (crank_talk_oop_t)gcFrame.stopValue), (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_HIRBuilder_conditionalBranch(primContext->context, builder, (crank_talk_HIRValue_t*)continueCondition, gcFrame.loopBody, gcFrame.loopMerge, (crank_talk_oop_t)node->super.sourcePosition);
     }
 
     // Loop body
@@ -934,23 +934,24 @@ crank_talk_ToByDoNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank
     builder->basicBlock = gcFrame.loopBody;
 
     // Cull inline block.
-    crank_talk_ParseTree_cullInlineBlock(context, node->blockExpression, buildContextValue, (crank_talk_HIRValue_t*)currentNumber);
+    crank_talk_ParseTree_cullInlineBlock(primContext->context, node->blockExpression, buildContextValue, (crank_talk_HIRValue_t*)currentNumber);
 
     // Increment
     {
-        crank_talk_oop_t plusSelector = crank_talk_HIRConstantLiteralValue_create(context, context->roots.plusSymbol, (crank_talk_oop_t)node->super.sourcePosition);
-        crank_talk_oop_t incrementedValue = crank_talk_HIRBuilder_send(context, builder, (crank_talk_HIRValue_t*)plusSelector, (crank_talk_Array_t*)crank_talk_Array_WithWith(context, currentNumber, (crank_talk_oop_t)gcFrame.stepValue), (crank_talk_oop_t)node->super.sourcePosition);
-        crank_talk_HIRBuilder_variableStore(context,builder, gcFrame.currentNumberVariable, (crank_talk_HIRValue_t*)incrementedValue, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_oop_t plusSelector = crank_talk_HIRConstantLiteralValue_create(primContext->context, primContext->context->roots.plusSymbol, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_oop_t incrementedValue = crank_talk_HIRBuilder_send(primContext->context, builder, (crank_talk_HIRValue_t*)plusSelector, (crank_talk_Array_t*)crank_talk_Array_WithWith(primContext->context, currentNumber, (crank_talk_oop_t)gcFrame.stepValue), (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_HIRBuilder_variableStore(primContext->context,builder, gcFrame.currentNumberVariable, (crank_talk_HIRValue_t*)incrementedValue, (crank_talk_oop_t)node->super.sourcePosition);
     }
 
-    crank_talk_HIRBuilder_branch(context, builder, gcFrame.loopHeader, (crank_talk_oop_t)node->super.sourcePosition);
+    crank_talk_HIRBuilder_branch(primContext->context, builder, gcFrame.loopHeader, (crank_talk_oop_t)node->super.sourcePosition);
 
     // Loop merge
     builder->basicBlock = gcFrame.loopMerge;
     crank_talk_HIRFunction_addBasicBlock(builder->hirFunction, gcFrame.loopMerge);
 
+    crank_talk_oop_t result = crank_talk_HIRConstantLiteralValue_create(primContext->context, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
     CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-    return crank_talk_HIRConstantLiteralValue_create(context, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
+    return crank_talk_Primitive_return(primContext, result);
 }
 
 void
@@ -990,6 +991,6 @@ crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIfSelectionNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeIfSelectionNode::analyzeAndBuildWith:", crank_talk_ParseTreeIfSelectionNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeWhileNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeWhileNode::analyzeAndBuildWith:", crank_talk_ParseTreeWhileNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeDoWhileNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeDoWhileNode::analyzeAndBuildWith:", crank_talk_ParseTreeDoWhileNode_analyzeAndBuildWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeToByDoNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ToByDoNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeToByDoNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeToByDoNode::analyzeAndBuildWith:", crank_talk_ToByDoNode_analyzeAndBuildWith);
 }
 
