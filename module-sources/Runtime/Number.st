@@ -14,5 +14,7 @@ SmallInteger ![
     self error: 'TODO: SmallInteger::+'
 ].
 
+Stdio stdout print: (1 perform: #negated); lf.
+Stdio stdout print: (1 perform: #+ with: 2); lf.
 "Stdio stdout print: 1 + 2; lf."
 "Stdio stdout print: 1 + 2.0; lf."

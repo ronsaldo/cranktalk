@@ -6,6 +6,7 @@
 #include "crank-talk/errors.h"
 #include "crank-talk/function.h"
 #include "crank-talk/primitives.h"
+#include "crank-talk/stack-frame.h"
 #include "crank-talk/string.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -110,4 +111,30 @@ crank_talk_send(crank_talk_VMContext_t *context, crank_talk_oop_t selector, size
     crank_talk_oop_t receiver = arguments[0];
     crank_talk_oop_t receiverClass = (crank_talk_oop_t)crank_talk_oop_getClass(context, receiver);
     return crank_talk_sendWithClass(context, receiverClass, selector, argumentCount, arguments);
+}
+
+static void
+crank_talk_Object_perform_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+    if(primContext->argumentCount > CRANK_TALK_MAX_CALL_ARGUMENT_COUNT + 2) return crank_talk_Primitive_fail(primContext);
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t selector = primContext->arguments[1];
+
+    crank_talk_oop_t callArguments[CRANK_TALK_MAX_CALL_ARGUMENT_COUNT];
+    callArguments[0] = self;
+    for(size_t i = 2; i < primContext->argumentCount; ++i)
+        callArguments[i - 1] = primContext->arguments[i];
+
+    crank_talk_oop_t result = crank_talk_send(primContext->context, selector, primContext->argumentCount - 1, callArguments);
+    return crank_talk_Primitive_return(primContext, result);
+}
+
+void crank_talk_registerMessagePrimitives(crank_talk_VMContext_t* context)
+{
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "perform:", 2, "Object::perform:", crank_talk_Object_perform_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "perform:with:", 3, "Object::perform:with:", crank_talk_Object_perform_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "perform:with:with:", 4, "Object::perform:with:with:", crank_talk_Object_perform_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "perform:with:with:with:", 5, "Object::perform:with:with:with:", crank_talk_Object_perform_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "perform:with:with:with:with:", 6, "Object::perform:with:with:with:with:", crank_talk_Object_perform_primitive);
 }

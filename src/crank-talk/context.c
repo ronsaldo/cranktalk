@@ -33,6 +33,7 @@ void crank_talk_registerFunctionalPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerGUIBackendPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerGUIPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerMacrosPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerMessagePrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerHIRPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerIOPrimitives(crank_talk_VMContext_t* context);
@@ -992,6 +993,7 @@ crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
     crank_talk_registerGUIBackendPrimitives(context);
     crank_talk_registerGUIPrimitives(context);
     crank_talk_registerMacrosPrimitives(context);
+    crank_talk_registerMessagePrimitives(context);
     crank_talk_registerNumbersPrimitives(context);
     crank_talk_registerHIRPrimitives(context);
     crank_talk_registerIOPrimitives(context);
