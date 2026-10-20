@@ -52,8 +52,18 @@ crank_talk_Behavior_createBehaviorSlotsTables(crank_talk_VMContext_t *context, c
 }
 
 CRANK_TALK_API void
+crank_talk_Behavior_registerClassInSuperclass(crank_talk_VMContext_t *context, crank_talk_Class_t *clazz)
+{
+    crank_talk_Class_t *superclass = (crank_talk_Class_t *)clazz->super.super.superclass;
+    if(!superclass)
+        return;
+    superclass->subclasses = (crank_talk_Array_t*)crank_talk_Array_copyWith(context, (crank_talk_oop_t)superclass->subclasses, (crank_talk_oop_t)clazz);
+}
+
+CRANK_TALK_API void
 crank_talk_Behavior_createClassTables(crank_talk_VMContext_t *context, crank_talk_oop_t classValue)
 {
+    crank_talk_Behavior_registerClassInSuperclass(context, (crank_talk_Class_t*)classValue);
     crank_talk_Behavior_createBehaviorSlotsTables(context, classValue);
     crank_talk_oop_t metaclass = (crank_talk_oop_t)crank_talk_oop_getClass(context, classValue);
     crank_talk_Behavior_createBehaviorSlotsTables(context, metaclass);
@@ -62,6 +72,7 @@ crank_talk_Behavior_createClassTables(crank_talk_VMContext_t *context, crank_tal
 CRANK_TALK_API void
 crank_talk_Behavior_createClassTableAndComputeLayouts(crank_talk_VMContext_t *context, crank_talk_oop_t classValue)
 {
+    crank_talk_Behavior_registerClassInSuperclass(context, (crank_talk_Class_t*)classValue);
     crank_talk_Behavior_computeLayout(context, classValue);
     crank_talk_oop_t metaclass = (crank_talk_oop_t)crank_talk_oop_getClass(context, classValue);
     crank_talk_Behavior_computeLayout(context, metaclass);
@@ -299,6 +310,7 @@ crank_talk_ShiftClassBuilder_build_primitive(crank_talk_PrimitiveContext_t *prim
     crank_talk_oop_t classValue = crank_talk_Behavior_createAnonymousClassAndMetaclass(primContext->context, classBuilder->superclass, 0, CrankTalkGCObjectDataTypeOops);
     crank_talk_Class_t *clazz = (crank_talk_Class_t *)classValue;
     clazz->super.super.slots = (crank_talk_oop_t)classBuilder->slots;
+    clazz->subclasses = (crank_talk_Array_t*)crank_talk_Array_create(primContext->context, 0);
     clazz->name = classBuilder->name;
     clazz->environment = classBuilder->environment;
 

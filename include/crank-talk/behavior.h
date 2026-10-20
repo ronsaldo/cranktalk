@@ -5,6 +5,7 @@
 
 CRANK_TALK_API crank_talk_oop_t crank_talk_Behavior_createAnonymousClassAndMetaclass(crank_talk_VMContext_t *context, crank_talk_oop_t superclass, size_t instanceSize, crank_talk_GCObjectDataType_t dataType);
 CRANK_TALK_API void crank_talk_Behavior_createBehaviorSlotsTables(crank_talk_VMContext_t *context, crank_talk_oop_t behaviorValue);
+CRANK_TALK_API void crank_talk_Behavior_registerClassInSuperclass(crank_talk_VMContext_t *context, crank_talk_Class_t *classValue);
 CRANK_TALK_API void crank_talk_Behavior_createClassTables(crank_talk_VMContext_t *context, crank_talk_oop_t classValue);
 
 CRANK_TALK_API void crank_talk_Behavior_computeLayout(crank_talk_VMContext_t *context, crank_talk_oop_t behavior);

@@ -64,6 +64,9 @@ crank_talk_context_setClassTypeMetadataVList(crank_talk_VMContext_t *context, cr
         crank_talk_SystemEnvironment_atPut(context, context->roots.systemEnvironment, nameSymbol, classValue);
     }
 
+    if(!clazz->subclasses)
+        clazz->subclasses = (crank_talk_Array_t*)crank_talk_Array_create(context, 0);
+
     if(!clazz->environment)
         clazz->environment = context->roots.systemEnvironment;
 
@@ -313,6 +316,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.ClassDescriptionClass, "ClassDescription", NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.ClassClass, "Class",
+        CrankTalkSlotDef(Class, subclasses),
         CrankTalkSlotDef(Class, name),
         CrankTalkSlotDef(Class, environment),
         NULL);

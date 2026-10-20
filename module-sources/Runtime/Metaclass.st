@@ -1,0 +1,4 @@
+Metaclass ![
+thisClass
+    ^ thisClass
+].

@@ -37,6 +37,25 @@ crank_talk_Array_concat(crank_talk_VMContext_t *context, crank_talk_oop_t left, 
 }
 
 CRANK_TALK_API crank_talk_oop_t
+crank_talk_Array_copyWith(crank_talk_VMContext_t *context, crank_talk_oop_t array, crank_talk_oop_t element)
+{
+    crank_talk_oop_t *arrayValues = crank_talk_oop_getSlotsData(array);
+    size_t arraySize = crank_talk_object_getSizeInSlots(array);
+    for(size_t i = 0; i < arraySize; ++i)
+    {
+        if(arrayValues[i] == element)
+            return array;
+    }
+
+    crank_talk_oop_t newArray = crank_talk_Array_create(context, arraySize + 1);
+    crank_talk_oop_t *newArrayValues = crank_talk_oop_getSlotsData(newArray);
+    for(size_t i = 0; i < arraySize; ++i)
+        newArrayValues[i] = arrayValues[i];
+    newArrayValues[arraySize] = element;
+    return newArray;
+}
+
+CRANK_TALK_API crank_talk_oop_t
 crank_talk_Array_With(crank_talk_VMContext_t *context, crank_talk_oop_t first)
 {
     crank_talk_oop_t array = crank_talk_Array_create(context, 1);

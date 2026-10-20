@@ -407,6 +407,7 @@ struct crank_talk_ClassDescription_s {
 
 struct crank_talk_Class_s {
     crank_talk_ClassDescription_t super;
+    crank_talk_Array_t *subclasses;
     crank_talk_Symbol_t *name;
     crank_talk_oop_t environment;
 };

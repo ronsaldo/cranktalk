@@ -1,7 +1,11 @@
 thisContext 
+    loadFile: 'Array.st';
+    loadFile: 'Behavior.st';
+    loadFile: 'Class.st';
+    loadFile: 'Metaclass.st';
+    loadFile: 'MethodDictionary.st';
     loadFile: 'Collection.st';
     loadFile: 'SequenceableCollection.st';
-    loadFile: 'Array.st';
     loadFile: 'Number.st'.
 
 "Stdio stdout nextPutAll: 'Hello World from Runtime/package.st'; lf.
