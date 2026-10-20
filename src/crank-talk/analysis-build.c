@@ -426,13 +426,13 @@ crank_talk_ParseTreeThisContextReferenceNode_analyzeAndBuildWith(crank_talk_Prim
     return crank_talk_Primitive_return(primContext, result);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    assert(argumentCount >= 2);
-    crank_talk_ParseTreeMessageCascadeNode_t *node = (crank_talk_ParseTreeMessageCascadeNode_t*)arguments[0];
-    crank_talk_oop_t buildContextValue = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_ParseTreeMessageCascadeNode_t *node = (crank_talk_ParseTreeMessageCascadeNode_t*)primContext->arguments[0];
+    crank_talk_oop_t buildContextValue = primContext->arguments[1];
 
     struct {
         crank_talk_HIRValue_t *receiver;
@@ -442,8 +442,8 @@ crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith(crank_talk_VMContext_
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
 
     // Evaluate the receiver and make the 
-    gcFrame.receiver = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->receiver, buildContextValue);
-    gcFrame.receiverNode = (crank_talk_ParseTreeLiteralNode_t*)CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralNode);
+    gcFrame.receiver = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)node->receiver, buildContextValue);
+    gcFrame.receiverNode = (crank_talk_ParseTreeLiteralNode_t*)CrankAllocateValuesObjectWithClassName(primContext->context, ParseTreeLiteralNode);
     gcFrame.receiverNode->super.sourcePosition = node->receiver->sourcePosition;
     gcFrame.receiverNode->value = (crank_talk_oop_t)gcFrame.receiver;
 
@@ -456,21 +456,21 @@ crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith(crank_talk_VMContext_
         crank_talk_oop_t cascadedMessageValue = node->cascadedMessages->elements[i];
         crank_talk_ParseTreeCascadedMessageNode_t *cascadedMessage = (crank_talk_ParseTreeCascadedMessageNode_t*)cascadedMessageValue;
 
-        crank_talk_oop_t expandedCascadedMessage = crank_talk_ParseTreeCascadedMessageNode_asMessageSendWithReceiver(context, cascadedMessage, (crank_talk_oop_t)gcFrame.receiverNode);
-        gcFrame.result = crank_talk_ParseTreeAnalyzeAndBuild(context, expandedCascadedMessage, buildContextValue);
+        crank_talk_oop_t expandedCascadedMessage = crank_talk_ParseTreeCascadedMessageNode_asMessageSendWithReceiver(primContext->context, cascadedMessage, (crank_talk_oop_t)gcFrame.receiverNode);
+        gcFrame.result = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, expandedCascadedMessage, buildContextValue);
     }
 
     CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-    return (crank_talk_oop_t)gcFrame.result;
+    return crank_talk_Primitive_return(primContext, (crank_talk_oop_t)gcFrame.result);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    assert(argumentCount >= 2);
-    crank_talk_ParseTreeMessageSendNode_t *node = (crank_talk_ParseTreeMessageSendNode_t*)arguments[0];
-    crank_talk_oop_t buildContextValue = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_ParseTreeMessageSendNode_t *node = (crank_talk_ParseTreeMessageSendNode_t*)primContext->arguments[0];
+    crank_talk_oop_t buildContextValue = primContext->arguments[1];
     crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)buildContextValue;
 
     struct {
@@ -482,54 +482,76 @@ crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith(crank_talk_VMContext_t *
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
 
     // Fetch the selector value.
-    gcFrame.selector = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->selector, buildContextValue);
-    assert(crank_talk_oop_isKindOf(context, (crank_talk_oop_t)gcFrame.selector, context->roots.HIRConstantLiteralValueClass));
+    gcFrame.selector = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)node->selector, buildContextValue);
+    assert(crank_talk_oop_isKindOf(primContext->context, (crank_talk_oop_t)gcFrame.selector, primContext->context->roots.HIRConstantLiteralValueClass));
     gcFrame.selectorValue = ((crank_talk_HIRConstantLiteralValue_t*)gcFrame.selector)->value;
 
     // Is this a macro message send?
-    if(crank_talk_IdentityDictionary_includesKey(context->roots.messageSendMacroDictionary, gcFrame.selectorValue))
+    if(crank_talk_IdentityDictionary_includesKey(primContext->context->roots.messageSendMacroDictionary, gcFrame.selectorValue))
     {
-        crank_talk_oop_t messageMacro = crank_talk_IdentityDictionary_at(context, context->roots.messageSendMacroDictionary, gcFrame.selectorValue);
-        crank_talk_oop_t expandedMacro = crank_talk_apply1(context, messageMacro, arguments[0]);
+        crank_talk_oop_t messageMacro = crank_talk_IdentityDictionary_at(primContext->context, primContext->context->roots.messageSendMacroDictionary, gcFrame.selectorValue);
+        crank_talk_oop_t expandedMacro = crank_talk_apply1(primContext->context, messageMacro, primContext->arguments[0]);
         CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-        return (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndBuild(context, expandedMacro, buildContextValue);
+        crank_talk_oop_t result = (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, expandedMacro, buildContextValue);
+        return crank_talk_Primitive_return(primContext, result);
     }
 
-    bool isSuperSend = crank_talk_isParseTreeSuperReferenceNode(context, (crank_talk_oop_t)node->receiver);
+    bool isSuperSend = crank_talk_isParseTreeSuperReferenceNode(primContext->context, (crank_talk_oop_t)node->receiver);
 
-    gcFrame.receiver = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->receiver, buildContextValue);
+    gcFrame.receiver = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)node->receiver, buildContextValue);
     size_t messageArgumentCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->arguments);
-    gcFrame.argumentsWithReceiver = (crank_talk_Array_t*)crank_talk_Array_create(context, 1 + messageArgumentCount);
+    gcFrame.argumentsWithReceiver = (crank_talk_Array_t*)crank_talk_Array_create(primContext->context, 1 + messageArgumentCount);
     gcFrame.argumentsWithReceiver->elements[0] = (crank_talk_oop_t)gcFrame.receiver;
     for(size_t i = 0; i < messageArgumentCount; ++i)
-        gcFrame.argumentsWithReceiver->elements[i + 1] = (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndBuild(context, node->arguments->elements[i], buildContextValue);
+        gcFrame.argumentsWithReceiver->elements[i + 1] = (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, node->arguments->elements[i], buildContextValue);
 
     if(isSuperSend)
     {
-        crank_talk_oop_t receiverClasss = crank_talk_Environment_lookupReceiverClassRecursively(context, buildContext->builder->lexicalEnvironment);
-        crank_talk_HIRValue_t *receiverClassValue = (crank_talk_HIRValue_t *)crank_talk_HIRConstantLiteralValue_create(context, receiverClasss, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_oop_t receiverClasss = crank_talk_Environment_lookupReceiverClassRecursively(primContext->context, buildContext->builder->lexicalEnvironment);
+        crank_talk_HIRValue_t *receiverClassValue = (crank_talk_HIRValue_t *)crank_talk_HIRConstantLiteralValue_create(primContext->context, receiverClasss, (crank_talk_oop_t)node->super.sourcePosition);
         if(!receiverClasss)
-            crank_talk_error(context, "super is not properly defined in this context.");
+            crank_talk_error(primContext->context, "super is not properly defined in this context.");
+
+        crank_talk_oop_t result = crank_talk_HIRBuilder_superSend(primContext->context, buildContext->builder, receiverClassValue, gcFrame.selector, gcFrame.argumentsWithReceiver, (crank_talk_oop_t)node->super.sourcePosition);
         CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
 
-        return crank_talk_HIRBuilder_superSend(context, buildContext->builder, receiverClassValue, gcFrame.selector, gcFrame.argumentsWithReceiver, (crank_talk_oop_t)node->super.sourcePosition);
+        return crank_talk_Primitive_return(primContext, result);
     }
     else
     {
+        crank_talk_oop_t result = crank_talk_HIRBuilder_send(primContext->context, buildContext->builder, gcFrame.selector, gcFrame.argumentsWithReceiver, (crank_talk_oop_t)node->super.sourcePosition);
         CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-        return crank_talk_HIRBuilder_send(context, buildContext->builder, gcFrame.selector, gcFrame.argumentsWithReceiver, (crank_talk_oop_t)node->super.sourcePosition);
+        return crank_talk_Primitive_return(primContext, result);
     }
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeSequenceNodeWithLocals_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeReturnNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)context;
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_ParseTreeSequenceNode_t *node = (crank_talk_ParseTreeSequenceNode_t*)arguments[0];
-    crank_talk_oop_t buildContextValue = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_ParseTreeReturnNode_t *node = (crank_talk_ParseTreeReturnNode_t*)primContext->arguments[0];
+    crank_talk_oop_t buildContextValue = primContext->arguments[1];
+    
+    crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)buildContextValue;
+
+    crank_talk_oop_t isInnerBlock = crank_talk_Environment_lookupIsInnerBlockRecursively(primContext->context, buildContext->builder->lexicalEnvironment);
+
+    crank_talk_HIRValue_t *resultValue = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)node->expression, buildContextValue);
+    if(isInnerBlock == primContext->context->roots.trueValue)
+        crank_talk_HIRBuilder_nonLocalReturn(primContext->context, buildContext->builder, resultValue, (crank_talk_oop_t)node->super.sourcePosition);
+    else
+        crank_talk_HIRBuilder_return(primContext->context, buildContext->builder, resultValue, (crank_talk_oop_t)node->super.sourcePosition);
+    return crank_talk_Primitive_return(primContext, (crank_talk_oop_t)resultValue);
+}
+
+static void
+crank_talk_ParseTreeSequenceNodeWithLocals_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_ParseTreeSequenceNode_t *node = (crank_talk_ParseTreeSequenceNode_t*)primContext->arguments[0];
+    crank_talk_oop_t buildContextValue = primContext->arguments[1];
     crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)buildContextValue;
 
     struct {
@@ -539,76 +561,58 @@ crank_talk_ParseTreeSequenceNodeWithLocals_analyzeAndBuildWith(crank_talk_VMCont
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
 
     gcFrame.oldLexicalEnvironment = buildContext->builder->lexicalEnvironment;
-    buildContext->builder->lexicalEnvironment = crank_talk_LexicalEnvironment_create(context, buildContext->builder->lexicalEnvironment);
+    buildContext->builder->lexicalEnvironment = crank_talk_LexicalEnvironment_create(primContext->context, buildContext->builder->lexicalEnvironment);
 
     // Build the local variables
     size_t localVariableCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->localVariables);
     for(size_t i = 0; i < localVariableCount; ++i)
-        crank_talk_ParseTreeAnalyzeAndBuild(context, node->localVariables->elements[i], buildContextValue);
+        crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, node->localVariables->elements[i], buildContextValue);
     
     // Build the expressions
-    gcFrame.result = (crank_talk_HIRValue_t *)crank_talk_HIRConstantLiteralValue_create(context, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
+    gcFrame.result = (crank_talk_HIRValue_t *)crank_talk_HIRConstantLiteralValue_create(primContext->context, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
     size_t expressionCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->expressions);
     crank_talk_oop_t *expressions = node->expressions->elements;
     for(size_t i = 0; i< expressionCount; ++i)
-        gcFrame.result = crank_talk_ParseTreeAnalyzeAndBuild(context, expressions[i], buildContextValue);
+        gcFrame.result = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, expressions[i], buildContextValue);
     
     buildContext->builder->lexicalEnvironment = gcFrame.oldLexicalEnvironment;
     CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-    return (crank_talk_oop_t)gcFrame.result;
+    return crank_talk_Primitive_return(primContext, (crank_talk_oop_t)gcFrame.result);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeReturnNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeSequenceNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    assert(argumentCount >= 2);
-    crank_talk_ParseTreeReturnNode_t *node = (crank_talk_ParseTreeReturnNode_t*)arguments[0];
-    crank_talk_oop_t buildContextValue = arguments[1];
-    
-    crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)buildContextValue;
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
 
-    crank_talk_oop_t isInnerBlock = crank_talk_Environment_lookupIsInnerBlockRecursively(context, buildContext->builder->lexicalEnvironment);
-
-    crank_talk_HIRValue_t *resultValue = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->expression, buildContextValue);
-    if(isInnerBlock == context->roots.trueValue)
-        crank_talk_HIRBuilder_nonLocalReturn(context, buildContext->builder, resultValue, (crank_talk_oop_t)node->super.sourcePosition);
-    else
-        crank_talk_HIRBuilder_return(context, buildContext->builder, resultValue, (crank_talk_oop_t)node->super.sourcePosition);
-    return (crank_talk_oop_t)resultValue;
-}
-
-static crank_talk_oop_t
-crank_talk_ParseTreeSequenceNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
-{
-    (void)closure;
-    assert(argumentCount >= 2);
-    crank_talk_ParseTreeSequenceNode_t *node = (crank_talk_ParseTreeSequenceNode_t*)arguments[0];
-    crank_talk_oop_t buildContext = arguments[1];
+    crank_talk_ParseTreeSequenceNode_t *node = (crank_talk_ParseTreeSequenceNode_t*)primContext->arguments[0];
+    crank_talk_oop_t buildContext = primContext->arguments[1];
 
     if(crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->localVariables) != 0)
-        return crank_talk_ParseTreeSequenceNodeWithLocals_analyzeAndBuildWith(context, closure, argumentCount, arguments);
+        return crank_talk_ParseTreeSequenceNodeWithLocals_analyzeAndBuildWith(primContext);
     
-    crank_talk_HIRValue_t *result = (crank_talk_HIRValue_t *)crank_talk_HIRConstantLiteralValue_create(context, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
+    crank_talk_HIRValue_t *result = (crank_talk_HIRValue_t *)crank_talk_HIRConstantLiteralValue_create(primContext->context, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
     size_t expressionCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->expressions);
     crank_talk_oop_t *expressions = node->expressions->elements;
     for(size_t i = 0; i< expressionCount; ++i)
-        result = crank_talk_ParseTreeAnalyzeAndBuild(context, expressions[i], buildContext);
-    return (crank_talk_oop_t)result;
+        result = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, expressions[i], buildContext);
+    
+    return crank_talk_Primitive_return(primContext, (crank_talk_oop_t)result);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeVariableDefinitionNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeVariableDefinitionNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    assert(argumentCount >= 2);
-    crank_talk_ParseTreeVariableDefinitionNode_t *node = (crank_talk_ParseTreeVariableDefinitionNode_t*)arguments[0];
-    crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
 
-    crank_talk_oop_t alloca = crank_talk_HIRBuilder_alloca(context, buildContext->builder->allocaBuilder, (crank_talk_oop_t)node->super.sourcePosition);
-    crank_talk_LexicalEnvironment_setNewHIRSymbolBinding(context, buildContext->builder->lexicalEnvironment, (crank_talk_oop_t)node->name, alloca, (crank_talk_oop_t)node->super.sourcePosition);
+    crank_talk_ParseTreeVariableDefinitionNode_t *node = (crank_talk_ParseTreeVariableDefinitionNode_t*)primContext->arguments[0];
+    crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)primContext->arguments[1];
 
-    return crank_talk_HIRConstantLiteralValue_create(context, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
+    crank_talk_oop_t alloca = crank_talk_HIRBuilder_alloca(primContext->context, buildContext->builder->allocaBuilder, (crank_talk_oop_t)node->super.sourcePosition);
+    crank_talk_LexicalEnvironment_setNewHIRSymbolBinding(primContext->context, buildContext->builder->lexicalEnvironment, (crank_talk_oop_t)node->name, alloca, (crank_talk_oop_t)node->super.sourcePosition);
+
+    crank_talk_oop_t result = crank_talk_HIRConstantLiteralValue_create(primContext->context, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
+    return crank_talk_Primitive_return(primContext, result);
 }
 
 static crank_talk_oop_t
@@ -973,11 +977,11 @@ crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSuperReferenceNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeSuperReferenceNode::analyzeAndBuildWith:", crank_talk_ParseTreeSuperReferenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeThisContextReferenceNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeThisContextReferenceNode::analyzeAndBuildWith:", crank_talk_ParseTreeThisContextReferenceNode_analyzeAndBuildWith);
 
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeMessageCascadeNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeReturnNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeReturnNode_analyzeAndBuildWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeSequenceNode_analyzeAndBuildWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeVariableDefinitionNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageCascadeNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeMessageCascadeNode::analyzeAndBuildWith:", crank_talk_ParseTreeMessageCascadeNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeMessageSendNode::analyzeAndBuildWith:", crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeReturnNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeReturnNode::analyzeAndBuildWith:", crank_talk_ParseTreeReturnNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeSequenceNode::analyzeAndBuildWith:", crank_talk_ParseTreeSequenceNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeVariableDefinitionNode::analyzeAndBuildWith:", crank_talk_ParseTreeVariableDefinitionNode_analyzeAndBuildWith);
 
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeCullBlockNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeCullBlockNode_analyzeAndBuildWith);
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeIfSelectionNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeIfSelectionNode_analyzeAndBuildWith);
