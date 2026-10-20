@@ -615,34 +615,35 @@ crank_talk_ParseTreeVariableDefinitionNode_analyzeAndBuildWith(crank_talk_Primit
     return crank_talk_Primitive_return(primContext, result);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeCullBlockNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeCullBlockNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    assert(argumentCount >= 2);
-    crank_talk_ParseTreeCullBlockNode_t *node = (crank_talk_ParseTreeCullBlockNode_t*)arguments[0];
-    crank_talk_oop_t buildContextValue = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_ParseTreeCullBlockNode_t *node = (crank_talk_ParseTreeCullBlockNode_t*)primContext->arguments[0];
+    crank_talk_oop_t buildContextValue = primContext->arguments[1];
 
     //crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)buildContextValue;
 
     // Make sure we have an inlinable block
-    if(!crank_talk_oop_isKindOf(context, (crank_talk_oop_t)node->blockExpression, context->roots.ParseTreeBlockNodeClass))
-        crank_talk_errorAtSourcePosition(context, (crank_talk_oop_t)node->blockExpression->sourcePosition, "Expected an inlinable block expression.");
+    if(!crank_talk_oop_isKindOf(primContext->context, (crank_talk_oop_t)node->blockExpression, primContext->context->roots.ParseTreeBlockNodeClass))
+        crank_talk_errorAtSourcePosition(primContext->context, (crank_talk_oop_t)node->blockExpression->sourcePosition, "Expected an inlinable block expression.");
 
     crank_talk_ParseTreeBlockNode_t *blockNode = (crank_talk_ParseTreeBlockNode_t*)node->blockExpression;
 
     // TODO: Make an environment and set the block arguments.
 
-    return (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)blockNode->body, buildContextValue);
+    crank_talk_oop_t result = (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)blockNode->body, buildContextValue);
+    return crank_talk_Primitive_return(primContext, result);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeIfSelectionNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeIfSelectionNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    assert(argumentCount >= 2);
-    crank_talk_ParseTreeIfSelectionNode_t *node = (crank_talk_ParseTreeIfSelectionNode_t*)arguments[0];
-    crank_talk_oop_t buildContextValue = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_ParseTreeIfSelectionNode_t *node = (crank_talk_ParseTreeIfSelectionNode_t*)primContext->arguments[0];
+    crank_talk_oop_t buildContextValue = primContext->arguments[1];
 
     crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)buildContextValue;
     crank_talk_HIRBuilder_t *builder = buildContext->builder;
@@ -668,60 +669,60 @@ crank_talk_ParseTreeIfSelectionNode_analyzeAndBuildWith(crank_talk_VMContext_t *
 
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
 
-    gcFrame.nilLiteral = (crank_talk_HIRValue_t*)crank_talk_HIRConstantLiteralValue_create(context, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
+    gcFrame.nilLiteral = (crank_talk_HIRValue_t*)crank_talk_HIRConstantLiteralValue_create(primContext->context, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
 
-    gcFrame.trueDestination = crank_talk_HIRBasicBlock_createNamed(context, "ifTrue");
-    gcFrame.falseDestination = crank_talk_HIRBasicBlock_createNamed(context, "ifFalse");
-    gcFrame.mergeDestination = crank_talk_HIRBasicBlock_createNamed(context, "ifMerge");
+    gcFrame.trueDestination = crank_talk_HIRBasicBlock_createNamed(primContext->context, "ifTrue");
+    gcFrame.falseDestination = crank_talk_HIRBasicBlock_createNamed(primContext->context, "ifFalse");
+    gcFrame.mergeDestination = crank_talk_HIRBasicBlock_createNamed(primContext->context, "ifMerge");
 
-    gcFrame.condition = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->condition, buildContextValue);
-    crank_talk_HIRBuilder_conditionalBranch(context, builder, gcFrame.condition, gcFrame.trueDestination, gcFrame.falseDestination, (crank_talk_oop_t)node->super.sourcePosition);
+    gcFrame.condition = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)node->condition, buildContextValue);
+    crank_talk_HIRBuilder_conditionalBranch(primContext->context, builder, gcFrame.condition, gcFrame.trueDestination, gcFrame.falseDestination, (crank_talk_oop_t)node->super.sourcePosition);
 
     // True destination
     crank_talk_HIRFunction_addBasicBlock(builder->hirFunction, gcFrame.trueDestination);
-    gcFrame.trueBuilder = crank_talk_HIRBuilder_copyWithBasicBlock(context, builder, gcFrame.trueDestination);
-    gcFrame.trueBuildPass = crank_talk_createAnalysisAndBuildContext(context, gcFrame.trueBuilder);
+    gcFrame.trueBuilder = crank_talk_HIRBuilder_copyWithBasicBlock(primContext->context, builder, gcFrame.trueDestination);
+    gcFrame.trueBuildPass = crank_talk_createAnalysisAndBuildContext(primContext->context, gcFrame.trueBuilder);
     gcFrame.trueResult = gcFrame.nilLiteral;
     if(node->trueExpression)
-        gcFrame.trueResult = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->trueExpression, gcFrame.trueBuildPass);
+        gcFrame.trueResult = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)node->trueExpression, gcFrame.trueBuildPass);
 
     // False destination
     crank_talk_HIRFunction_addBasicBlock(builder->hirFunction, gcFrame.falseDestination);
-    gcFrame.falseBuilder = crank_talk_HIRBuilder_copyWithBasicBlock(context, builder, gcFrame.falseDestination);
-    gcFrame.falseBuildPass = crank_talk_createAnalysisAndBuildContext(context, gcFrame.falseBuilder);
+    gcFrame.falseBuilder = crank_talk_HIRBuilder_copyWithBasicBlock(primContext->context, builder, gcFrame.falseDestination);
+    gcFrame.falseBuildPass = crank_talk_createAnalysisAndBuildContext(primContext->context, gcFrame.falseBuilder);
     gcFrame.falseResult = gcFrame.nilLiteral;
     if(node->falseExpression)
-        gcFrame.falseResult = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->falseExpression, gcFrame.falseBuildPass);
+        gcFrame.falseResult = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)node->falseExpression, gcFrame.falseBuildPass);
 
     // Merge
     crank_talk_HIRFunction_addBasicBlock(builder->hirFunction, gcFrame.mergeDestination);
     builder->basicBlock = gcFrame.mergeDestination;
 
-    gcFrame.mergePhi = crank_talk_HIRBuilder_phi(context, builder, (crank_talk_oop_t)node->super.sourcePosition);
+    gcFrame.mergePhi = crank_talk_HIRBuilder_phi(primContext->context, builder, (crank_talk_oop_t)node->super.sourcePosition);
 
-    if(!crank_talk_HIRBuilder_isLastTerminator(context, gcFrame.trueBuilder))
+    if(!crank_talk_HIRBuilder_isLastTerminator(primContext->context, gcFrame.trueBuilder))
     {
-        crank_talk_HIRBuilder_phiSource(context, gcFrame.trueBuilder, gcFrame.mergePhi, gcFrame.trueResult, (crank_talk_oop_t)node->super.sourcePosition);
-        crank_talk_HIRBuilder_branch(context, gcFrame.trueBuilder, gcFrame.mergeDestination, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_HIRBuilder_phiSource(primContext->context, gcFrame.trueBuilder, gcFrame.mergePhi, gcFrame.trueResult, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_HIRBuilder_branch(primContext->context, gcFrame.trueBuilder, gcFrame.mergeDestination, (crank_talk_oop_t)node->super.sourcePosition);
     }
 
-    if(!crank_talk_HIRBuilder_isLastTerminator(context, gcFrame.falseBuilder))
+    if(!crank_talk_HIRBuilder_isLastTerminator(primContext->context, gcFrame.falseBuilder))
     {
-        crank_talk_HIRBuilder_phiSource(context, gcFrame.falseBuilder, gcFrame.mergePhi, gcFrame.falseResult, (crank_talk_oop_t)node->super.sourcePosition);
-        crank_talk_HIRBuilder_branch(context, gcFrame.falseBuilder, gcFrame.mergeDestination, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_HIRBuilder_phiSource(primContext->context, gcFrame.falseBuilder, gcFrame.mergePhi, gcFrame.falseResult, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_HIRBuilder_branch(primContext->context, gcFrame.falseBuilder, gcFrame.mergeDestination, (crank_talk_oop_t)node->super.sourcePosition);
     }
 
     CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-    return (crank_talk_oop_t)gcFrame.mergePhi;
+    return crank_talk_Primitive_return(primContext, (crank_talk_oop_t)gcFrame.mergePhi);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeWhileNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeWhileNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    assert(argumentCount >= 2);
-    crank_talk_ParseTreeWhileNode_t *node = (crank_talk_ParseTreeWhileNode_t*)arguments[0];
-    crank_talk_oop_t buildContextValue = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_ParseTreeWhileNode_t *node = (crank_talk_ParseTreeWhileNode_t*)primContext->arguments[0];
+    crank_talk_oop_t buildContextValue = primContext->arguments[1];
 
     crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)buildContextValue;
     crank_talk_HIRBuilder_t *builder = buildContext->builder;
@@ -735,23 +736,23 @@ crank_talk_ParseTreeWhileNode_analyzeAndBuildWith(crank_talk_VMContext_t *contex
 
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
 
-    gcFrame.loopHeader = crank_talk_HIRBasicBlock_createNamed(context, "loopHeader");
-    gcFrame.loopBody = crank_talk_HIRBasicBlock_createNamed(context, "loopBody");
-    gcFrame.loopMerge = crank_talk_HIRBasicBlock_createNamed(context, "loopMerge");
+    gcFrame.loopHeader = crank_talk_HIRBasicBlock_createNamed(primContext->context, "loopHeader");
+    gcFrame.loopBody = crank_talk_HIRBasicBlock_createNamed(primContext->context, "loopBody");
+    gcFrame.loopMerge = crank_talk_HIRBasicBlock_createNamed(primContext->context, "loopMerge");
 
     // Loop header
-    crank_talk_HIRBuilder_branch(context, builder, gcFrame.loopHeader, (crank_talk_oop_t)node->super.sourcePosition);
+    crank_talk_HIRBuilder_branch(primContext->context, builder, gcFrame.loopHeader, (crank_talk_oop_t)node->super.sourcePosition);
     builder->basicBlock = gcFrame.loopHeader;
     crank_talk_HIRFunction_addBasicBlock(builder->hirFunction, gcFrame.loopHeader);
 
     if(node->condition)
     {
-        crank_talk_HIRValue_t *condition = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->condition, buildContextValue);
-        crank_talk_HIRBuilder_conditionalBranch(context, builder, condition, gcFrame.loopBody, gcFrame.loopMerge, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_HIRValue_t *condition = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)node->condition, buildContextValue);
+        crank_talk_HIRBuilder_conditionalBranch(primContext->context, builder, condition, gcFrame.loopBody, gcFrame.loopMerge, (crank_talk_oop_t)node->super.sourcePosition);
     }
     else
     {
-        crank_talk_HIRBuilder_branch(context, builder, gcFrame.loopBody, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_HIRBuilder_branch(primContext->context, builder, gcFrame.loopBody, (crank_talk_oop_t)node->super.sourcePosition);
     }
 
     // Loop body.
@@ -759,26 +760,27 @@ crank_talk_ParseTreeWhileNode_analyzeAndBuildWith(crank_talk_VMContext_t *contex
     crank_talk_HIRFunction_addBasicBlock(builder->hirFunction, gcFrame.loopBody);
 
     if(node->bodyExpression)
-        crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->bodyExpression, buildContextValue);
+        crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)node->bodyExpression, buildContextValue);
 
-    if(!crank_talk_HIRBuilder_isLastTerminator(context, builder))
-        crank_talk_HIRBuilder_branch(context, builder, gcFrame.loopHeader, (crank_talk_oop_t)node->super.sourcePosition);
+    if(!crank_talk_HIRBuilder_isLastTerminator(primContext->context, builder))
+        crank_talk_HIRBuilder_branch(primContext->context, builder, gcFrame.loopHeader, (crank_talk_oop_t)node->super.sourcePosition);
 
     // Loop merge
     builder->basicBlock = gcFrame.loopMerge;
     crank_talk_HIRFunction_addBasicBlock(builder->hirFunction, gcFrame.loopMerge);
 
+    crank_talk_oop_t result = crank_talk_HIRConstantLiteralValue_create(primContext->context, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
     CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-    return crank_talk_HIRConstantLiteralValue_create(context, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
+    return crank_talk_Primitive_return(primContext, result);
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeDoWhileNode_analyzeAndBuildWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeDoWhileNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    assert(argumentCount >= 2);
-    crank_talk_ParseTreeDoWhileNode_t *node = (crank_talk_ParseTreeDoWhileNode_t*)arguments[0];
-    crank_talk_oop_t buildContextValue = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_ParseTreeDoWhileNode_t *node = (crank_talk_ParseTreeDoWhileNode_t*)primContext->arguments[0];
+    crank_talk_oop_t buildContextValue = primContext->arguments[1];
 
     crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)buildContextValue;
     crank_talk_HIRBuilder_t *builder = buildContext->builder;
@@ -791,27 +793,27 @@ crank_talk_ParseTreeDoWhileNode_analyzeAndBuildWith(crank_talk_VMContext_t *cont
 
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
 
-    gcFrame.loopBody = crank_talk_HIRBasicBlock_createNamed(context, "loopBody");
-    gcFrame.loopMerge = crank_talk_HIRBasicBlock_createNamed(context, "loopMerge");
+    gcFrame.loopBody = crank_talk_HIRBasicBlock_createNamed(primContext->context, "loopBody");
+    gcFrame.loopMerge = crank_talk_HIRBasicBlock_createNamed(primContext->context, "loopMerge");
 
     // Loop body
-    crank_talk_HIRBuilder_branch(context, builder, gcFrame.loopBody, (crank_talk_oop_t)node->super.sourcePosition);
+    crank_talk_HIRBuilder_branch(primContext->context, builder, gcFrame.loopBody, (crank_talk_oop_t)node->super.sourcePosition);
     builder->basicBlock = gcFrame.loopBody;
     crank_talk_HIRFunction_addBasicBlock(builder->hirFunction, gcFrame.loopBody);
 
     if(node->bodyExpression)
-        crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->bodyExpression, buildContextValue);
+        crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)node->bodyExpression, buildContextValue);
 
-    if(!crank_talk_HIRBuilder_isLastTerminator(context, builder))
+    if(!crank_talk_HIRBuilder_isLastTerminator(primContext->context, builder))
     {
         if(node->condition)
         {
-            crank_talk_HIRValue_t *condition = crank_talk_ParseTreeAnalyzeAndBuild(context, (crank_talk_oop_t)node->condition, buildContextValue);
-            crank_talk_HIRBuilder_conditionalBranch(context, builder, condition, gcFrame.loopBody, gcFrame.loopMerge, (crank_talk_oop_t)node->super.sourcePosition);
+            crank_talk_HIRValue_t *condition = crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, (crank_talk_oop_t)node->condition, buildContextValue);
+            crank_talk_HIRBuilder_conditionalBranch(primContext->context, builder, condition, gcFrame.loopBody, gcFrame.loopMerge, (crank_talk_oop_t)node->super.sourcePosition);
         }
         else
         {
-            crank_talk_HIRBuilder_branch(context, builder, gcFrame.loopBody, (crank_talk_oop_t)node->super.sourcePosition);
+            crank_talk_HIRBuilder_branch(primContext->context, builder, gcFrame.loopBody, (crank_talk_oop_t)node->super.sourcePosition);
         }
     }
 
@@ -819,8 +821,9 @@ crank_talk_ParseTreeDoWhileNode_analyzeAndBuildWith(crank_talk_VMContext_t *cont
     builder->basicBlock = gcFrame.loopMerge;
     crank_talk_HIRFunction_addBasicBlock(builder->hirFunction, gcFrame.loopMerge);
 
+    crank_talk_oop_t result = crank_talk_HIRConstantLiteralValue_create(primContext->context, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
     CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-    return crank_talk_HIRConstantLiteralValue_create(context, crank_talk_oop_nil(), (crank_talk_oop_t)node->super.sourcePosition);
+    return crank_talk_Primitive_return(primContext, result);
 }
 
 static crank_talk_oop_t
@@ -983,10 +986,10 @@ crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeSequenceNode::analyzeAndBuildWith:", crank_talk_ParseTreeSequenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeVariableDefinitionNode::analyzeAndBuildWith:", crank_talk_ParseTreeVariableDefinitionNode_analyzeAndBuildWith);
 
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeCullBlockNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeCullBlockNode_analyzeAndBuildWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeIfSelectionNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeIfSelectionNode_analyzeAndBuildWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeWhileNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeWhileNode_analyzeAndBuildWith);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeDoWhileNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ParseTreeDoWhileNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeCullBlockNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeCullBlockNode::analyzeAndBuildWith:", crank_talk_ParseTreeCullBlockNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIfSelectionNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeIfSelectionNode::analyzeAndBuildWith:", crank_talk_ParseTreeIfSelectionNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeWhileNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeWhileNode::analyzeAndBuildWith:", crank_talk_ParseTreeWhileNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeDoWhileNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeDoWhileNode::analyzeAndBuildWith:", crank_talk_ParseTreeDoWhileNode_analyzeAndBuildWith);
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeToByDoNodeClass, "analyzeAndBuildWith:", 2, crank_talk_ToByDoNode_analyzeAndBuildWith);
 }
 
