@@ -769,58 +769,40 @@ crank_talk_HIRVariableStoreInstruction_fullPrintOn_primitive(crank_talk_Primitiv
     return crank_talk_Primitive_return(primContext, receiver);
 }
 
-static crank_talk_oop_t
-crank_talk_HIRInstruction_isTerminator(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRInstruction_isTerminator(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, false);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, false));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRBranchInstruction_isTerminator(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRBranchInstruction_isTerminator(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, true);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRConditionalBranchInstruction_isTerminator(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRConditionalBranchInstruction_isTerminator(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, true);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRNonLocalReturnInstruction_isTerminator(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRNonLocalReturnInstruction_isTerminator(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, true);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRReturnInstruction_isTerminator(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRReturnInstruction_isTerminator(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, true);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
-static crank_talk_oop_t
-crank_talk_HIRUnreachableInstruction_isTerminator(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_HIRUnreachableInstruction_isTerminator(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    (void)arguments;
-    return crank_talk_oop_fromBoolean(context, true);
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
 }
 
 static crank_talk_oop_t
@@ -1351,12 +1333,12 @@ crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableLoadInstructionClass, "fullPrintOn:", 2, "HIRVariableLoadInstruction::fullPrintOn:", crank_talk_HIRVariableLoadInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRVariableStoreInstructionClass, "fullPrintOn:", 2, "HIRVariableStoreInstruction::fullPrintOn:", crank_talk_HIRVariableStoreInstruction_fullPrintOn_primitive);
 
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRInstructionClass, "isTerminator", 1, crank_talk_HIRInstruction_isTerminator);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "isTerminator", 1, crank_talk_HIRBranchInstruction_isTerminator);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRConditionalBranchInstructionClass, "isTerminator", 1, crank_talk_HIRConditionalBranchInstruction_isTerminator);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRNonLocalReturnInstructionClass, "isTerminator", 1, crank_talk_HIRNonLocalReturnInstruction_isTerminator);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRReturnInstructionClass, "isTerminator", 1, crank_talk_HIRReturnInstruction_isTerminator);
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRUnreachableInstructionClass, "isTerminator", 1, crank_talk_HIRUnreachableInstruction_isTerminator);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRInstructionClass, "isTerminator", 1, "HIRInstruction::isTerminator", crank_talk_HIRInstruction_isTerminator);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "isTerminator", 1, "HIRBranchInstruction::isTerminator", crank_talk_HIRBranchInstruction_isTerminator);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRConditionalBranchInstructionClass, "isTerminator", 1, "HIRConditionalBranchInstruction::isTerminator", crank_talk_HIRConditionalBranchInstruction_isTerminator);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRNonLocalReturnInstructionClass, "isTerminator", 1, "HIRNonLocalReturnInstruction::isTerminator", crank_talk_HIRNonLocalReturnInstruction_isTerminator);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRReturnInstructionClass, "isTerminator", 1, "HIRReturnInstruction::isTerminator", crank_talk_HIRReturnInstruction_isTerminator);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRUnreachableInstructionClass, "isTerminator", 1, "HIRUnreachableInstruction::isTerminator", crank_talk_HIRUnreachableInstruction_isTerminator);
 
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "hasResultValue", 1, crank_talk_HIRAllocaInstruction_hasResultValue);
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "hasResultValue", 1, crank_talk_HIRBranchInstruction_hasResultValue);
