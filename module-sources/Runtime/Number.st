@@ -1,4 +1,48 @@
+
 "Number primitives. Most of these methods are ported from Pharo."
+
+"Testing methods"
+Object ![
+isNumber
+    ^ false
+].
+
+Number ![
+isNumber
+    ^ true
+].
+
+Object ![
+isInteger
+    ^ false
+].
+
+Integer ![
+isInteger
+    ^ true
+].
+
+Object ![
+isFraction
+    ^ false
+].
+
+Fraction ![
+isFraction
+    ^ true
+].
+
+Object ![
+isFloat
+    ^ false
+].
+
+Float ![
+isFloat
+    ^ true
+].
+
+"Number primitives"
 Number ![
 abs
     ^ self < 0

@@ -50,6 +50,8 @@ crank_talk_analyzeAndEvaluateFileNamed(crank_talk_VMContext_t *context, crank_ta
     char *absolutePath = strdup(fileName);
 #else
     char *absolutePath = realpath(fileName, NULL);
+    if(!absolutePath)
+        absolutePath = strdup(fileName);
 #endif
     // Open the file
     crank_talk_oop_t absolutePathString = crank_talk_String_createWithCString(context, absolutePath);

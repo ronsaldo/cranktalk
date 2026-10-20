@@ -1,1 +1,3 @@
-thisContext loadFile: 'Runtime/package.st'.
+thisContext
+    loadFile: 'Runtime/package.st';
+    loadFile: 'RuntimeTests/package.st'.
