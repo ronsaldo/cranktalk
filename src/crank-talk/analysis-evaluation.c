@@ -127,19 +127,17 @@ crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *con
     return gcFrame.blockClosureValue;
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeLiteralVariableNode_analyzeAndEvaluateIdentifierReferenceWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeLiteralVariableNode_analyzeAndEvaluateIdentifierReferenceWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)context;
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t self = arguments[0];
+    if(primContext->argumentCount < 3) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
     //crank_talk_oop_t identifierReference = arguments[1];
     //crank_talk_oop_t evaluationContextValue = arguments[2];
 
     crank_talk_LiteralVariable_t *literalVariable = (crank_talk_LiteralVariable_t*)self;
-    return literalVariable->value;
+    return crank_talk_Primitive_return(primContext, literalVariable->value);
 }
 
 
@@ -778,7 +776,7 @@ crank_talk_ParseTreeToByDoNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *co
 void
 crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* context)
 {
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.LiteralVariableClass, "analyzeAndEvaluateIdentifierReference:with:", 3, crank_talk_ParseTreeLiteralVariableNode_analyzeAndEvaluateIdentifierReferenceWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.LiteralVariableClass, "analyzeAndEvaluateIdentifierReference:with:", 3, "LiteralVariable::analyzeAndEvaluateIdentifierReference:with:", crank_talk_ParseTreeLiteralVariableNode_analyzeAndEvaluateIdentifierReferenceWith);
 
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeAssignmentNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeAssignmentNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeBlockNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith);
