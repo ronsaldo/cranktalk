@@ -127,13 +127,26 @@ SmallInteger ![
 SmallInteger ![
 // other
     <primitive: #'SmallInteger:://'>
+    other = 0 ifTrue: [
+        self error: 'Zero divide'
+    ].
     ^ super // other
 ].
 
 SmallInteger ![
+\\ other
+    <primitive: #'SmallInteger::\\'>
+    other = 0 ifTrue: [
+        self error: 'Zero divide'
+    ].
+    ^ super \\ other
+].
+
+
+SmallInteger ![
 / other
     <primitive: #'SmallInteger::/'>
-    other == 0 ifTrue: [
+    other = 0 ifTrue: [
         self error: 'Zero divide'
     ].
 
@@ -142,7 +155,10 @@ SmallInteger ![
         ifFalse: [super / other]
 ].
 
-"Stdio stdout print: 1 / 2; lf.
+"Stdio stdout print: 1 // 2; lf.
+Stdio stdout print: 1 \\ 2; lf.
+
+Stdio stdout print: 1 / 2; lf.
 Stdio stdout print: 1 / 2.0; lf.
 Stdio stdout print: 1.0 / 2; lf.
 "

@@ -456,7 +456,7 @@ crank_talk_registerNumbersPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "-", 2,  "SmallInteger::-",  crank_talk_SmallInteger_minus_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "*", 2,  "SmallInteger::*",  crank_talk_SmallInteger_times_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "//", 2, "SmallInteger:://", crank_talk_SmallInteger_divide_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "\\\\", 2, "SmallInteger::\\", crank_talk_SmallInteger_modulo_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "\\\\", 2, "SmallInteger::\\\\", crank_talk_SmallInteger_modulo_primitive);
 crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "/", 2,  "SmallInteger::/",  crank_talk_SmallInteger_divideFraction_primitive);
     
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmallIntegerClass, "=",  2, "SmallInteger::=",  crank_talk_SmallInteger_equals_primitive);
