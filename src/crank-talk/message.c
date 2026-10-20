@@ -32,14 +32,6 @@ crank_talk_Behavior_withSelectorSetMethod(crank_talk_VMContext_t *context, crank
 }
 
 CRANK_TALK_API void
-crank_talk_createAndSetNativePrimitiveMethod(crank_talk_VMContext_t *context, crank_talk_oop_t behavior, const char *selector, size_t argumentCount, crank_talk_CompiledFunctionNativeEntryPoint_t entryPoint)
-{
-    crank_talk_oop_t name = crank_talk_Symbol_internWithCString(context, selector);
-    crank_talk_oop_t compiledFunction = (crank_talk_oop_t)crank_talk_CompiledFunction_createForNativePrimitive(context, name, argumentCount, entryPoint);
-    crank_talk_Behavior_withSelectorSetMethod(context, behavior, selector, compiledFunction);
-}
-
-CRANK_TALK_API void
 crank_talk_createAndSetPrimitiveMethod(crank_talk_VMContext_t *context, crank_talk_oop_t behavior, const char *selector, size_t argumentCount, const char *primitiveName, crank_talk_PrimitiveFunction_t entryPoint)
 {
     if(entryPoint)
