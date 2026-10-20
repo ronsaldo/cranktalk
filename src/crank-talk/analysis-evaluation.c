@@ -693,14 +693,13 @@ crank_talk_ParseTree_cullInlineBlock(crank_talk_VMContext_t *context, crank_talk
     return gcFrame.result;
 }
 
-static crank_talk_oop_t
-crank_talk_ParseTreeToByDoNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *context, crank_talk_oop_t closure, size_t argumentCount, crank_talk_oop_t *arguments)
+static void
+crank_talk_ParseTreeToByDoNode_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
 {
-    (void)closure;
-    (void)argumentCount;
-    assert(argumentCount >= 2);
-    crank_talk_oop_t self = arguments[0];
-    crank_talk_oop_t evaluationContextValue = arguments[1];
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t evaluationContextValue = primContext->arguments[1];
 
     crank_talk_ParseTreeToByDoNode_t *node = (crank_talk_ParseTreeToByDoNode_t*)self;
     
@@ -714,29 +713,29 @@ crank_talk_ParseTreeToByDoNode_analyzeAndEvaluateWith(crank_talk_VMContext_t *co
     CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
 
     // Evaluate the end points.
-    gcFrame.startValue = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->startExpression, evaluationContextValue);
+    gcFrame.startValue = crank_talk_ParseTreeAnalyzeAndEvaluate(primContext->context, (crank_talk_oop_t)node->startExpression, evaluationContextValue);
     gcFrame.currentValue = gcFrame.startValue;
     gcFrame.stepValue = crank_talk_oop_encodeSmallInteger(1);
     if(node->stepExpression)
-        gcFrame.stepValue = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->stepExpression, evaluationContextValue);
-    gcFrame.stopValue = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->stopExpression, evaluationContextValue);
+        gcFrame.stepValue = crank_talk_ParseTreeAnalyzeAndEvaluate(primContext->context, (crank_talk_oop_t)node->stepExpression, evaluationContextValue);
+    gcFrame.stopValue = crank_talk_ParseTreeAnalyzeAndEvaluate(primContext->context, (crank_talk_oop_t)node->stopExpression, evaluationContextValue);
 
-    if(!crank_talk_isParseTreeBlockNode(context, (crank_talk_oop_t)node->blockExpression))
-        gcFrame.blockValue = crank_talk_ParseTreeAnalyzeAndEvaluate(context, (crank_talk_oop_t)node->blockExpression, evaluationContextValue);
+    if(!crank_talk_isParseTreeBlockNode(primContext->context, (crank_talk_oop_t)node->blockExpression))
+        gcFrame.blockValue = crank_talk_ParseTreeAnalyzeAndEvaluate(primContext->context, (crank_talk_oop_t)node->blockExpression, evaluationContextValue);
 
     // Loop
-    while(crank_talk_oop_asBoolean(context, crank_talk_send1(context, context->roots.lessOrEqualsSymbol, gcFrame.currentValue, gcFrame.stopValue)))
+    while(crank_talk_oop_asBoolean(primContext->context, crank_talk_send1(primContext->context, primContext->context->roots.lessOrEqualsSymbol, gcFrame.currentValue, gcFrame.stopValue)))
     {
         if(gcFrame.blockValue)
-            crank_talk_send1(context, context->roots.valueWithSymbol, gcFrame.blockValue, gcFrame.currentValue);
+            crank_talk_send1(primContext->context, primContext->context->roots.valueWithSymbol, gcFrame.blockValue, gcFrame.currentValue);
         else
-            crank_talk_ParseTree_cullInlineBlock(context, node->blockExpression, evaluationContextValue, gcFrame.currentValue);
+            crank_talk_ParseTree_cullInlineBlock(primContext->context, node->blockExpression, evaluationContextValue, gcFrame.currentValue);
 
-        gcFrame.currentValue = crank_talk_send1(context, context->roots.plusSymbol, gcFrame.currentValue, gcFrame.stepValue);
+        gcFrame.currentValue = crank_talk_send1(primContext->context, primContext->context->roots.plusSymbol, gcFrame.currentValue, gcFrame.stepValue);
     }
 
     CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
-    return gcFrame.startValue;
+    return crank_talk_Primitive_return(primContext, gcFrame.startValue);
 }
 
 void
@@ -770,5 +769,5 @@ crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* conte
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeWhileNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeWhileNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeWhileNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeDoWhileNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeDoWhileNode::analyzeAndEvaluateWith:",crank_talk_ParseTreeDoWhileNode_analyzeAndEvaluateWith);
 
-    crank_talk_createAndSetNativePrimitiveMethod(context, context->roots.ParseTreeToByDoNodeClass, "analyzeAndEvaluateWith:", 2, crank_talk_ParseTreeToByDoNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeToByDoNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeToByDoNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeToByDoNode_analyzeAndEvaluateWith);
 }
