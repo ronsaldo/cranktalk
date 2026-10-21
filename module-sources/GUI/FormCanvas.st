@@ -59,6 +59,12 @@ translucentImage: aForm atRect: targetRectangle sourceRect: sourceRect
 ].
 
 FormCanvas ![
+translucentImage: aForm atRect: targetRectangle sourceRect: sourceRect color: aColor
+    self translucentImage: aForm atRect: targetRectangle sourceRect: sourceRect color: aColor flipX: false flipY: false
+].
+
+
+FormCanvas ![
 setForm: aForm
     form := aForm
 ].

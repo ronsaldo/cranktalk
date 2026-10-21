@@ -405,6 +405,7 @@ static void
 crank_talk_FormCanvas_drawTranslucentImage(crank_talk_VMContext_t *context,
     crank_talk_Form_t *form, float fMinX, float fMinY, float fMaxX, float fMaxY,
     crank_talk_Form_t *sourceForm, float fSourceMinX, float fSourceMinY, float fSourceMaxX, float fSourceMaxY,
+    bool flipX, bool flipY,
     float blendColorR, float blendColorG, float blendColorB, float blendColorA)
 {
     // Fetch the form parameters
@@ -434,6 +435,8 @@ crank_talk_FormCanvas_drawTranslucentImage(crank_talk_VMContext_t *context,
     {
         float alphaY = (y - fMinY) / (fMaxY - fMinY);
         alphaY = alphaY - floorf(alphaY);
+        if (flipY)
+            alphaY = 1 - alphaY;
         //printf("alphaY %f: %f\n", alphaY, t);
         
         uint32_t *row = (uint32_t*)(formBits + formPitch*y);
@@ -441,6 +444,8 @@ crank_talk_FormCanvas_drawTranslucentImage(crank_talk_VMContext_t *context,
         {
             float alphaX = (x - fMinX) / (fMaxX - fMinX);
             alphaX = alphaX - floorf(alphaX);
+            if(flipX)
+                alphaX = 1 - alphaX;
 
             float sourceS = sourceFormWidth*alphaX;
             float sourceT = sourceFormHeight*alphaY;
@@ -615,7 +620,7 @@ crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive(crank_talk_Pr
 static void
 crank_talk_FormCanvas_translucenImageAtSourceRectWithColor_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
-    if(primContext->argumentCount < 5) return crank_talk_Primitive_fail(primContext);
+    if(primContext->argumentCount < 7) return crank_talk_Primitive_fail(primContext);
 
     crank_talk_oop_t self = primContext->arguments[0];
     crank_talk_FormCanvas_t *formCanvas = (crank_talk_FormCanvas_t *)self;
@@ -623,6 +628,8 @@ crank_talk_FormCanvas_translucenImageAtSourceRectWithColor_primitive(crank_talk_
     crank_talk_Rectangle_t *targetRect = (crank_talk_Rectangle_t*)primContext->arguments[2];
     crank_talk_Rectangle_t *sourceRect = (crank_talk_Rectangle_t *)primContext->arguments[3];
     crank_talk_Color_t *blendColor = (crank_talk_Color_t *)primContext->arguments[4];
+    bool flipX = crank_talk_oop_asBoolean(primContext->context, primContext->arguments[5]);
+    bool flipY = crank_talk_oop_asBoolean(primContext->context, primContext->arguments[6]);
 
     float sourceMinX = (float)crank_talk_oop_numberAsFloat(sourceRect->origin->x);
     float sourceMinY = (float)crank_talk_oop_numberAsFloat(sourceRect->origin->y);
@@ -647,6 +654,7 @@ crank_talk_FormCanvas_translucenImageAtSourceRectWithColor_primitive(crank_talk_
     crank_talk_FormCanvas_drawTranslucentImage(primContext->context,
         formCanvas->form, targetMinX, targetMinY, targetMaxX, targetMaxY,
         form, sourceMinX, sourceMinY, sourceMaxX, sourceMaxY,
+        flipX, flipY,
         blendColorR, blendColorG, blendColorB, blendColorA);
 
     return crank_talk_Primitive_return(primContext, self);
@@ -670,6 +678,6 @@ crank_talk_registerGUIPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "fillRectangle:color:", 3, "FormCanvas::fillRectangle:color:", crank_talk_FormCanvas_fillRectangleWithColor_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "frameRectangle:borderWidth:color:", 4, "FormCanvas::frameRectangle:borderWidth:color:", crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "drawString:from:to:at:font:color:", 7, "FormCanvas::drawString:from:to:at:font:color:", crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "translucentImage:atRect:sourceRect:color:", 5, "FormCanvas::translucentImage:atRect:sourceRect:color:", crank_talk_FormCanvas_translucenImageAtSourceRectWithColor_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.FormCanvasClass, "translucentImage:atRect:sourceRect:color:flipX:flipY:", 7, "FormCanvas::translucentImage:atRect:sourceRect:color:flipX:flipY:", crank_talk_FormCanvas_translucenImageAtSourceRectWithColor_primitive);
 }
 
