@@ -296,6 +296,17 @@ crank_talk_HIRBuilder_conditionalBranch(crank_talk_VMContext_t *context, crank_t
 }
 
 CRANK_TALK_API crank_talk_oop_t
+crank_talk_HIRBuilder_makeArray(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_Array_t *elements, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_oop_t instructionValue = CrankAllocateValuesObjectWithClassName(context, HIRMakeArrayInstruction);
+    crank_talk_HIRMakeArrayInstruction_t *instruction = (crank_talk_HIRMakeArrayInstruction_t*)instructionValue;
+    instruction->super.super.super.sourcePosition = sourcePosition;
+    instruction->elements = elements;
+    crank_talk_HIRBuilder_addInstruction(builder, &instruction->super);
+    return instructionValue;
+}
+
+CRANK_TALK_API crank_talk_oop_t
 crank_talk_HIRBuilder_makeClosure(crank_talk_VMContext_t *context, crank_talk_HIRBuilder_t *builder, crank_talk_CompiledFunction_t *function, crank_talk_Array_t *capturedValues, crank_talk_oop_t sourcePosition)
 {
     crank_talk_oop_t instructionValue = CrankAllocateValuesObjectWithClassName(context, HIRMakeClosureInstruction);
@@ -544,6 +555,29 @@ crank_talk_HIRConditionalBranchInstruction_fullPrintOn_primitive(crank_talk_Prim
     crank_talk_StringStream_print(primContext->context, stream, (crank_talk_oop_t)instruction->trueDestination);
     crank_talk_StringStream_insertCString(primContext->context, stream, " falseDestination ");
     crank_talk_StringStream_print(primContext->context, stream, (crank_talk_oop_t)instruction->falseDestination);
+
+    return crank_talk_Primitive_return(primContext, receiver);
+}
+
+static void
+crank_talk_HIRMakeArrayInstruction_fullPrintOn_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t receiver = primContext->arguments[0];
+    crank_talk_oop_t stream = primContext->arguments[1];
+    
+    crank_talk_HIRMakeArrayInstruction_t *instruction = (crank_talk_HIRMakeArrayInstruction_t*)receiver;
+
+    crank_talk_StringStream_print(primContext->context, stream, receiver);
+    crank_talk_StringStream_insertCString(primContext->context, stream, " := makeArray ");
+    size_t elementCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)instruction->elements);
+    for(size_t i = 0 ; i < elementCount; ++i)
+    {
+        if(i > 0)
+            crank_talk_StringStream_insertCString(primContext->context, stream, ", ");
+        crank_talk_StringStream_print(primContext->context, stream, (crank_talk_oop_t)instruction->elements->elements[i]);
+    }
 
     return crank_talk_Primitive_return(primContext, receiver);
 }
@@ -824,6 +858,12 @@ crank_talk_HIRConditionalBranchInstruction_hasResultValue(crank_talk_PrimitiveCo
 }
 
 static void
+crank_talk_HIRMakeArrayInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
+{
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
+}
+
+static void
 crank_talk_HIRMakeClosureInstruction_hasResultValue(crank_talk_PrimitiveContext_t *primContext)
 {
     return crank_talk_Primitive_return(primContext, crank_talk_oop_fromBoolean(primContext->context, true));
@@ -982,6 +1022,28 @@ crank_talk_HIRConditionalBranchInstruction_emitBytecodeAssemblyWith(crank_talk_P
     crank_talk_BytecodeAssembler_jumpIfTrue(primContext->context, bytecodeAssembler, condition, (crank_talk_BytecodeLabel_t*)branchInstruction->trueDestination->bytecodeLabel, branchInstruction->super.super.super.sourcePosition);
     crank_talk_BytecodeAssembler_jumpIfFalse(primContext->context, bytecodeAssembler, condition, (crank_talk_BytecodeLabel_t*)branchInstruction->falseDestination->bytecodeLabel, branchInstruction->super.super.super.sourcePosition);
     crank_talk_BytecodeAssembler_booleanExpected(primContext->context, bytecodeAssembler, branchInstruction->super.super.super.sourcePosition);
+    return crank_talk_Primitive_return(primContext, self);
+}
+
+static void
+crank_talk_HIRMakeArrayInstruction_emitBytecodeAssemblyWith(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_HIRMakeArrayInstruction_t *instruction = (crank_talk_HIRMakeArrayInstruction_t*)self;
+    crank_talk_BytecodeAssembler_t *bytecodeAssembler = (crank_talk_BytecodeAssembler_t *)primContext->arguments[1];
+
+    size_t elementCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)instruction->elements);
+    crank_talk_BytecodeAssembler_beginArray(primContext->context, bytecodeAssembler, elementCount, instruction->super.super.super.sourcePosition);
+    for(size_t i = 0; i < elementCount; ++i)
+    {
+        crank_talk_BytecodeVectorOperand_t elementValue = crank_talk_HIRValue_getBytecodeAssemblyOperandWith(primContext->context, (crank_talk_HIRValue_t*)instruction->elements->elements[i], (crank_talk_oop_t)bytecodeAssembler);
+        crank_talk_BytecodeAssembler_pushArrayElement(primContext->context, bytecodeAssembler, elementValue, instruction->super.super.super.sourcePosition);
+    }
+
+    crank_talk_BytecodeAssembler_finishArray(primContext->context, bytecodeAssembler, (crank_talk_BytecodeVectorOperand_t)crank_talk_oop_decodeSmallInteger(instruction->super.super.bytecodeVectorIndex), instruction->super.super.super.sourcePosition);
+    
     return crank_talk_Primitive_return(primContext, self);
 }
 
@@ -1233,6 +1295,7 @@ crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "fullPrintOn:", 2, "HIRAllocaInstruction::fullPrintOn:", crank_talk_HIRAllocaInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "fullPrintOn:", 2, "HIRBranchInstruction::fullPrintOn:", crank_talk_HIRBranchInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRConditionalBranchInstructionClass, "fullPrintOn:", 2, "HIRConditionalBranchInstruction::fullPrintOn:", crank_talk_HIRConditionalBranchInstruction_fullPrintOn_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRMakeArrayInstructionClass, "fullPrintOn:", 2, "HIRMakeArrayInstruction::fullPrintOn:", crank_talk_HIRMakeArrayInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRMakeClosureInstructionClass, "fullPrintOn:", 2, "HIRMakeClosureInstruction::fullPrintOn:", crank_talk_HIRMakeClosureInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRPhiInstructionClass, "fullPrintOn:", 2, "HIRPhiInstruction::fullPrintOn:", crank_talk_HIRPhiInstruction_fullPrintOn_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRPhiSourceInstructionClass, "fullPrintOn:", 2, "HIRPhiSourceInstruction::fullPrintOn:", crank_talk_HIRPhiSourceInstruction_fullPrintOn_primitive);
@@ -1256,6 +1319,7 @@ crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "hasResultValue", 1, "HIRAllocaInstruction::hasResultValue", crank_talk_HIRAllocaInstruction_hasResultValue);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "hasResultValue", 1, "HIRBranchInstruction::hasResultValue", crank_talk_HIRBranchInstruction_hasResultValue);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRConditionalBranchInstructionClass, "hasResultValue", 1, "HIRConditionalBranchInstruction::hasResultValue", crank_talk_HIRConditionalBranchInstruction_hasResultValue);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRMakeArrayInstructionClass, "hasResultValue", 1, "HIRMakeArrayInstruction::hasResultValue", crank_talk_HIRMakeArrayInstruction_hasResultValue);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRMakeClosureInstructionClass, "hasResultValue", 1, "HIRMakeClosureInstruction::hasResultValue", crank_talk_HIRMakeClosureInstruction_hasResultValue);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRPhiInstructionClass, "hasResultValue", 1, "HIRPhiInstruction::hasResultValue", crank_talk_HIRPhiInstruction_hasResultValue);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRPhiSourceInstructionClass, "hasResultValue", 1, "HIRPhiSourceInstruction::hasResultValue", crank_talk_HIRPhiSourceInstruction_hasResultValue);
@@ -1280,6 +1344,7 @@ crank_talk_registerHIRPrimitives(crank_talk_VMContext_t *context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRAllocaInstructionClass, "emitBytecodeAssemblyWith:", 2, "HIRAllocaInstruction::emitBytecodeAssemblyWith:", crank_talk_HIRAllocaInstruction_emitBytecodeAssemblyWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRBranchInstructionClass, "emitBytecodeAssemblyWith:", 2, "HIRBranchInstruction::emitBytecodeAssemblyWith:", crank_talk_HIRBranchInstruction_emitBytecodeAssemblyWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRConditionalBranchInstructionClass, "emitBytecodeAssemblyWith:", 2, "HIRConditionalBranchInstruction::emitBytecodeAssemblyWith:", crank_talk_HIRConditionalBranchInstruction_emitBytecodeAssemblyWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRMakeArrayInstructionClass, "emitBytecodeAssemblyWith:", 2, "HIRMakeArrayInstruction::emitBytecodeAssemblyWith:", crank_talk_HIRMakeArrayInstruction_emitBytecodeAssemblyWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRMakeClosureInstructionClass, "emitBytecodeAssemblyWith:", 2, "HIRMakeClosureInstruction::emitBytecodeAssemblyWith:", crank_talk_HIRMakeClosureInstruction_emitBytecodeAssemblyWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRPhiInstructionClass, "emitBytecodeAssemblyWith:", 2, "HIRPhiInstruction::emitBytecodeAssemblyWith:", crank_talk_HIRPhiInstruction_emitBytecodeAssemblyWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.HIRPhiSourceInstructionClass, "emitBytecodeAssemblyWith:", 2, "HIRPhiSourceInstruction::emitBytecodeAssemblyWith:", crank_talk_HIRPhiSourceInstruction_emitBytecodeAssemblyWith);

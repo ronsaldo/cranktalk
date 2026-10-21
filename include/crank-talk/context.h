@@ -221,6 +221,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t HIRAllocaInstructionClass;
     crank_talk_oop_t HIRBranchInstructionClass;
     crank_talk_oop_t HIRConditionalBranchInstructionClass;
+    crank_talk_oop_t HIRMakeArrayInstructionClass;
     crank_talk_oop_t HIRMakeClosureInstructionClass;
     crank_talk_oop_t HIRPhiInstructionClass;
     crank_talk_oop_t HIRPhiSourceInstructionClass;

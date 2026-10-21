@@ -4,6 +4,7 @@ CRANK_TALK_OPCODE(Nop)
 CRANK_TALK_OPCODE(BooleanExpected)
 CRANK_TALK_OPCODE(Breakpoint)
 CRANK_TALK_OPCODE(Unreachable)
+CRANK_TALK_OPCODE(BeginArray)
 CRANK_TALK_OPCODE(BeginClosure)
 CRANK_TALK_OPCODE(BeginSend)
 
@@ -22,6 +23,9 @@ CRANK_TALK_OPCODE(SuperSendMessage)
 
 CRANK_TALK_OPCODE(PushClosureCapture)
 CRANK_TALK_OPCODE(FinishClosure)
+
+CRANK_TALK_OPCODE(PushArrayElement)
+CRANK_TALK_OPCODE(FinishArray)
 
 CRANK_TALK_OPCODE(ThisContext)
 

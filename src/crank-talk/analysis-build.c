@@ -617,6 +617,31 @@ crank_talk_ParseTreeSequenceNode_analyzeAndBuildWith(crank_talk_PrimitiveContext
 }
 
 static void
+crank_talk_ParseTreeArrayNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_ParseTreeArrayNode_t *node = (crank_talk_ParseTreeArrayNode_t*)primContext->arguments[0];
+    crank_talk_oop_t buildContextValue = primContext->arguments[1];
+    crank_talk_AnalysisAndBuildContext_t *buildContext = (crank_talk_AnalysisAndBuildContext_t *)buildContextValue;
+
+    struct {
+        crank_talk_Array_t *elements;
+    } gcFrame = {0};
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    size_t elementCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->elements);
+    gcFrame.elements = (crank_talk_Array_t*)crank_talk_Array_create(primContext->context, elementCount);
+
+    for(size_t i = 0; i < elementCount; ++i)
+        gcFrame.elements->elements[i] = (crank_talk_oop_t)crank_talk_ParseTreeAnalyzeAndBuild(primContext->context, node->elements->elements[i], buildContextValue);
+
+    crank_talk_oop_t result = crank_talk_HIRBuilder_makeArray(primContext->context, buildContext->builder, gcFrame.elements, (crank_talk_oop_t)node->super.sourcePosition);
+    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+
+    return crank_talk_Primitive_return(primContext, result);
+}
+static void
 crank_talk_ParseTreeVariableDefinitionNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
 {
     if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
@@ -1002,6 +1027,7 @@ crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeMessageSendNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeMessageSendNode::analyzeAndBuildWith:", crank_talk_ParseTreeMessageSendNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeReturnNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeReturnNode::analyzeAndBuildWith:", crank_talk_ParseTreeReturnNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeSequenceNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeSequenceNode::analyzeAndBuildWith:", crank_talk_ParseTreeSequenceNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeArrayNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeArrayNode::analyzeAndBuildWith:", crank_talk_ParseTreeArrayNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeVariableDefinitionNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeVariableDefinitionNode::analyzeAndBuildWith:", crank_talk_ParseTreeVariableDefinitionNode_analyzeAndBuildWith);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeCullBlockNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeCullBlockNode::analyzeAndBuildWith:", crank_talk_ParseTreeCullBlockNode_analyzeAndBuildWith);

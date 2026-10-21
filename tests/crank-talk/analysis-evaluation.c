@@ -608,5 +608,17 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(6, crank_talk_object_getSizeInSlots(value));
     }
 
+    // Block with empty array
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[{}] value");
+        AssertEquals(0, crank_talk_object_getSizeInSlots(value));
+    }
+
+    // Block with array
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[{1 . 2}] value");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(value));
+    }
+
     crank_talk_vm_destroyContext(context);
 }

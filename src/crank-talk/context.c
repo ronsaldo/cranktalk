@@ -767,6 +767,9 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(HIRConditionalBranchInstruction, trueDestination),
         CrankTalkSlotDef(HIRConditionalBranchInstruction, falseDestination),
         NULL);
+    context->roots.HIRMakeArrayInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRMakeArrayInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRMakeArrayInstruction_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(HIRMakeArrayInstruction, elements),
+        NULL);
     context->roots.HIRMakeClosureInstructionClass = crank_talk_context_createClassAndMetaclass(context, "HIRMakeClosureInstruction", context->roots.HIRInstructionClass, sizeof(crank_talk_HIRMakeClosureInstruction_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRMakeClosureInstruction, function),
         CrankTalkSlotDef(HIRMakeClosureInstruction, capturedValues),

@@ -217,6 +217,15 @@ crank_talk_BytecodeAssembler_beginSend(crank_talk_VMContext_t *context, crank_ta
 }
 
 CRANK_TALK_API void
+crank_talk_BytecodeAssembler_beginArray(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, size_t elementCount, crank_talk_oop_t sourcePosition)
+{
+    assert(elementCount <= 0xFFFF);
+    crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeBeginArray, sourcePosition);
+    crank_talk_BytecodeAssembler_uint16Operand(context, assembler, (uint16_t)elementCount);
+
+}
+
+CRANK_TALK_API void
 crank_talk_BytecodeAssembler_beginClosure(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t function, size_t captureCount, crank_talk_oop_t sourcePosition)
 {
     assert(captureCount <= 0xFFFF);
@@ -300,6 +309,19 @@ crank_talk_BytecodeAssembler_finishClosure(crank_talk_VMContext_t *context, cran
     crank_talk_BytecodeAssembler_vectorOperand(context, assembler, resultTemporary);
 }
 
+CRANK_TALK_API void
+crank_talk_BytecodeAssembler_pushArrayElement(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t elementValue, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodePushArrayElement, sourcePosition);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, elementValue);
+}
+
+CRANK_TALK_API void
+crank_talk_BytecodeAssembler_finishArray(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t resultTemporary, crank_talk_oop_t sourcePosition)
+{
+    crank_talk_BytecodeAssembler_opcode(context, assembler, CrankTalkOpcodeFinishArray, sourcePosition);
+    crank_talk_BytecodeAssembler_vectorOperand(context, assembler, resultTemporary);
+}
 
 CRANK_TALK_API void
 crank_talk_BytecodeAssembler_not(crank_talk_VMContext_t *context, crank_talk_BytecodeAssembler_t *assembler, crank_talk_BytecodeVectorOperand_t resultTemporary, crank_talk_BytecodeVectorOperand_t operand, crank_talk_oop_t sourcePosition)
@@ -566,7 +588,14 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
         case CrankTalkOpcodeBeginSend:
             activationRecord->calloutArgumentCount = 0;
             break;
+        case CrankTalkOpcodeBeginArray:
+        {
+            size_t elementCount = crank_talk_BytecodeFunction_fetchInt16(bytecodesSize, &activationRecord->pc, bytecodes);
+            crank_talk_Array_t *array = (crank_talk_Array_t*)crank_talk_Array_create(context, elementCount);
 
+            activationRecord->arrayInConstruction = array;
+            activationRecord->arrayInConstructionSize = 0;
+        } break;
         case CrankTalkOpcodeBeginClosure:
         {
             crank_talk_oop_t function = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
@@ -648,9 +677,15 @@ crank_talk_vm_BytecodeFunction_interpretWithActivationRecord(crank_talk_VMContex
         case CrankTalkOpcodePushClosureCapture:
             activationRecord->arrayInConstruction->elements[activationRecord->arrayInConstructionSize++] = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
             break;
-
         case CrankTalkOpcodeFinishClosure:
             crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, activationRecord->closureInConstruction);
+            break;
+
+        case CrankTalkOpcodePushArrayElement:
+            activationRecord->arrayInConstruction->elements[activationRecord->arrayInConstructionSize++] = crank_talk_BytecodeFunction_fetchVectorOperand(activationRecord);
+            break;
+        case CrankTalkOpcodeFinishArray:
+            crank_talk_BytecodeFunction_fetchTemporaryAndSetValue(context, activationRecord, (crank_talk_oop_t)activationRecord->arrayInConstruction);
             break;
 
         case CrankTalkOpcodeNot:
@@ -790,6 +825,11 @@ crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank
         case CrankTalkOpcodeBeginSend:
             break;
 
+        case CrankTalkOpcodeBeginArray:
+            printf(" ");
+            printf("%d", crank_talk_BytecodeFunction_fetchUInt16(bytecodesSize, &pc, bytecodes));
+            break;
+
         case CrankTalkOpcodeBeginClosure:
             printf(" ");
             crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
@@ -850,6 +890,14 @@ crank_talk_BytecodeFunction_dumpToConsole(crank_talk_VMContext_t *context, crank
             crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
             break;
 
+        case CrankTalkOpcodePushArrayElement:
+            printf(" ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            break;
+        case CrankTalkOpcodeFinishArray:
+            printf(" -> ");
+            crank_talk_BytecodeFunction_fetchAndPrintVectorOperand(bytecodesSize, &pc, bytecodes);
+            break;
 
         case CrankTalkOpcodeNot:
         case CrankTalkOpcodeClass:
