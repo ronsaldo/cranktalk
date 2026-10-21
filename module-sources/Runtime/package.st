@@ -4,6 +4,7 @@ thisContext
     loadFile: 'Behavior.st';
     loadFile: 'Class.st';
     loadFile: 'Metaclass.st';
+    loadFile: 'Variable.st';
 
     loadFile: 'CompiledFunction.st';
     

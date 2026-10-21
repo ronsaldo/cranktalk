@@ -1,5 +1,6 @@
 Object << #Morph
     slots: {#bounds . #owner . #submorphs . #color. #layout};
+    sharedPools: {OSKeySymbols};
     build.
 
 Morph ![

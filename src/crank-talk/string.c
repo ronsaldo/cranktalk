@@ -501,6 +501,16 @@ crank_talk_Symbol_asString_primitive(crank_talk_PrimitiveContext_t *primContext)
 }
 
 static void
+crank_talk_Symbol_asSymbol_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 1) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t receiver = primContext->arguments[0];
+    return crank_talk_Primitive_return(primContext, receiver);
+}
+
+
+static void
 crank_talk_Symbol_printOn_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
     if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
@@ -591,6 +601,7 @@ void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringClass, "insertString:atIndex:", 3, "String::insertString:atIndex:", crank_talk_String_insertStringAtIndex_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "asString", 1, "Symbol::asString", crank_talk_Symbol_asString_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "asSymbol", 1, "Symbol::asSymbol", crank_talk_Symbol_asSymbol_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "printOn:", 2, "Symbol::printOn:", crank_talk_Symbol_printOn_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.StringStreamClass, "nextPut:", 2, "StringStream::nextPut:", crank_talk_StringStream_nextPut_primitive);

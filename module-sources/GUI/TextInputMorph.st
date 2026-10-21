@@ -79,42 +79,42 @@ TextInputMorph ![
 onKeyboardDownEvent: anEvent
     anEvent wasHandled ifTrue: [^ self].
 
-    anEvent symbol == OSKeySymbols OSK_RETURN ifTrue: [
+    anEvent symbol == OSK_RETURN ifTrue: [
         ^ onEnterAction value: self
     ].
 
-    anEvent symbol == OSKeySymbols OSK_ESCAPE ifTrue: [
+    anEvent symbol == OSK_ESCAPE ifTrue: [
         ^ onCancelAction value: self
     ].
 
-    anEvent symbol == OSKeySymbols OSK_BACKSPACE ifTrue: [
+    anEvent symbol == OSK_BACKSPACE ifTrue: [
         (cursorIndex > 1 and: [text size >= 1]) ifTrue: [
             cursorIndex := cursorIndex - 1.
             text := text withoutElementAtIndex: cursorIndex.
         ]
     ].
 
-    anEvent symbol == OSKeySymbols OSK_DELETE ifTrue: [
+    anEvent symbol == OSK_DELETE ifTrue: [
         cursorIndex <= text size ifTrue: [
             text := text withoutElementAtIndex: cursorIndex.
         ]
     ].
 
-    anEvent symbol == OSKeySymbols OSK_LEFT ifTrue: [
+    anEvent symbol == OSK_LEFT ifTrue: [
         "Stdio stdout nextPutAll: 'Move cursor left'; lf."
         cursorIndex := cursorIndex - 1 max: 1.
     ].
-    anEvent symbol == OSKeySymbols OSK_RIGHT ifTrue: [
+    anEvent symbol == OSK_RIGHT ifTrue: [
         "Stdio stdout nextPutAll: 'Move cursor right'; lf."
         cursorIndex := cursorIndex + 1 min: text size + 1.
     ].
 
-    anEvent symbol == OSKeySymbols OSK_HOME ifTrue: [
+    anEvent symbol == OSK_HOME ifTrue: [
         "Stdio stdout nextPutAll: 'Move cursor begining'; lf."
         cursorIndex := 1.
     ].
 
-    anEvent symbol == OSKeySymbols OSK_END ifTrue: [
+    anEvent symbol == OSK_END ifTrue: [
         "Stdio stdout nextPutAll: 'Move cursor end'; lf."
         cursorIndex := text size + 1.
     ].

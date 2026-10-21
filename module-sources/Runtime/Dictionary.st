@@ -34,10 +34,34 @@ at: key put: anObject
         association := Association key: key value: anObject.
         storage at: index put: association.
         size := size + 1.
+        self checkCapacityIncrementThreshold.
     ] ifFalse:[
         association value: anObject
     ].
     ^ anObject
+].
+
+Dictionary ![
+add: anAssociation
+    | index association |
+    index := self scanForOrIncreaseCapacity: anAssociation key.
+    association := storage at: index.
+    association == nil ifTrue: [
+        storage at: index put: anAssociation.
+        size := size + 1.
+        self checkCapacityIncrementThreshold.
+    ] ifFalse:[
+        association value: anAssociation value
+    ].
+    ^ anAssociation
+].
+
+Dictionary ![
+insertWithoutChecking: anAssociation
+    | index |
+    index := self scanFor: anAssociation key.
+    storage at: index put: anAssociation.
+    size := size + 1.
 ].
 
 Dictionary ![
@@ -52,7 +76,9 @@ increaseCapacity
     ].
 
     newStorage := Array basicNew: newCapacity.
+    size := 0.
 
+    storage := newStorage.
     1 to: oldCapacity do: [:i |
         | oldAssociationValue |
         oldAssociationValue := oldStorage at: i.
@@ -60,8 +86,32 @@ increaseCapacity
             self insertWithoutChecking: oldAssociationValue
         ]
     ].
+].
 
-    storage := newStorage
+Dictionary ![
+checkCapacityIncrementThreshold
+    | capacityThreshold |
+    capacityThreshold := self capacity * 4 // 5.
+    size >= capacityThreshold ifTrue: [
+        self increaseCapacity
+    ]
+].
+
+Dictionary ![
+associationAt: key
+    ^ self associationAt: key ifAbsent: [self error: 'Key not found']
+].
+
+Dictionary ![
+associationAt: key ifAbsent: aBlock
+    | index association |
+    index := self scanFor: key.
+    index < 1 ifTrue: [^ aBlock value].
+
+    association := storage at: index.
+    association == nil ifTrue: [ ^ aBlock value].
+
+    ^ association
 ].
 
 Dictionary ![
@@ -80,7 +130,6 @@ at: key ifAbsent: aBlock
 
     ^ association value
 ].
-
 
 Dictionary ![
 printOn: aStream
