@@ -1,4 +1,5 @@
 thisContext 
+    loadFile: 'Canvas.st';
     loadFile: 'Color.st';
     loadFile: 'Event.st';
     loadFile: 'Font.st';

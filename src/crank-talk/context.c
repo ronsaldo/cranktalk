@@ -924,10 +924,12 @@ crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(FontFace, linegap),
         NULL);
 
-    context->roots.FormCanvasClass = crank_talk_context_createClassAndMetaclass(context, "FormCanvas", context->roots.ObjectClass, sizeof(crank_talk_FormCanvas_t), CrankTalkGCObjectDataTypeOops,
+    context->roots.CanvasClass = crank_talk_context_createClassAndMetaclass(context, "Canvas", context->roots.ObjectClass, sizeof(crank_talk_Canvas_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(Canvas, origin),
+        CrankTalkSlotDef(Canvas, scaleFactor),
+        NULL);
+    context->roots.FormCanvasClass = crank_talk_context_createClassAndMetaclass(context, "FormCanvas", context->roots.CanvasClass, sizeof(crank_talk_FormCanvas_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(FormCanvas, form),
-        CrankTalkSlotDef(FormCanvas, origin),
-        CrankTalkSlotDef(FormCanvas, scaleFactor),
         NULL);
 
     context->roots.OSWindowClass = crank_talk_context_createClassAndMetaclass(context, "OSWindow", context->roots.ObjectClass, sizeof(crank_talk_OSWindow_t), CrankTalkGCObjectDataTypeOops,

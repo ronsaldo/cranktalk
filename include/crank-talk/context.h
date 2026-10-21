@@ -265,6 +265,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t PointClass;
     crank_talk_oop_t RectangleClass;
     crank_talk_oop_t FormClass;
+    crank_talk_oop_t CanvasClass;
     crank_talk_oop_t FormCanvasClass;
     crank_talk_oop_t FontClass;
     crank_talk_oop_t FontBakedCharClass;

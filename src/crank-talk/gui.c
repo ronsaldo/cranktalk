@@ -505,10 +505,10 @@ crank_talk_FormCanvas_fillRectangleWithColor_primitive(crank_talk_PrimitiveConte
         crank_talk_error(primContext->context, "Only 32 bit forms are supported.");
     
     // Fetch the rectangle corners.
-    float originX = (float)crank_talk_oop_numberAsFloat(formCanvas->origin->x);
-    float originY = (float)crank_talk_oop_numberAsFloat(formCanvas->origin->y);
-    float scaleX = (float)crank_talk_oop_numberAsFloat(formCanvas->scaleFactor->x);
-    float scaleY = (float)crank_talk_oop_numberAsFloat(formCanvas->scaleFactor->y);
+    float originX = (float)crank_talk_oop_numberAsFloat(formCanvas->super.origin->x);
+    float originY = (float)crank_talk_oop_numberAsFloat(formCanvas->super.origin->y);
+    float scaleX = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->x);
+    float scaleY = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->y);
 
     float fMinX = ((float)crank_talk_oop_numberAsFloat(rectangle->origin->x) + originX) * scaleX;
     float fMinY = ((float)crank_talk_oop_numberAsFloat(rectangle->origin->y) + originY) * scaleY;
@@ -546,10 +546,10 @@ crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive(crank_talk_Pri
     float borderWidth = (float)crank_talk_oop_numberAsFloat(borderWidthValue);
 
     // Fetch the rectangle corners.
-    float originX = (float)crank_talk_oop_numberAsFloat(formCanvas->origin->x);
-    float originY = (float)crank_talk_oop_numberAsFloat(formCanvas->origin->y);
-    float scaleX = (float)crank_talk_oop_numberAsFloat(formCanvas->scaleFactor->x);
-    float scaleY = (float)crank_talk_oop_numberAsFloat(formCanvas->scaleFactor->y);
+    float originX = (float)crank_talk_oop_numberAsFloat(formCanvas->super.origin->x);
+    float originY = (float)crank_talk_oop_numberAsFloat(formCanvas->super.origin->y);
+    float scaleX = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->x);
+    float scaleY = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->y);
 
     float fMinX = ((float)crank_talk_oop_numberAsFloat(rectangle->origin->x) + originX) * scaleX;
     float fMinY = ((float)crank_talk_oop_numberAsFloat(rectangle->origin->y) + originY) * scaleY;
@@ -593,8 +593,8 @@ crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive(crank_talk_Pr
     crank_talk_Form_t *fontForm = fontFace->image;
     int fontImageWidth  = (int)crank_talk_oop_decodeSmallInteger(fontForm->width);
     int fontImageHeight = (int)crank_talk_oop_decodeSmallInteger(fontForm->height);
-    float currentBaselineX = (float)crank_talk_oop_numberAsFloat(baselineStart->x) + crank_talk_oop_numberAsFloat(formCanvas->origin->x);
-    float currentBaselineY = (float)crank_talk_oop_numberAsFloat(baselineStart->y) + crank_talk_oop_numberAsFloat(formCanvas->origin->y);
+    float currentBaselineX = (float)crank_talk_oop_numberAsFloat(baselineStart->x) + crank_talk_oop_numberAsFloat(formCanvas->super.origin->x);
+    float currentBaselineY = (float)crank_talk_oop_numberAsFloat(baselineStart->y) + crank_talk_oop_numberAsFloat(formCanvas->super.origin->y);
 
     // TODO: Decode UTF-8
     for(size_t i = stringStartIndex - 1; i < stringStopIndex; ++i)
@@ -636,10 +636,10 @@ crank_talk_FormCanvas_translucenImageAtSourceRectWithColor_primitive(crank_talk_
     float sourceMaxX = (float)crank_talk_oop_numberAsFloat(sourceRect->corner->x);
     float sourceMaxY = (float)crank_talk_oop_numberAsFloat(sourceRect->corner->y);
 
-    float originX = (float)crank_talk_oop_numberAsFloat(formCanvas->origin->x);
-    float originY = (float)crank_talk_oop_numberAsFloat(formCanvas->origin->y);
-    float scaleX = (float)crank_talk_oop_numberAsFloat(formCanvas->scaleFactor->x);
-    float scaleY = (float)crank_talk_oop_numberAsFloat(formCanvas->scaleFactor->y);
+    float originX = (float)crank_talk_oop_numberAsFloat(formCanvas->super.origin->x);
+    float originY = (float)crank_talk_oop_numberAsFloat(formCanvas->super.origin->y);
+    float scaleX = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->x);
+    float scaleY = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->y);
 
     float targetMinX = (float)crank_talk_oop_numberAsFloat(targetRect->origin->x)*scaleX + originX;
     float targetMinY = (float)crank_talk_oop_numberAsFloat(targetRect->origin->y)*scaleY + originY;

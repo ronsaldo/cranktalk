@@ -10,7 +10,8 @@ typedef struct crank_talk_Form_s crank_talk_Form_t;
 typedef struct crank_talk_Font_s crank_talk_Font_t;
 typedef struct crank_talk_FontBakedChar_s crank_talk_FontBakedChar_t;
 typedef struct crank_talk_FontFace_s crank_talk_FontFace_t;
-typedef struct crank_talk_FormCanvas_s crank_talk_FormCanvas_t;
+typedef struct crank_talk_Canvas_s crank_talk_Canvas_t;
+    typedef struct crank_talk_FormCanvas_s crank_talk_FormCanvas_t;
 
 typedef struct crank_talk_OSWindow_s crank_talk_OSWindow_t;
 typedef struct crank_talk_OSWindowEventHandler_s crank_talk_OSWindowEventHandler_t;
@@ -93,15 +94,17 @@ struct crank_talk_FontFace_s
     crank_talk_oop_t linegap;
 };
 
-//typedef struct crank_talk_Font_s crank_talk_Font_t;
-//typedef struct crank_talk_FontFace_s crank_talk_FontFace_t;
+struct crank_talk_Canvas_s
+{
+    crank_talk_Object_t super;
+    crank_talk_Point_t *origin;
+    crank_talk_Point_t *scaleFactor;
+};
 
 struct crank_talk_FormCanvas_s
 {
-    crank_talk_Object_t super;
+    crank_talk_Canvas_t super;
     crank_talk_Form_t *form;
-    crank_talk_Point_t *origin;
-    crank_talk_Point_t *scaleFactor;
 };
 
 struct crank_talk_OSWindow_s
