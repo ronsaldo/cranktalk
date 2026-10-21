@@ -153,6 +153,12 @@ crank_talk_Behavior_lookupSlotNamed(crank_talk_oop_t behaviorValue, crank_talk_o
     return crank_talk_oop_nil();
 }
 
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_Behavior_lookupClassBinding(crank_talk_VMContext_t *context, crank_talk_oop_t behavior, crank_talk_oop_t name)
+{
+    return crank_talk_send1(context, context->roots.lookupClassBindingSymbol, behavior, name);
+}
+
 static void
 crank_talk_Behavior_basicNew_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
@@ -234,6 +240,55 @@ crank_talk_Metaclass_environment_primitive(crank_talk_PrimitiveContext_t *primCo
 }
 
 static void
+crank_talk_Class_lookupClassBinding_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_Class_t *self = (crank_talk_Class_t *)primContext->arguments[0];
+    crank_talk_oop_t name = primContext->arguments[1];
+
+    // Check the class pool
+    if(self->classPool)
+    {
+        crank_talk_oop_t classVariable = crank_talk_IdentityDictionary_associationAtOrNil((crank_talk_oop_t)self->classPool, name);
+        if(classVariable)
+            return crank_talk_Primitive_return(primContext, classVariable);
+    }
+
+    // Check the shared pools.
+    if(self->sharedPools)
+    {
+        size_t sharedPoolCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)self->sharedPools);
+        for(size_t i = 0; i < sharedPoolCount; ++i)
+        {
+            crank_talk_oop_t sharedPool = self->sharedPools->elements[i];
+            crank_talk_oop_t binding = crank_talk_Behavior_lookupClassBinding(primContext->context, sharedPool, name);
+            if(binding)
+                return crank_talk_Primitive_return(primContext, binding);
+        }
+    }
+
+    // Delegate to the super class
+    if(self->super.super.superclass)
+        return crank_talk_Primitive_return(primContext, crank_talk_Behavior_lookupClassBinding(primContext->context, (crank_talk_oop_t)self->super.super.superclass, name));
+
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_nil());
+}
+
+static void
+crank_talk_Metaclass_lookupClassBinding_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_Metaclass_t *self = (crank_talk_Metaclass_t *)primContext->arguments[0];
+    crank_talk_oop_t name = primContext->arguments[1];
+    if (!self->thisClass)
+        return crank_talk_Primitive_return(primContext, crank_talk_oop_nil());
+
+    return crank_talk_Primitive_return(primContext, crank_talk_Behavior_lookupClassBinding(primContext->context, (crank_talk_oop_t)self->thisClass, name));
+}
+
+static void
 crank_talk_Behavior_makeClassBuilder_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
     if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
@@ -251,6 +306,8 @@ crank_talk_Behavior_makeClassBuilder_primitive(crank_talk_PrimitiveContext_t *pr
     classBuilder->name = (crank_talk_Symbol_t*)subclassName;
     classBuilder->environment = environment;
     classBuilder->slots = (crank_talk_Array_t*)crank_talk_Array_create(primContext->context, 0);
+    classBuilder->sharedVariables = (crank_talk_Array_t*)crank_talk_Array_create(primContext->context, 0);
+    classBuilder->sharedPools = (crank_talk_Array_t*)crank_talk_Array_create(primContext->context, 0);
     return crank_talk_Primitive_return(primContext, classBuilderValue);
 }
 
@@ -277,6 +334,50 @@ crank_talk_ShiftClassBuilder_slots_primitive(crank_talk_PrimitiveContext_t *prim
         crank_talk_oop_t slotValue = crank_talk_send0(primContext->context, primContext->context->roots.asSlotSymbol, slotDefinition);
         slots->elements[i] = slotValue;
     }
+
+    return crank_talk_Primitive_return(primContext, self);
+}
+
+static void
+crank_talk_ShiftClassBuilder_sharedVariables_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t sharedVariableDefinitions = primContext->arguments[1];
+
+    crank_talk_ShiftClassBuilder_t *classBuilder = (crank_talk_ShiftClassBuilder_t *)self;
+    if(!crank_talk_oop_isKindOf(primContext->context, sharedVariableDefinitions, primContext->context->roots.ArrayClass))
+        crank_talk_error(primContext->context, "Expected an array with the shared variables.");
+
+    size_t variableCount = crank_talk_object_getSizeInSlots(sharedVariableDefinitions);
+    crank_talk_oop_t *sharedVariablesDefinitionValues = crank_talk_oop_getSlotsData(sharedVariableDefinitions);
+    crank_talk_Array_t *sharedVariables = (crank_talk_Array_t*)crank_talk_Array_create(primContext->context, variableCount);
+    classBuilder->sharedVariables = sharedVariables;
+
+    for(size_t i = 0; i < variableCount; ++i)
+    {
+        crank_talk_oop_t sharedVariableDefinition = sharedVariablesDefinitionValues[i];
+        crank_talk_oop_t sharedVariableValue = crank_talk_send0(primContext->context, primContext->context->roots.asClassVariableSymbol, sharedVariableDefinition);
+        sharedVariables->elements[i] = sharedVariableValue;
+    }
+
+    return crank_talk_Primitive_return(primContext, self);
+}
+
+static void
+crank_talk_ShiftClassBuilder_sharedPools_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t sharedPoolsDefinitions = primContext->arguments[1];
+
+    crank_talk_ShiftClassBuilder_t *classBuilder = (crank_talk_ShiftClassBuilder_t *)self;
+    if(!crank_talk_oop_isKindOf(primContext->context, sharedPoolsDefinitions, primContext->context->roots.ArrayClass))
+        crank_talk_error(primContext->context, "Expected an array with the slots.");
+
+    classBuilder->sharedPools = (crank_talk_Array_t*)sharedPoolsDefinitions;
 
     return crank_talk_Primitive_return(primContext, self);
 }
@@ -313,6 +414,15 @@ crank_talk_ShiftClassBuilder_build_primitive(crank_talk_PrimitiveContext_t *prim
     clazz->subclasses = (crank_talk_Array_t*)crank_talk_Array_create(primContext->context, 0);
     clazz->name = classBuilder->name;
     clazz->environment = classBuilder->environment;
+    clazz->classPool = (crank_talk_IdentityDictionary_t*)crank_talk_IdentityDictionary_create(primContext->context);
+    clazz->sharedPools = classBuilder->sharedPools;
+
+    size_t sharedVariableCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)classBuilder->sharedVariables);
+    for(size_t i = 0; i < sharedVariableCount; ++i)
+    {
+        crank_talk_ClassVariable_t *classVariable = (crank_talk_ClassVariable_t*)classBuilder->sharedVariables->elements[i];
+        crank_talk_IdentityDictionary_associationAtPut(primContext->context, (crank_talk_oop_t)clazz->classPool, (crank_talk_oop_t)classVariable);
+    }
 
     crank_talk_oop_t metaclassValue = (crank_talk_oop_t)crank_talk_oop_getClass(primContext->context, classValue);
     assert(!crank_talk_oop_isNil(metaclassValue));
@@ -348,6 +458,27 @@ crank_talk_Symbol_asSlot_primitive(crank_talk_PrimitiveContext_t *primContext)
     return crank_talk_Primitive_return(primContext, slotValue);
 }
 
+static void
+crank_talk_ClassVariable_asClassVariable_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 1) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    return crank_talk_Primitive_return(primContext, self);
+}
+
+static void
+crank_talk_Symbol_asClassVariable_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 1) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t classVariableValue = CrankAllocateValuesObjectWithClassName(primContext->context, ClassVariable);
+    crank_talk_ClassVariable_t *classVariable = (crank_talk_ClassVariable_t *)classVariableValue;
+    classVariable->super.super.name = (crank_talk_Symbol_t*)self;
+    return crank_talk_Primitive_return(primContext, classVariableValue);
+}
+
 void
 crank_talk_registerBehaviorPrimitives(crank_talk_VMContext_t* context)
 {
@@ -360,14 +491,22 @@ crank_talk_registerBehaviorPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ClassClass,     "environment", 1, "Class::environment",     crank_talk_Class_environment_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.MetaclassClass, "environment", 1, "Metaclass::environment", crank_talk_Metaclass_environment_primitive);
 
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ClassClass,     "lookupClassBinding:", 2, "Class::lookupClassBinding:",     crank_talk_Class_lookupClassBinding_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.MetaclassClass, "lookupClassBinding:", 2, "Metaclass::lookupClassBinding:", crank_talk_Metaclass_lookupClassBinding_primitive);
+
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.BehaviorClass, "<<", 2, "Behavior::<<", crank_talk_Behavior_makeClassBuilder_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ShiftClassBuilderClass, "slots:", 2, "ShiftClassBuilder::slots:", crank_talk_ShiftClassBuilder_slots_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ShiftClassBuilderClass, "sharedPools:", 2, "ShiftClassBuilder::sharedPools:", crank_talk_ShiftClassBuilder_sharedPools_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ShiftClassBuilderClass, "sharedVariables:", 2, "ShiftClassBuilder::sharedVariables:", crank_talk_ShiftClassBuilder_sharedVariables_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ShiftClassBuilderClass, "tag:", 2, "ShiftClassBuilder::tag:", crank_talk_ShiftClassBuilder_tag_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ShiftClassBuilderClass, "package:", 2, "ShiftClassBuilder::package:", crank_talk_ShiftClassBuilder_package_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ShiftClassBuilderClass, "build", 1, "ShiftClassBuilder::build", crank_talk_ShiftClassBuilder_build_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SlotClass,   "asSlot", 1, "Slot::asSlot",   crank_talk_Slot_asSlot_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "asSlot", 1, "Symbol::asSlot", crank_talk_Symbol_asSlot_primitive);
+
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ClassVariableClass,   "asClassVariable", 1, "ClassVariable::asClassVariable", crank_talk_ClassVariable_asClassVariable_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SymbolClass, "asClassVariable", 1, "Symbol::asClassVariable", crank_talk_Symbol_asClassVariable_primitive);
 }
 

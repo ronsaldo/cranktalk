@@ -144,6 +144,10 @@ crank_talk_FunctionAnalysisEnvironment_lookupSymbolRecursively(crank_talk_Primit
         crank_talk_oop_t slot = crank_talk_Behavior_lookupSlotNamed((crank_talk_oop_t)environment->receiverClass, symbol);
         if(slot)
             return crank_talk_Primitive_return(primContext, slot);
+
+        crank_talk_oop_t classVariable = crank_talk_Behavior_lookupClassBinding(primContext->context, (crank_talk_oop_t)environment->receiverClass, symbol);
+        if(classVariable)
+            return crank_talk_Primitive_return(primContext, classVariable);
     }
 
     binding = crank_talk_Environment_lookupSymbolRecursively(primContext->context, environment->super.parent, symbol);

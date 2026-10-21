@@ -187,6 +187,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     // Variables and slots
     context->roots.VariableClass        = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass,          sizeof(crank_talk_Variable_t),        CrankTalkGCObjectDataTypeOops);
     context->roots.LiteralVariableClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.VariableClass,        sizeof(crank_talk_LiteralVariable_t), CrankTalkGCObjectDataTypeOops);
+    context->roots.ClassVariableClass   = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.LiteralVariableClass, sizeof(crank_talk_ClassVariable_t),  CrankTalkGCObjectDataTypeOops);
     context->roots.GlobalVariableClass  = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.LiteralVariableClass, sizeof(crank_talk_GlobalVariable_t),  CrankTalkGCObjectDataTypeOops);
     context->roots.LocalVariableClass   = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.LiteralVariableClass, sizeof(crank_talk_LocalVariable_t),   CrankTalkGCObjectDataTypeOops);
     context->roots.HIRVariableClass     = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.VariableClass,        sizeof(crank_talk_HIRVariable_t),     CrankTalkGCObjectDataTypeOops);
@@ -276,6 +277,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.lookupSymbolRecursively = crank_talk_Symbol_internWithCString(context, "lookupSymbolRecursively:");
     context->roots.lookupReceiverClassRecursively = crank_talk_Symbol_internWithCString(context, "lookupReceiverClassRecursively");
     context->roots.lookupIsInnerBlockRecursively = crank_talk_Symbol_internWithCString(context, "lookupIsInnerBlockRecursively");
+    
+    context->roots.lookupClassBindingSymbol = crank_talk_Symbol_internWithCString(context, "lookupClassBinding:");
 
     context->roots.hasResultValueSymbol = crank_talk_Symbol_internWithCString(context, "hasResultValue");
     context->roots.isTerminatorSymbol = crank_talk_Symbol_internWithCString(context, "isTerminator");
@@ -300,6 +303,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.initializeSymbol = crank_talk_Symbol_internWithCString(context, "initialize");
 
     context->roots.asSlotSymbol = crank_talk_Symbol_internWithCString(context, "asSlot");
+    context->roots.asClassVariableSymbol = crank_talk_Symbol_internWithCString(context, "asClassVariable");
 
     context->roots.plusSymbol = crank_talk_Symbol_internWithCString(context, "+");
     context->roots.lessOrEqualsSymbol = crank_talk_Symbol_internWithCString(context, "<=");
@@ -404,6 +408,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_context_setClassTypeMetadata(context, context->roots.LiteralVariableClass, "LiteralVariable",
         CrankTalkSlotDef(LiteralVariable, value),
         NULL);
+    crank_talk_context_setClassTypeMetadata(context, context->roots.ClassVariableClass, "ClassVariable", NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.GlobalVariableClass, "GlobalVariable", NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.LocalVariableClass, "LocalVariable", NULL);
     crank_talk_context_setClassTypeMetadata(context, context->roots.HIRVariableClass, "HIRVariable",
@@ -486,6 +491,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(ShiftClassBuilder, name),
         CrankTalkSlotDef(ShiftClassBuilder, environment),
         CrankTalkSlotDef(ShiftClassBuilder, slots),
+        CrankTalkSlotDef(ShiftClassBuilder, sharedVariables),
+        CrankTalkSlotDef(ShiftClassBuilder, sharedPools),
         NULL);
 
     crank_talk_context_setClassTypeMetadata(context, context->roots.SmalltalkImageClass, "SmalltalkImage",
@@ -538,6 +545,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
 
     crank_talk_Behavior_createClassTables(context, context->roots.VariableClass);
     crank_talk_Behavior_createClassTables(context, context->roots.LiteralVariableClass);
+    crank_talk_Behavior_createClassTables(context, context->roots.ClassVariableClass);
     crank_talk_Behavior_createClassTables(context, context->roots.GlobalVariableClass);
     crank_talk_Behavior_createClassTables(context, context->roots.LocalVariableClass);
     crank_talk_Behavior_createClassTables(context, context->roots.HIRVariableClass);

@@ -14,6 +14,6 @@ CRANK_TALK_API void crank_talk_Behavior_enumerateSlots(crank_talk_VMContext_t *c
 CRANK_TALK_API crank_talk_oop_t crank_talk_Behavior_lookupSelector(crank_talk_oop_t behavior, crank_talk_oop_t selector);
 
 CRANK_TALK_API crank_talk_oop_t crank_talk_Behavior_lookupSlotNamed(crank_talk_oop_t behavior, crank_talk_oop_t name);
-
+CRANK_TALK_API crank_talk_oop_t crank_talk_Behavior_lookupClassBinding(crank_talk_VMContext_t *context, crank_talk_oop_t behavior, crank_talk_oop_t name);
 
 #endif //CRANK_TALK_BEHAVIOR_H

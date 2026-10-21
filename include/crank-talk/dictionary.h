@@ -11,6 +11,7 @@ CRANK_TALK_API void crank_talk_IdentityDictionary_hirVariableAtPut(crank_talk_VM
 CRANK_TALK_API bool crank_talk_IdentityDictionary_includesKey(crank_talk_oop_t dictionaryValue, crank_talk_oop_t key);
 CRANK_TALK_API crank_talk_oop_t crank_talk_IdentityDictionary_associationAtOrNil(crank_talk_oop_t dictionaryValue, crank_talk_oop_t key);
 CRANK_TALK_API crank_talk_oop_t crank_talk_IdentityDictionary_at(crank_talk_VMContext_t *context, crank_talk_oop_t dictionaryValue, crank_talk_oop_t key);
+CRANK_TALK_API crank_talk_oop_t crank_talk_IdentityDictionary_atOrNil(crank_talk_VMContext_t *context, crank_talk_oop_t dictionaryValue, crank_talk_oop_t key);
 
 CRANK_TALK_API crank_talk_oop_t crank_talk_SystemEnvironment_create(crank_talk_VMContext_t *context);
 CRANK_TALK_API void crank_talk_SystemEnvironment_atPut(crank_talk_VMContext_t *context, crank_talk_oop_t dictionaryValue, crank_talk_oop_t key, crank_talk_oop_t value);

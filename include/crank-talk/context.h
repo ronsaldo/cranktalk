@@ -56,6 +56,7 @@ struct crank_talk_VMContextRoots_s
 
     crank_talk_oop_t VariableClass;
     crank_talk_oop_t LiteralVariableClass;
+    crank_talk_oop_t ClassVariableClass;
     crank_talk_oop_t GlobalVariableClass;
     crank_talk_oop_t LocalVariableClass;
     crank_talk_oop_t HIRVariableClass;
@@ -129,6 +130,8 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t lookupSymbolRecursively;
     crank_talk_oop_t lookupReceiverClassRecursively;
     crank_talk_oop_t lookupIsInnerBlockRecursively;
+    
+    crank_talk_oop_t lookupClassBindingSymbol;
 
     crank_talk_oop_t hasResultValueSymbol;
     crank_talk_oop_t isTerminatorSymbol;
@@ -152,6 +155,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t initializeSymbol;
     
     crank_talk_oop_t asSlotSymbol;
+    crank_talk_oop_t asClassVariableSymbol;
 
     crank_talk_oop_t plusSymbol;
     crank_talk_oop_t lessOrEqualsSymbol;

@@ -118,6 +118,7 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
 
     typedef struct crank_talk_Variable_s crank_talk_Variable_t;
         typedef struct crank_talk_LiteralVariable_s crank_talk_LiteralVariable_t;
+            typedef struct crank_talk_ClassVariable_s crank_talk_ClassVariable_t;
             typedef struct crank_talk_GlobalVariable_s crank_talk_GlobalVariable_t;
             typedef struct crank_talk_LocalVariable_s crank_talk_LocalVariable_t;
         typedef struct crank_talk_HIRVariable_s crank_talk_HIRVariable_t;
@@ -557,6 +558,10 @@ struct crank_talk_HIRVariable_s {
     crank_talk_oop_t value;
 };
 
+struct crank_talk_ClassVariable_s {
+    crank_talk_LiteralVariable_t super;
+};
+
 struct crank_talk_GlobalVariable_s {
     crank_talk_LiteralVariable_t super;
 };
@@ -731,6 +736,8 @@ struct crank_talk_ShiftClassBuilder_s
     crank_talk_Symbol_t *name;
     crank_talk_oop_t environment;
     crank_talk_Array_t *slots;
+    crank_talk_Array_t *sharedVariables;
+    crank_talk_Array_t *sharedPools;
 };
 
 struct crank_talk_SmalltalkImage_s
