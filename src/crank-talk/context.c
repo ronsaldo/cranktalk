@@ -148,6 +148,9 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_context_fixupMetaclassType(context, context->roots.ClassClass);
     crank_talk_context_fixupMetaclassType(context, context->roots.MetaclassClass);
 
+    // Shared pool
+    context->roots.SharedPoolClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_SharedPool_t), CrankTalkGCObjectDataTypeOops);
+
     // Functions and family
     context->roots.CompiledFunctionClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_CompiledFunction_t), CrankTalkGCObjectDataTypeOops);
     context->roots.BlockClosureClass     = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.ObjectClass, sizeof(crank_talk_BlockClosure_t),     CrankTalkGCObjectDataTypeOops);
@@ -324,6 +327,9 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(Metaclass, thisClass),
         NULL);
 
+    crank_talk_context_setClassTypeMetadata(context, context->roots.SharedPoolClass, "SharedPool",
+        NULL);
+
     crank_talk_context_setClassTypeMetadata(context, context->roots.CompiledFunctionClass, "CompiledFunction",
         CrankTalkSlotDef(CompiledFunction, name),
         CrankTalkSlotDef(CompiledFunction, owner),
@@ -494,6 +500,8 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     crank_talk_Behavior_createClassTables(context, context->roots.ClassDescriptionClass);
     crank_talk_Behavior_createClassTables(context, context->roots.ClassClass);
     crank_talk_Behavior_createClassTables(context, context->roots.MetaclassClass);
+
+    crank_talk_Behavior_createClassTables(context, context->roots.SharedPoolClass);
 
     crank_talk_Behavior_createClassTables(context, context->roots.CompiledFunctionClass);
     crank_talk_Behavior_createClassTables(context, context->roots.BlockClosureClass);

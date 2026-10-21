@@ -89,6 +89,8 @@ typedef struct crank_talk_ProtoObject_s crank_talk_ProtoObject_t;
             typedef struct crank_talk_Class_s crank_talk_Class_t;
             typedef struct crank_talk_Metaclass_s crank_talk_Metaclass_t;
 
+    typedef struct crank_talk_SharedPool_s crank_talk_SharedPool_t;
+
     typedef struct crank_talk_CompiledFunction_s crank_talk_CompiledFunction_t;
     typedef struct crank_talk_BlockClosure_s crank_talk_BlockClosure_t;
     typedef struct crank_talk_Message_s crank_talk_Message_t;
@@ -415,6 +417,11 @@ struct crank_talk_Class_s {
 struct crank_talk_Metaclass_s {
     crank_talk_ClassDescription_t super;
     crank_talk_Class_t *thisClass;
+};
+
+struct crank_talk_SharedPool_s
+{
+    crank_talk_Object_t super;
 };
 
 struct crank_talk_CompiledFunction_s {

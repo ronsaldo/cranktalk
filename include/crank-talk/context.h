@@ -27,6 +27,8 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t ClassClass;
     crank_talk_oop_t MetaclassClass;
 
+    crank_talk_oop_t SharedPoolClass;
+
     crank_talk_oop_t CompiledFunctionClass;
     crank_talk_oop_t BlockClosureClass;
     crank_talk_oop_t MessageClass;
