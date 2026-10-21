@@ -3,6 +3,7 @@ thisContext
     loadFile: 'Behavior.st';
     loadFile: 'Class.st';
     loadFile: 'Metaclass.st';
+    loadFile: 'IdentityDictionary.st';
     loadFile: 'MethodDictionary.st';
     loadFile: 'Collection.st';
     loadFile: 'SequenceableCollection.st';

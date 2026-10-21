@@ -25,3 +25,16 @@ reject: aBlock
     ].
     ^ selectedValues asArray
 ].
+
+Array ![
+copyWith: anElement
+    | size result |
+    size := self basicSize.
+    result := self class basicNew: size + 1.
+    1 to: size do: [:i |
+        result at: i put: (self basicAt: i)
+    ].
+    result at: size + 1 put: anElement.
+
+    ^ result
+]
