@@ -1,11 +1,15 @@
 thisContext 
     loadFile: 'Array.st';
+    loadFile: 'Association.st';
     loadFile: 'Behavior.st';
     loadFile: 'Class.st';
     loadFile: 'Metaclass.st';
+    
+    loadFile: 'Collection.st';
+    loadFile: 'HashedCollection.st';
+    loadFile: 'Dictionary.st';
     loadFile: 'IdentityDictionary.st';
     loadFile: 'MethodDictionary.st';
-    loadFile: 'Collection.st';
     loadFile: 'SequenceableCollection.st';
     loadFile: 'Number.st'.
 

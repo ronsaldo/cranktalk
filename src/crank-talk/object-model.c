@@ -352,13 +352,13 @@ crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "class", 1, "ProtoObject::class", crank_talk_ProtoObject_class_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "==", 2, "ProtoObject::==", crank_talk_ProtoObject_identityEquals_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "~~", 2, "ProtoObject::~~", crank_talk_ProtoObject_identityNotEquals_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "identityHash", 2, "ProtoObject::identityHash", crank_talk_ProtoObject_identityHash_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "identityHash", 1, "ProtoObject::identityHash", crank_talk_ProtoObject_identityHash_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "initialize", 1, "ProtoObject::initialize", crank_talk_ProtoObject_initialize_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ProtoObjectClass, "yourself", 1, "ProtoObject::yourself", crank_talk_ProtoObject_yourself_primitive);
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "=", 2, "Object::=", crank_talk_Object_equals_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "~=", 2, "Object::~=", crank_talk_Object_notEquals_primitive);
-    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "hash", 2, "Object::hash", crank_talk_Object_hash_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "hash", 1, "Object::hash", crank_talk_Object_hash_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "species", 1, "Object::species", crank_talk_Object_species_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "isKindOf:", 2, "Object::isKindOf:", crank_talk_Object_isKindOf_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ObjectClass, "isMemberOf:", 2, "Object::isMemberOf:", crank_talk_Object_isMemberOf_primitive);

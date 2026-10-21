@@ -650,7 +650,7 @@ struct crank_talk_SystemEnvironment_s
 
 struct crank_talk_MethodDictionary_s
 {
-    crank_talk_Dictionary_t super;
+    crank_talk_HashedCollection_t super;
 };
 
 struct crank_talk_Set_s

@@ -211,7 +211,7 @@ crank_talk_context_createCoreDefinitions(crank_talk_VMContext_t* context)
     context->roots.DictionaryClass          = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.HashedCollectionClass,  sizeof(crank_talk_Dictionary_t),         CrankTalkGCObjectDataTypeOops);
     context->roots.IdentityDictionaryClass  = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.DictionaryClass,        sizeof(crank_talk_IdentityDictionary_t), CrankTalkGCObjectDataTypeOops);
     context->roots.SystemEnvironmentClass   = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.IdentityDictionaryClass, sizeof(crank_talk_SystemEnvironment_t), CrankTalkGCObjectDataTypeOops);
-    context->roots.MethodDictionaryClass    = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.DictionaryClass,         sizeof(crank_talk_MethodDictionary_t),  CrankTalkGCObjectDataTypeOops);
+    context->roots.MethodDictionaryClass    = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.HashedCollectionClass,         sizeof(crank_talk_MethodDictionary_t),  CrankTalkGCObjectDataTypeOops);
 
     context->roots.SetClass         = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.HashedCollectionClass, sizeof(crank_talk_Set_t),         CrankTalkGCObjectDataTypeOops);
     context->roots.IdentitySetClass = crank_talk_Behavior_createAnonymousClassAndMetaclass(context, context->roots.SetClass,              sizeof(crank_talk_IdentitySet_t), CrankTalkGCObjectDataTypeOops);

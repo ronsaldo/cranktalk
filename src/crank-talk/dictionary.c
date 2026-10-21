@@ -235,14 +235,14 @@ crank_talk_MethodDictionary_create(crank_talk_VMContext_t *context)
 {
     crank_talk_oop_t dictionaryValue = CrankAllocateValuesObjectWithClassName(context, MethodDictionary);
     crank_talk_MethodDictionary_t *dictionary = (crank_talk_MethodDictionary_t*)dictionaryValue;
-    dictionary->super.super.size = crank_talk_oop_encodeSmallInteger(0);
+    dictionary->super.size = crank_talk_oop_encodeSmallInteger(0);
     return dictionaryValue;
 }
 
 static intptr_t
 crank_talk_MethodDictionary_scanFor(crank_talk_MethodDictionary_t *dict, crank_talk_oop_t key)
 {
-    crank_talk_oop_t storage = (crank_talk_oop_t)dict->super.super.storage;
+    crank_talk_oop_t storage = (crank_talk_oop_t)dict->super.storage;
     size_t capacity =  crank_talk_object_getSizeInSlots(storage) / 2;
     if(capacity == 0)
         return -1;
@@ -271,7 +271,7 @@ crank_talk_MethodDictionary_insertNoCheck(crank_talk_MethodDictionary_t *dict, c
 {
     intptr_t elementIndex = crank_talk_MethodDictionary_scanFor(dict, key);
     assert(elementIndex >= 0);
-    crank_talk_oop_t *storage = dict->super.super.storage->elements;
+    crank_talk_oop_t *storage = dict->super.storage->elements;
     storage[elementIndex*2] = key;
     storage[elementIndex*2 + 1] = value;
 }
@@ -279,7 +279,7 @@ crank_talk_MethodDictionary_insertNoCheck(crank_talk_MethodDictionary_t *dict, c
 static void
 crank_talk_MethodDictionary_increaseCapacity(crank_talk_VMContext_t *context, crank_talk_MethodDictionary_t *dict)
 {
-    crank_talk_oop_t oldStorage = (crank_talk_oop_t)dict->super.super.storage;
+    crank_talk_oop_t oldStorage = (crank_talk_oop_t)dict->super.storage;
     size_t oldCapacity = crank_talk_object_getSizeInSlots(oldStorage) / 2;
     size_t newCapacity = oldCapacity*2;
     if(newCapacity < 8)
@@ -287,7 +287,7 @@ crank_talk_MethodDictionary_increaseCapacity(crank_talk_VMContext_t *context, cr
 
     // Make the new storage
     crank_talk_oop_t newStorage = crank_talk_Array_create(context, newCapacity*2);
-    dict->super.super.storage = (crank_talk_Array_t*)newStorage;
+    dict->super.storage = (crank_talk_Array_t*)newStorage;
 
     // Reinsert the old elements
     crank_talk_oop_t *oldStorageElements = crank_talk_oop_getSlotsData(oldStorage);
@@ -308,7 +308,7 @@ crank_talk_MethodDictionary_atOrNil(crank_talk_oop_t dictValue, crank_talk_oop_t
     if(elementIndex < 0)
         return crank_talk_oop_nil();
 
-    crank_talk_oop_t *storageElements = dict->super.super.storage->elements;
+    crank_talk_oop_t *storageElements = dict->super.storage->elements;
     crank_talk_oop_t oldKey = storageElements[elementIndex*2];
     if(!crank_talk_oop_isNil(oldKey))
         return storageElements[elementIndex*2 + 1];
@@ -328,7 +328,7 @@ crank_talk_MethodDictionary_atPut(crank_talk_VMContext_t *context, crank_talk_oo
             crank_talk_error(context, "Method dictionary is out of memory");
     }
     
-    crank_talk_oop_t *storageElements = dict->super.super.storage->elements;
+    crank_talk_oop_t *storageElements = dict->super.storage->elements;
     crank_talk_oop_t oldKey = storageElements[elementIndex*2];
     if(!crank_talk_oop_isNil(oldKey))
     {
@@ -339,9 +339,9 @@ crank_talk_MethodDictionary_atPut(crank_talk_VMContext_t *context, crank_talk_oo
         storageElements[elementIndex*2] = key;
         storageElements[elementIndex*2 + 1] = value;
 
-        size_t capacity = crank_talk_object_getSizeInSlots((crank_talk_oop_t)dict->super.super.storage) / 2;
-        size_t newSize = crank_talk_oop_decodeSmallInteger(dict->super.super.size) + 1;
-        dict->super.super.size = crank_talk_oop_encodeSmallInteger(newSize);
+        size_t capacity = crank_talk_object_getSizeInSlots((crank_talk_oop_t)dict->super.storage) / 2;
+        size_t newSize = crank_talk_oop_decodeSmallInteger(dict->super.size) + 1;
+        dict->super.size = crank_talk_oop_encodeSmallInteger(newSize);
         size_t capacityThreshold = capacity*4/5;
         if(newSize >= capacityThreshold)
             crank_talk_MethodDictionary_increaseCapacity(context, dict);
