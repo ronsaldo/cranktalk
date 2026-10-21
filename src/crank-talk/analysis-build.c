@@ -1,4 +1,5 @@
 #include "crank-talk/analysis-build.h"
+#include "crank-talk/analysis-evaluation.h"
 #include "crank-talk/array.h"
 #include "crank-talk/context.h"
 #include "crank-talk/dictionary.h"
@@ -339,6 +340,21 @@ crank_talk_ParseTreeLiteralNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_
         return crank_talk_Primitive_return(primContext, node->value);
     
     crank_talk_oop_t result = crank_talk_HIRConstantLiteralValue_create(primContext->context, node->value, (crank_talk_oop_t)node->super.sourcePosition);
+    return crank_talk_Primitive_return(primContext, result);
+}
+
+static void
+crank_talk_ParseTreeLiteralArrayNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_ParseTreeLiteralArrayNode_t *node = (crank_talk_ParseTreeLiteralArrayNode_t*)primContext->arguments[0];
+
+    // Evaluate the literal array
+    crank_talk_oop_t evaluationContext = crank_talk_createTopLevelAnalysisAndEvaluationContext(primContext->context, crank_talk_oop_nil());
+    crank_talk_oop_t literalArrayValue = crank_talk_ParseTreeAnalyzeAndEvaluate(primContext->context, (crank_talk_oop_t)node, evaluationContext);
+
+    crank_talk_oop_t result = crank_talk_HIRConstantLiteralValue_create(primContext->context, literalArrayValue, (crank_talk_oop_t)node->super.sourcePosition);
     return crank_talk_Primitive_return(primContext, result);
 }
 
@@ -974,6 +990,7 @@ crank_talk_registerAnalysisAndBuildPrimitives(crank_talk_VMContext_t* context)
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeBlockNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeBlockNode::analyzeAndBuildWith:", crank_talk_ParseTreeBlockNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeIdentifierReferenceNode::analyzeAndBuildWith:", crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeLiteralNode::analyzeAndBuildWith:", crank_talk_ParseTreeLiteralNode_analyzeAndBuildWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeLiteralArrayNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeLiteralArrayNode::analyzeAndBuildWith:", crank_talk_ParseTreeLiteralArrayNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeNilReferenceNode::analyzeAndBuildWith:", crank_talk_ParseTreeNilReferenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeFalseReferenceNode::analyzeAndBuildWith:", crank_talk_ParseTreeFalseReferenceNode_analyzeAndBuildWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndBuildWith:", 2, "ParseTreeTrueReferenceNode::analyzeAndBuildWith:", crank_talk_ParseTreeTrueReferenceNode_analyzeAndBuildWith);

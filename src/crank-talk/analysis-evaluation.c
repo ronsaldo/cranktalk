@@ -168,6 +168,32 @@ crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith(crank_talk_PrimitiveConte
 }
 
 static void
+crank_talk_ParseTreeLiteralArrayNode_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
+
+    crank_talk_oop_t self = primContext->arguments[0];
+    crank_talk_oop_t evaluationContext = primContext->arguments[1];
+
+    crank_talk_ParseTreeLiteralArrayNode_t *node = (crank_talk_ParseTreeLiteralArrayNode_t*)self;
+   
+    struct {
+        crank_talk_Array_t *result;
+    } gcFrame = {0};
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    size_t elementCount = crank_talk_object_getSizeInSlots((crank_talk_oop_t)node->elements);
+    crank_talk_oop_t *elements = crank_talk_oop_getSlotsData((crank_talk_oop_t)node->elements);
+    gcFrame.result = (crank_talk_Array_t*)crank_talk_Array_create(primContext->context, elementCount);
+    for(size_t i = 0; i < elementCount; ++i)
+        gcFrame.result->elements[i] = crank_talk_ParseTreeAnalyzeAndEvaluate(primContext->context, elements[i], evaluationContext);
+
+    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
+    return crank_talk_Primitive_return(primContext, (crank_talk_oop_t)gcFrame.result);
+}
+
+
+static void
 crank_talk_ParseTreeNilReference_analyzeAndEvaluateWith(crank_talk_PrimitiveContext_t *primContext)
 {
     if(primContext->argumentCount < 2) return crank_talk_Primitive_fail(primContext);
@@ -779,6 +805,7 @@ crank_talk_registerAnalysisAndEvaluationPrimitives(crank_talk_VMContext_t* conte
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeBlockNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeBlockNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeIdentifierReferenceNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeIdentifierReferenceNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeIdentifierReferenceNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeLiteralNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeLiteralNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeLiteralNode_analyzeAndEvaluateWith);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeLiteralArrayNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeLiteralArrayNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeLiteralArrayNode_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeNilReferenceNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeNilReferenceNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeNilReference_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeFalseReferenceNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeFalseReferenceNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeFalseReference_analyzeAndEvaluateWith);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.ParseTreeTrueReferenceNodeClass, "analyzeAndEvaluateWith:", 2, "ParseTreeTrueReferenceNode::analyzeAndEvaluateWith:", crank_talk_ParseTreeTrueReference_analyzeAndEvaluateWith);

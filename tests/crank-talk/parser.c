@@ -232,6 +232,24 @@ void parser_runTests(void)
         AssertEquals(42, crank_talk_oop_decodeSmallInteger(literal->value));
     }
 
+    // Empty literal array
+    {
+        crank_talk_oop_t ast = parseString(context, "#()");
+        Assert(crank_talk_isParseTreeLiteralArrayNode(context, ast));
+
+        crank_talk_ParseTreeLiteralArrayNode_t *literalArray = (crank_talk_ParseTreeLiteralArrayNode_t*)ast;
+        AssertEquals(0, crank_talk_object_getSizeInSlots((crank_talk_oop_t)literalArray->elements));
+    }
+
+    // Literal array
+    {
+        crank_talk_oop_t ast = parseString(context, "#(1  2 true false ())");
+        Assert(crank_talk_isParseTreeLiteralArrayNode(context, ast));
+
+        crank_talk_ParseTreeLiteralArrayNode_t *literalArray = (crank_talk_ParseTreeLiteralArrayNode_t*)ast;
+        AssertEquals(5, crank_talk_object_getSizeInSlots((crank_talk_oop_t)literalArray->elements));
+    }
+
     // Empty array
     {
         crank_talk_oop_t ast = parseString(context, "{}");

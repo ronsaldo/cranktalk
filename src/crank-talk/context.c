@@ -616,6 +616,9 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
     context->roots.ParseTreeLiteralNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeLiteralNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeLiteralNode_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(ParseTreeLiteralNode, value),
         NULL);
+    context->roots.ParseTreeLiteralArrayNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeLiteralArrayNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeLiteralArrayNode_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(ParseTreeLiteralArrayNode, elements),
+        NULL);
 
     context->roots.ParseTreeCascadedMessageNodeClass = crank_talk_context_createClassAndMetaclass(context, "ParseTreeCascadedMessageNode", context->roots.ParseTreeNodeClass, sizeof(crank_talk_ParseTreeCascadedMessageNode_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(ParseTreeCascadedMessageNode, selector),

@@ -20,6 +20,7 @@ typedef struct crank_talk_ParseTreePseudoVariableReferenceNode_s crank_talk_Pars
 typedef struct crank_talk_ParseTreeArgumentDefinitionNode_s crank_talk_ParseTreeArgumentDefinitionNode_t;
 typedef struct crank_talk_ParseTreeBlockNode_s crank_talk_ParseTreeBlockNode_t;
 typedef struct crank_talk_ParseTreeLiteralNode_s crank_talk_ParseTreeLiteralNode_t;
+typedef struct crank_talk_ParseTreeLiteralArrayNode_s crank_talk_ParseTreeLiteralArrayNode_t;
 typedef struct crank_talk_ParseTreeCascadedMessageNode_s crank_talk_ParseTreeCascadedMessageNode_t;
 typedef struct crank_talk_ParseTreeMessageCascadeNode_s crank_talk_ParseTreeMessageCascadeNode_t;
 typedef struct crank_talk_ParseTreeMessageSendNode_s crank_talk_ParseTreeMessageSendNode_t;
@@ -116,6 +117,12 @@ struct crank_talk_ParseTreeLiteralNode_s
 {
     crank_talk_ParseTreeNode_t super;
     crank_talk_oop_t value;
+};
+
+struct crank_talk_ParseTreeLiteralArrayNode_s
+{
+    crank_talk_ParseTreeNode_t super;
+    crank_talk_Array_t *elements;
 };
 
 struct crank_talk_ParseTreeCascadedMessageNode_s
@@ -244,6 +251,7 @@ CRANK_TALK_API bool crank_talk_isParseTreeThisContextReferenceNode(crank_talk_VM
 CRANK_TALK_API bool crank_talk_isParseTreeArgumentDefinitionNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
 CRANK_TALK_API bool crank_talk_isParseTreeBlockNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
 CRANK_TALK_API bool crank_talk_isParseTreeLiteralNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
+CRANK_TALK_API bool crank_talk_isParseTreeLiteralArrayNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
 CRANK_TALK_API bool crank_talk_isParseTreeCascadedMessageNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
 CRANK_TALK_API bool crank_talk_isParseTreeMessageCascadeNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);
 CRANK_TALK_API bool crank_talk_isParseTreeMessageSendNode(crank_talk_VMContext_t *context, crank_talk_oop_t node);

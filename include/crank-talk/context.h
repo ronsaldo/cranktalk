@@ -179,6 +179,7 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t ParseTreeArgumentDefinitionNodeClass;
     crank_talk_oop_t ParseTreeBlockNodeClass;
     crank_talk_oop_t ParseTreeLiteralNodeClass;
+    crank_talk_oop_t ParseTreeLiteralArrayNodeClass;
     
     crank_talk_oop_t ParseTreeCascadedMessageNodeClass;
     crank_talk_oop_t ParseTreeMessageCascadeNodeClass;

@@ -85,11 +85,24 @@ void analysisAndEvaluation_runTests(void)
         AssertEquals(2, crank_talk_oop_decodeSmallInteger(value));
     }
 
+    // Empty literal array
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "#()");
+        AssertEquals(0, crank_talk_object_getSizeInSlots(value));
+    }
+
+    // Literal array with some elements
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "#(1 2 true false nil ())");
+        AssertEquals(6, crank_talk_object_getSizeInSlots(value));
+    }
+
     // Empty array
     {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "{}");
         AssertEquals(0, crank_talk_object_getSizeInSlots(value));
     }
+
     // Array with two elements
     {
         crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "{1 . 2}");
@@ -581,6 +594,18 @@ void analysisAndEvaluation_runTests(void)
     {
         crank_talk_oop_t result = crank_talk_analyzeAndEvaluateString(context, "[|sum| sum := 0. 1 to: 5 do: [:x | sum := sum + x]. sum] value");
         AssertEquals(15, crank_talk_oop_decodeSmallInteger(result));
+    }
+
+    // Block with empty literal array
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[#()] value");
+        AssertEquals(0, crank_talk_object_getSizeInSlots(value));
+    }
+
+    // Block with literal array with some elements
+    {
+        crank_talk_oop_t value = crank_talk_analyzeAndEvaluateString(context, "[#(1 2 true false nil ())] value");
+        AssertEquals(6, crank_talk_object_getSizeInSlots(value));
     }
 
     crank_talk_vm_destroyContext(context);

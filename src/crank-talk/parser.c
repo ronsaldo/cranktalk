@@ -15,6 +15,7 @@ typedef struct crank_talk_ParserState_s
     size_t tokenCount;
 } crank_talk_ParserState_t;
 
+static crank_talk_oop_t crank_talk_parseLiteralArray(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state);
 static crank_talk_oop_t crank_talk_parseSequenceUntilEndOrDelimiter(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state, crank_talk_TokenKind_t delimiter);
 static crank_talk_oop_t crank_talk_parseExpressionListUntilEndOrDelimiter(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state, crank_talk_TokenKind_t delimiter);
 static bool isBinaryExpressionOperator(crank_talk_TokenKind_t kind);
@@ -357,6 +358,63 @@ crank_talk_parseLiteralSymbol(crank_talk_VMContext_t *context, crank_talk_Parser
 }
 
 static crank_talk_oop_t
+crank_talk_parseLiteralArrayElement(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    switch(crank_talk_ParserState_peekKind(state, 0))
+    {
+    case CrankTalkTokenKindInteger:   return crank_talk_parseLiteralInteger(context, state);
+    case CrankTalkTokenKindFloat:     return crank_talk_parseLiteralFloat(context, state);
+    case CrankTalkTokenKindCharacter: return crank_talk_parseLiteralCharacter(context, state);
+    case CrankTalkTokenKindString:    return crank_talk_parseLiteralString(context, state);
+    case CrankTalkTokenKindSymbol:    return crank_talk_parseLiteralSymbol(context, state);
+    case CrankTalkTokenKindNil:       return crank_talk_parseNilReference(context, state);
+    case CrankTalkTokenKindFalse:     return crank_talk_parseFalseReference(context, state);
+    case CrankTalkTokenKindTrue:      return crank_talk_parseTrueReference(context, state);
+    case CrankTalkTokenKindLiteralArrayStart: return crank_talk_parseLiteralArray(context, state);
+    case CrankTalkTokenKindLeftParent: return crank_talk_parseLiteralArray(context, state);
+    default:
+        return crank_talk_ParserState_advanceWithExpectedError(context, state, "Expected a literal.");
+    }
+}
+
+static crank_talk_oop_t
+crank_talk_parseLiteralArray(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
+{
+    size_t startingPosition = state->position;
+    crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_next(state);
+    assert(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindLiteralArrayStart ||
+        crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindLeftParent);
+
+    crank_talk_oop_t arrayElements = crank_talk_OrderedCollection_create(context);
+    while (!crank_talk_ParserState_atEnd(state) && crank_talk_ParserState_peekKind(state, 0) != CrankTalkTokenKindRightParent)
+    {
+        crank_talk_oop_t element = crank_talk_parseLiteralArrayElement(context, state);
+        crank_talk_OrderedCollection_add(context, arrayElements, element);
+    }
+    
+    if(crank_talk_ParserState_peekKind(state, 0) == CrankTalkTokenKindRightParent)
+    {
+        crank_talk_ParserState_advance(state);
+    }
+    else
+    {
+        crank_talk_oop_t errorNodeValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeParseErrorNode);
+        crank_talk_ParseTreeParseErrorNode_t *errorNode = (crank_talk_ParseTreeParseErrorNode_t *)errorNodeValue;
+        errorNode->super.sourcePosition = crank_talk_ParserState_currentSourcePosition(state);
+        errorNode->errorMessage = crank_talk_String_createWithCString(context, "Expected a right parenthesis.");
+        
+        crank_talk_oop_t errorNodeArray = crank_talk_Array_With(context, errorNodeValue);
+        crank_talk_OrderedCollection_add(context, arrayElements, errorNodeArray);
+    }
+
+    crank_talk_oop_t literalArrayValue = CrankAllocateValuesObjectWithClassName(context, ParseTreeLiteralArrayNode);
+    crank_talk_ParseTreeLiteralArrayNode_t *literalArray = (crank_talk_ParseTreeLiteralArrayNode_t *)literalArrayValue;
+    literalArray->super.sourcePosition = crank_talk_ParserState_sourcePositionFrom(context, state, startingPosition);
+    literalArray->elements = (crank_talk_Array_t*)crank_talk_OrderedCollection_asArray(context, arrayElements);
+    return literalArrayValue;
+}
+
+static crank_talk_oop_t
 crank_talk_parseLiteral(crank_talk_VMContext_t *context, crank_talk_ParserState_t *state)
 {
     switch(crank_talk_ParserState_peekKind(state, 0))
@@ -369,6 +427,8 @@ crank_talk_parseLiteral(crank_talk_VMContext_t *context, crank_talk_ParserState_
     case CrankTalkTokenKindNil:       return crank_talk_parseNilReference(context, state);
     case CrankTalkTokenKindFalse:     return crank_talk_parseFalseReference(context, state);
     case CrankTalkTokenKindTrue:      return crank_talk_parseTrueReference(context, state);
+    
+    case CrankTalkTokenKindLiteralArrayStart: return crank_talk_parseLiteralArray(context, state);
     default:
         return crank_talk_ParserState_advanceWithExpectedError(context, state, "Expected a literal.");
     }
