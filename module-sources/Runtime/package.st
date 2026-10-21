@@ -11,6 +11,7 @@ thisContext
     loadFile: 'IdentityDictionary.st';
     loadFile: 'MethodDictionary.st';
     loadFile: 'SequenceableCollection.st';
+    loadFile: 'OrderedCollection.st';
     loadFile: 'Number.st'.
 
 "Stdio stdout nextPutAll: 'Hello World from Runtime/package.st'; lf.

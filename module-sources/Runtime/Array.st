@@ -37,4 +37,4 @@ copyWith: anElement
     result at: size + 1 put: anElement.
 
     ^ result
-]
+].

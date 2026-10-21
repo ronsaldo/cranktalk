@@ -1,4 +1,49 @@
 SequenceableCollection ![
+first
+    ^ self at: 1
+].
+
+SequenceableCollection ![
+second
+    ^ self at: 2
+].
+
+SequenceableCollection ![
+third
+    ^ self at: 3
+].
+
+SequenceableCollection ![
+fourth
+    ^ self at: 4
+].
+
+SequenceableCollection ![
+fifth
+    ^ self at: 5
+].
+
+SequenceableCollection ![
+sixth
+    ^ self at: 6
+].
+
+SequenceableCollection ![
+seventh
+    ^ self at: 7
+].
+
+SequenceableCollection ![
+eighth
+    ^ self at: 8
+].
+
+SequenceableCollection ![
+ninth
+    ^ self at: 9
+].
+
+SequenceableCollection ![
 collect: aBlock
     | size array |
     size := self size.
@@ -67,3 +112,23 @@ SequenceableCollection ![
     self species == otherCollection species ifFalse: [^ false ].
     ^ self hasEqualElements: otherCollection
 ].
+
+SequenceableCollection ![
+atAllPut: anObject
+    1 to: self size do: [:index | self at: index put: anObject]
+].
+
+SequenceableCollection ![
+, otherCollection
+    | mySize otherSize result |
+    mySize := self size.
+    otherSize := otherCollection size.
+    result := self species new: mySize + otherSize.
+    1 to: mySize do: [:i |
+        result at: i put: (self at: i)
+    ].
+    1 to: otherSize do: [:i |
+        result at: mySize + i put: (otherCollection at: i)
+    ].
+    ^ result
+]
