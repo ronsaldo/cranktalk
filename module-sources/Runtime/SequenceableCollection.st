@@ -1,3 +1,4 @@
+"Ordinal accessors"
 SequenceableCollection ![
 first
     ^ self at: 1
@@ -43,6 +44,19 @@ ninth
     ^ self at: 9
 ].
 
+"Converting"
+SequenceableCollection ![
+asArray
+    | size array |
+    size := self size.
+    array := Array basicNew: size.
+    1 to: size do: [:i |
+        array at: i put: (self at: i)
+    ].
+    ^ array
+].
+
+"Enumerating"
 SequenceableCollection ![
 collect: aBlock
     | size array |
@@ -91,6 +105,7 @@ do: aBlock separatedBy: aSeparator
     ]
 ].
 
+"Comparisons"
 SequenceableCollection ![
 hasEqualElements: otherCollection
     | size |
@@ -113,11 +128,13 @@ SequenceableCollection ![
     ^ self hasEqualElements: otherCollection
 ].
 
+"Setters"
 SequenceableCollection ![
 atAllPut: anObject
     1 to: self size do: [:index | self at: index put: anObject]
 ].
 
+"Operations"
 SequenceableCollection ![
 , otherCollection
     | mySize otherSize result |
@@ -131,4 +148,4 @@ SequenceableCollection ![
         result at: mySize + i put: (otherCollection at: i)
     ].
     ^ result
-]
+].

@@ -1,4 +1,9 @@
 Array ![
+asArray
+    ^ self
+].
+
+Array ![
 select: aBlock
     | selectedValues |
     selectedValues := OrderedCollection new.
