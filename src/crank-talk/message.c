@@ -39,8 +39,11 @@ crank_talk_createAndSetPrimitiveMethod(crank_talk_VMContext_t *context, crank_ta
         crank_talk_PrimitiveTables_register(&context->primitiveTable, primitiveName, entryPoint);
 
     crank_talk_oop_t name = crank_talk_Symbol_internWithCString(context, selector);
-    crank_talk_oop_t compiledFunction = (crank_talk_oop_t)crank_talk_CompiledFunction_createForPrimitive(context, name, argumentCount, primitiveName, entryPoint);
-    crank_talk_Behavior_withSelectorSetMethod(context, behavior, selector, compiledFunction);
+    crank_talk_CompiledFunction_t *compiledFunction = crank_talk_CompiledFunction_createForPrimitive(context, name, argumentCount, primitiveName, entryPoint);
+    if(!compiledFunction->owner)
+        compiledFunction->owner = behavior;
+
+    crank_talk_Behavior_withSelectorSetMethod(context, behavior, selector, (crank_talk_oop_t)compiledFunction);
 }
 
 CRANK_TALK_API crank_talk_oop_t

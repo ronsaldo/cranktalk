@@ -27,3 +27,8 @@ Behavior ![
 allSlots
     ^ allSlots
 ].
+
+Behavior ![
+>> selector
+    ^ methodDictionary at: selector
+].
