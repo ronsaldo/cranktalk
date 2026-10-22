@@ -107,3 +107,13 @@ Canvas ![
 scaleFactor: aPoint
     scaleFactor := aPoint
 ].
+
+Canvas ![
+withScaleFactor: newScaleFactor do: aBlock
+    | oldScaleFactor |
+    oldScaleFactor := scaleFactor.
+    scaleFactor := scaleFactor * newScaleFactor.
+    aBlock ensure: [
+        scaleFactor := oldScaleFactor.
+    ].
+].

@@ -61,6 +61,11 @@ Point ![
 ].
 
 Point ![
+* arg
+    ^ (x * arg x) @ (y * arg y)
+].
+
+Point ![
 / arg
     ^ (x / arg x) @ (y / arg y)
 ].
