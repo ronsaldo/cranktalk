@@ -39,7 +39,7 @@ PongGameEntity << #PongGamePaddle
 PongGamePaddle ![
 initialize
     super initialize.
-    halfExtent := 0.5@4.0
+    halfExtent := 0.5@3.0
 ].
 
 "Ball"
@@ -55,7 +55,7 @@ initialize
 
 "Game state"
 Object << #PongGameState
-    slots: {#firstPaddle. #secondPaddle. #ball};
+    slots: {#firstPaddle. #secondPaddle. #ball. #player1Score. #player2Score};
     build.
 
 PongGameState ![
@@ -68,6 +68,9 @@ initialize
     firstPaddle position: 1.0@12.0.
     secondPaddle position: 39.0@12.0.
     ball position: 20.0@12.0.
+
+    player1Score := 0.
+    player2Score := 0.
 ].
 
 PongGameState ![
@@ -83,6 +86,16 @@ secondPaddle
 PongGameState ![
 ball
     ^ ball
+].
+
+PongGameState ![
+player1Score
+    ^ player1Score
+].
+
+PongGameState ![
+player2Score
+    ^ player2Score
 ].
 
 "Game morph"
@@ -117,7 +130,11 @@ drawOn: aCanvas
         gameState secondPaddle drawOn: aCanvas.
         gameState ball drawOn: aCanvas.
     ].
-    
+
+    aCanvas
+        drawString: gameState player1Score asString inRectangle: (10@10 extent: 10@10) color: Color white;
+        drawString: gameState player2Score asString inRectangle: ((self extent x @ 0) + (-20@10) extent: 10@10) color: Color white.
+
 ].
 
 PongGameMorph new openInWindow.
