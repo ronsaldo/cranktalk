@@ -1,6 +1,7 @@
 SharedPool << #OSKeySymbols
     slots: {};
     build.
+
 OSKeySymbols class ![
 data
 	^ #(
