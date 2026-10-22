@@ -41,6 +41,21 @@ static void sdl2_dispatchEvent(crank_talk_VMContext_t *context, uint32_t windowI
 }
 
 static void
+sdl2_dispatchEventToAllOpenWindows(crank_talk_VMContext_t *context, crank_talk_oop_t event)
+{
+    size_t windowCount = crank_talk_object_getSizeInSlots(context->roots.openWindowList);
+    crank_talk_oop_t *windowList = crank_talk_oop_getSlotsData(context->roots.openWindowList);
+    for(size_t i = 0; i < windowCount; ++i)
+    {
+        crank_talk_OSWindow_t *window = (crank_talk_OSWindow_t *)windowList[i];
+        if(!window || !window->eventHandler)
+            continue;
+
+        crank_talk_send1(context, context->roots.processEventSymbol, (crank_talk_oop_t)window->eventHandler, event);
+    }
+}
+
+static void
 sdl2_onTextInput(crank_talk_VMContext_t *context, SDL_TextInputEvent *event)
 {
     crank_talk_oop_t textInputEventValue = CrankAllocateValuesObjectWithClassName(context, OSTextInputEvent);
@@ -221,7 +236,7 @@ crank_talk_OSWindow_open_primitive(crank_talk_PrimitiveContext_t *primContext)
     osWindow->handle = (crank_talk_ExternalAddress_t*)crank_talk_ExternalAddress_make(primContext->context, handle);
 
     SDL_SetWindowData(handle, "OSWindow", osWindow);
-    primContext->context->roots.openWindowList = crank_talk_Array_concat(primContext->context, primContext->context->roots.openWindowList, crank_talk_Array_With(primContext->context, self));
+    primContext->context->roots.openWindowList = crank_talk_Array_copyWith(primContext->context, primContext->context->roots.openWindowList, self);
     return crank_talk_Primitive_return(primContext, self);
 }
 
@@ -245,10 +260,19 @@ crank_talk_OSWindow_close_primitive(crank_talk_PrimitiveContext_t *primContext)
         osWindow->handle = NULL;
     }
 
+    primContext->context->roots.openWindowList = crank_talk_Array_copyWithout(primContext->context, primContext->context->roots.openWindowList, self);
+
     // TODO: Avoid this hack
     isQuitting = true;
 
     return crank_talk_Primitive_return(primContext, self);
+}
+
+static void
+dispatchAnimationUpdateEvent(crank_talk_VMContext_t *context)
+{
+    crank_talk_oop_t updateEvent = CrankAllocateValuesObjectWithClassName(context, OSWindowAnimationUpdateEvent);
+    sdl2_dispatchEventToAllOpenWindows(context, updateEvent);
 }
 
 static void
@@ -259,6 +283,7 @@ crank_talk_OSWindow_mainLoop_primitive(crank_talk_PrimitiveContext_t *primContex
     while(!isQuitting)
     {
         processSDL2Events(primContext->context);
+        dispatchAnimationUpdateEvent(primContext->context);
         crank_talk_gc_safepoint(primContext->context);
         SDL_Delay(8);
     }

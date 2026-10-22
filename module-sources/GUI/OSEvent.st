@@ -119,6 +119,12 @@ scrollVertical
     ^ scrollVertical
 ].
 
+"OSWindowAnimationUpdateEvent"
+OSWindowAnimationUpdateEvent ![
+accept: anEventHandler
+    ^ anEventHandler visitWindowAnimationUpdateEvent: self
+].
+
 "OSWindowExposeEvent"
 OSWindowExposeEvent ![
 accept: anEventHandler

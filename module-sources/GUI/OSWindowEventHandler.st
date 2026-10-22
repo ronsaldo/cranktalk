@@ -39,6 +39,12 @@ visitMouseWheelEvent: anEvent
 ].
 
 OSWindowEventHandler ![
+visitWindowAnimationUpdateEvent: anEvent
+    anEvent window render.
+    Stdio stdout nextPutAll: 'Window animation update'; lf.
+].
+
+OSWindowEventHandler ![
 visitWindowExposeEvent: anEvent
     anEvent window render.
     Stdio stdout nextPutAll: 'Window expose'; lf.

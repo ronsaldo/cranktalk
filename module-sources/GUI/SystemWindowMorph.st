@@ -3,8 +3,14 @@ OSWindowEventHandler << #SystemWindowMorphEventHandler
     build.
 
 RootMorph << #SystemWindowMorph
-    slots: {#osWindow};
+    slots: {#osWindow. #changed};
     build.
+
+SystemWindowMorph ![
+initialize
+    super initialize.
+    changed := true.
+].
 
 Morph ![
 openInWindow
@@ -38,9 +44,10 @@ close
     osWindow close.
     osWindow := nil.
 ].
+
 SystemWindowMorph ![
 changed
-    self render
+    changed := true
 ].
 
 SystemWindowMorph ![
@@ -60,6 +67,12 @@ render
     osWindow renderer
         blitForm;
         endFrame
+].
+
+SystemWindowMorph ![
+renderIfChanged
+    changed ifTrue: [self render].
+    changed := false
 ].
 
 SystemWindowMorphEventHandler ![
@@ -139,5 +152,10 @@ visitMouseWheelEvent: anEvent
 
 SystemWindowMorphEventHandler ![
 visitWindowExposeEvent: anEvent
-    systemWindowMorph render
+    systemWindowMorph changed
+].
+
+SystemWindowMorphEventHandler ![
+visitWindowAnimationUpdateEvent: anEvent
+    systemWindowMorph updateAnimation; renderIfChanged
 ].

@@ -165,6 +165,11 @@ takeKeyboardFocus
 ].
 
 Morph ![
+updateAnimation
+    submorphs do: [:each | each updateAnimation]
+].
+
+Morph ![
 changed
     self rootMorph changed
 ].

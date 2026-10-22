@@ -28,6 +28,7 @@ typedef struct crank_talk_OSEvent_s crank_talk_OSEvent_t;
         typedef struct crank_talk_OSMouseMoveEvent_s crank_talk_OSMouseMoveEvent_t;
         typedef struct crank_talk_OSMouseWheelEvent_s crank_talk_OSMouseWheelEvent_t;
     typedef struct crank_talk_OSWindowEvent_s crank_talk_OSWindowEvent_t;
+        typedef struct crank_talk_OSWindowAnimationUpdateEvent_s crank_talk_OSWindowAnimationUpdateEvent_t;
         typedef struct crank_talk_OSWindowExposeEvent_s crank_talk_OSWindowExposeEvent_t;
 
 
@@ -193,12 +194,17 @@ struct crank_talk_OSMouseWheelEvent_s
 
 struct crank_talk_OSWindowEvent_s
 {
-    crank_talk_OSMouseEvent_t super;
+    crank_talk_OSEvent_t super;
+};
+
+struct crank_talk_OSWindowAnimationUpdateEvent_s
+{
+    crank_talk_OSWindowEvent_t super;
 };
 
 struct crank_talk_OSWindowExposeEvent_s
 {
-    crank_talk_OSMouseEvent_t super;
+    crank_talk_OSWindowEvent_t super;
 };
 
 struct crank_talk_OSWindowRenderer_s

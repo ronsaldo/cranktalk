@@ -1007,6 +1007,7 @@ crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
         NULL);
 
     context->roots.OSWindowEventClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowEvent", context->roots.OSEventClass, sizeof(crank_talk_OSWindowEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.OSWindowAnimationUpdateEventClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowAnimationUpdateEvent", context->roots.OSWindowEventClass, sizeof(crank_talk_OSWindowAnimationUpdateEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
     context->roots.OSWindowExposeEventClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowExposeEvent", context->roots.OSWindowEventClass, sizeof(crank_talk_OSWindowExposeEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
 
     context->roots.OSWindowRendererClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowRenderer", context->roots.ObjectClass, sizeof(crank_talk_OSWindowRenderer_t), CrankTalkGCObjectDataTypeOops,

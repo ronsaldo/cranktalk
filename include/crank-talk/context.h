@@ -301,6 +301,7 @@ struct crank_talk_VMContextRoots_s
 
     crank_talk_oop_t OSMouseWheelEventClass;
     crank_talk_oop_t OSWindowEventClass;
+    crank_talk_oop_t OSWindowAnimationUpdateEventClass;
     crank_talk_oop_t OSWindowExposeEventClass;
 
     crank_talk_oop_t OSWindowRendererClass;

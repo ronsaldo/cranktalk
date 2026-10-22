@@ -1,12 +1,13 @@
 "Pong game entity"
 Object << #PongGameEntity
-    slots: {#position . #halfExtent. #color};
+    slots: {#position . #velocity. #halfExtent. #color};
     build.
 
 PongGameEntity ![
 initialize
     super initialize.
     position := 0.0@0.0.
+    velocity := 0.0@0.0.
     halfExtent := 1.0@1.0.
     color := Color white.
 ].
@@ -135,6 +136,11 @@ drawOn: aCanvas
         drawString: gameState player1Score asString inRectangle: (10@10 extent: 10@10) color: Color white;
         drawString: gameState player2Score asString inRectangle: ((self extent x @ 0) + (-20@10) extent: 10@10) color: Color white.
 
+].
+
+PongGameMorph ![
+updateAnimation
+    Stdio stdout nextPutAll: 'updateAnimation'; lf.
 ].
 
 PongGameMorph new openInWindow.
