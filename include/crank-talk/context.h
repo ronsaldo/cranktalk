@@ -212,6 +212,9 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t LexicalEnvironmentClass;
     crank_talk_oop_t FunctionAnalysisEnvironmentClass;
 
+    // Time
+    crank_talk_oop_t TimeClass;
+
     // HIR
     crank_talk_oop_t HIRValueClass;
     crank_talk_oop_t HIRConstantValueClass;

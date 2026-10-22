@@ -263,7 +263,8 @@ crank_talk_OSWindow_close_primitive(crank_talk_PrimitiveContext_t *primContext)
     primContext->context->roots.openWindowList = crank_talk_Array_copyWithout(primContext->context, primContext->context->roots.openWindowList, self);
 
     // TODO: Avoid this hack
-    isQuitting = true;
+    if(crank_talk_object_getSizeInSlots(primContext->context->roots.openWindowList) == 0)
+        isQuitting = true;
 
     return crank_talk_Primitive_return(primContext, self);
 }

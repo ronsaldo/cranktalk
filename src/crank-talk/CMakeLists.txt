@@ -35,6 +35,7 @@ set(CrankTalk_Sources
     stack-frame.c
     stb-impls.c
     string.c
+    time.c
 )
 
 add_library(CrankTalk ${CrankTalk_Sources})

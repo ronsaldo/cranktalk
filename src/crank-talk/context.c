@@ -15,6 +15,7 @@
 #include "crank-talk/parse-tree.h"
 #include "crank-talk/set.h"
 #include "crank-talk/string.h"
+#include "crank-talk/time.h"
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -43,6 +44,7 @@ void crank_talk_registerParseTreePrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerScriptPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerSourcePositionPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerTimePrimitives(crank_talk_VMContext_t* context);
 
 static void
 crank_talk_context_fixupMetaclassType(crank_talk_VMContext_t *context, crank_talk_oop_t classToFixup)
@@ -737,6 +739,12 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(FunctionAnalysisEnvironment, isInnerBlock),
         NULL);
 
+    // Time
+    context->roots.TimeClass = crank_talk_context_createClassAndMetaclass(context, "Time", context->roots.MagnitudeClass, sizeof(crank_talk_FunctionAnalysisEnvironment_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(Time, seconds),
+        CrankTalkSlotDef(Time, nanos),
+        NULL);
+
     // HIR
     context->roots.HIRValueClass = crank_talk_context_createClassAndMetaclass(context, "HIRValue", context->roots.ObjectClass, sizeof(crank_talk_HIRValue_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRValue, sourcePosition),
@@ -1044,6 +1052,7 @@ crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
     crank_talk_registerScriptPrimitives(context);
     crank_talk_registerSourcePositionPrimitives(context);
     crank_talk_registerStringPrimitives(context);
+    crank_talk_registerTimePrimitives(context);
 }
 
 CRANK_TALK_API crank_talk_VMContext_t*

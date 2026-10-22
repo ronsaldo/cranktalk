@@ -781,6 +781,7 @@ CRANK_TALK_API double crank_talk_oop_numberAsFloat(crank_talk_oop_t oop);
 CRANK_TALK_API bool crank_talk_oop_asBoolean(crank_talk_VMContext_t *context, crank_talk_oop_t value);
 CRANK_TALK_API crank_talk_oop_t crank_talk_oop_fromBoolean(crank_talk_VMContext_t *context, bool value);
 CRANK_TALK_API crank_talk_oop_t crank_talk_oop_fromFloat(crank_talk_VMContext_t *context, double value);
+CRANK_TALK_API crank_talk_oop_t crank_talk_oop_fromInt64(crank_talk_VMContext_t *context, int64_t value);
 CRANK_TALK_API crank_talk_Behavior_t *crank_talk_oop_getClass(crank_talk_VMContext_t *context, crank_talk_oop_t value);
 
 CRANK_TALK_API bool sysmel_vm_Behavior_isDirectSubtype(crank_talk_oop_t type, crank_talk_oop_t supertype);

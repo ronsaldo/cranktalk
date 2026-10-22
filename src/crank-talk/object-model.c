@@ -43,6 +43,14 @@ crank_talk_oop_fromFloat(crank_talk_VMContext_t *context, double value)
     }
 }
 
+CRANK_TALK_API crank_talk_oop_t
+crank_talk_oop_fromInt64(crank_talk_VMContext_t *context, int64_t value)
+{
+    if(CRANK_TALK_SMALL_INTEGER_MIN_VALUE <= value && value <= CRANK_TALK_SMALL_INTEGER_MAX_VALUE)
+        return crank_talk_oop_encodeSmallInteger((intptr_t)value);
+    abort();
+}
+
 CRANK_TALK_API crank_talk_Behavior_t *
 crank_talk_oop_getClass(crank_talk_VMContext_t *context, crank_talk_oop_t value)
 {
