@@ -99,15 +99,21 @@ player2Score
     ^ player2Score
 ].
 
+PongGameState ![
+updateWithTimestep: delta
+
+].
+
 "Game morph"
 Morph << #PongGameMorph
-    slots: {#gameState};
+    slots: {#gameState . #lastAnimationTime. #accumulatedTime};
     build.
 
 PongGameMorph ![
 initialize
     super initialize.
     gameState := PongGameState new.
+    accumulatedTime := 0.0.
 ].
 
 PongGameMorph ![
@@ -139,8 +145,36 @@ drawOn: aCanvas
 ].
 
 PongGameMorph ![
+updateWithTimestep: delta
+    gameState updateWithTimestep: delta
+].
+
+PongGameMorph ![
 updateAnimation
-    Stdio stdout nextPutAll: 'updateAnimation'; lf.
+    | newTime deltaTime deltaTimeSeconds timeStep |
+    lastAnimationTime == nil ifTrue: [lastAnimationTime := Time microsecondClockValue].
+    newTime := Time microsecondClockValue.
+
+    deltaTime := newTime - lastAnimationTime.
+    lastAnimationTime := newTime.
+
+    "Accumulate time"
+    deltaTimeSeconds := deltaTime asFloat * 0.000001.
+    accumulatedTime := accumulatedTime + deltaTimeSeconds.
+    timeStep := 1.0 / 120.0.
+
+    "Handle pauses"
+    accumulatedTime >= (timeStep * 8) ifTrue: [
+        accumulatedTime := 0.0
+    ].
+
+    "Simulate the timesteps"
+    [accumulatedTime >= timeStep] whileTrue: [
+        self updateWithTimestep: timeStep.
+        accumulatedTime := accumulatedTime - timeStep
+    ].
+
+    self changed
 ].
 
 PongGameMorph new openInWindow.

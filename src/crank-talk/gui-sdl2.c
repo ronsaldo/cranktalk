@@ -11,6 +11,7 @@
 
 static bool hasInitializedSDL2 = false;
 static bool isQuitting = false;
+static int targetFrameRate = 120;
 
 static void
 crank_talk_ensureSDL2Initialization()
@@ -283,10 +284,17 @@ crank_talk_OSWindow_mainLoop_primitive(crank_talk_PrimitiveContext_t *primContex
 
     while(!isQuitting)
     {
+        Uint64 startTime = SDL_GetTicks64();
         processSDL2Events(primContext->context);
         dispatchAnimationUpdateEvent(primContext->context);
         crank_talk_gc_safepoint(primContext->context);
-        SDL_Delay(8);
+
+        Uint64 endTime = SDL_GetTicks64();
+        Uint64 deltaTime = endTime - startTime;
+        Uint64 targetSleep = 1000 / targetFrameRate;
+        Sint64 sleepAmount = targetSleep - deltaTime;
+        if(sleepAmount > 0)
+            SDL_Delay(sleepAmount);
     }
 
     crank_talk_oop_t self = primContext->arguments[0];
@@ -306,7 +314,7 @@ crank_talk_OSWindow_newFormRenderer_primitive(crank_talk_PrimitiveContext_t *pri
         crank_talk_error(primContext->context, "Window already has an associated renderer.");
 
     SDL_Window *windowHandle = osWindow->handle->address;
-    SDL_Renderer *renderer = SDL_CreateRenderer(windowHandle, -1, 0);
+    SDL_Renderer *renderer = SDL_CreateRenderer(windowHandle, -1, SDL_RENDERER_PRESENTVSYNC);
 
     crank_talk_OSWindowFormRenderer_t *formRenderer = (crank_talk_OSWindowFormRenderer_t*)CrankAllocateValuesObjectWithClassName(primContext->context, OSWindowFormRenderer);
     formRenderer->super.rendererHandle = (crank_talk_ExternalAddress_t*)crank_talk_ExternalAddress_make(primContext->context, renderer);
