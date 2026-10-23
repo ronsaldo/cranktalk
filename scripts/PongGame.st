@@ -32,6 +32,11 @@ drawOn: aCanvas
     aCanvas fillRectangle: self bounds color: color
 ].
 
+PongGameEntity ![
+updateWithTimestep: delta
+    position := position + (velocity * (delta@delta)).
+].
+
 "Paddle"
 PongGameEntity << #PongGamePaddle
     slots: {};
@@ -51,7 +56,8 @@ PongGameEntity << #PongGameBall
 PongGameBall ![
 initialize
     super initialize.
-    halfExtent := 0.5@0.5
+    halfExtent := 0.5@0.5.
+    velocity := -15.0@15.0.
 ].
 
 "Game state"
@@ -101,7 +107,9 @@ player2Score
 
 PongGameState ![
 updateWithTimestep: delta
-
+    firstPaddle updateWithTimestep: delta.
+    secondPaddle updateWithTimestep: delta.
+    ball updateWithTimestep: delta.
 ].
 
 "Game morph"
