@@ -34,3 +34,11 @@
     self assert: (1/2) numerator = 1.
     self assert: (1/2) denominator = 2.
 ] value.
+
+"Comparisons"
+[
+    self assert: 0 = 0.0.
+    self assert: 0 ~= 0.1.
+    self assert: (0 ~= 0.0) not.
+    self assert: 0 <= 0.5.
+] value.

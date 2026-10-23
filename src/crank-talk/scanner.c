@@ -355,7 +355,7 @@ crank_talk_ScannerState_scanNextToken(crank_talk_VMContext_t *context, crank_tal
         else if (isOperatorCharacter((char)c1))
         {
             crank_talk_ScannerState_advanceCount(state, 2);
-            while(isIdentifierMiddle((char)crank_talk_ScannerState_peekAt(state, 0)))
+            while(isOperatorCharacter((char)crank_talk_ScannerState_peekAt(state, 0)))
                 crank_talk_ScannerState_advance(state);
 
             return crank_talk_ScannerState_makeTokenStartingFrom(context, state, CrankTalkTokenKindSymbol, &initialState);

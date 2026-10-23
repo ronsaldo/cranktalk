@@ -77,6 +77,16 @@ adaptToInteger: receiver andSend: selector
 	^ receiver asFloat perform: selector with: self
 ].
 
+Number ![
+adaptToInteger: receiver andCompare: selector
+    self subclassResponsibility
+].
+
+Float ![
+adaptToInteger: receiver andCompare: selector
+	^ receiver asFloat perform: selector with: self
+].
+
 "Number arithmetic"
 Number ![
 + other
@@ -157,6 +167,32 @@ Integer ![
 ].
 
 Integer ![
+= aNumber
+    ^ aNumber adaptToInteger: self andCompare: #=
+].
+
+Integer ![
+< aNumber
+    ^ aNumber adaptToInteger: self andCompare: #<
+].
+
+Integer ![
+<= aNumber
+    ^ aNumber adaptToInteger: self andCompare: #<=
+].
+
+Integer ![
+> aNumber
+    ^ aNumber adaptToInteger: self andCompare: #>
+].
+
+Integer ![
+>= aNumber
+    ^ aNumber adaptToInteger: self andCompare: #>=
+].
+
+
+Integer ![
 gcd: anInteger
 	| n m |
 	n := self.
@@ -215,6 +251,42 @@ SmallInteger ![
     ^ (other isMemberOf: SmallInteger)
         ifTrue: [ (Fraction numerator: self denominator: other) reduced]
         ifFalse: [super / other]
+].
+
+SmallInteger ![
+= other
+    <primitive: #'SmallInteger::='>
+    ^ super = other
+].
+
+SmallInteger ![
+~= other
+    <primitive: #'SmallInteger::~='>
+    ^ super ~= other
+].
+
+SmallInteger ![
+< other
+    <primitive: #'SmallInteger::<'>
+    ^ super < other
+].
+
+SmallInteger ![
+<= other
+    <primitive: #'SmallInteger::<='>
+    ^ super <= other
+].
+
+SmallInteger ![
+> other
+    <primitive: #'SmallInteger::>'>
+    ^ super > other
+].
+
+SmallInteger ![
+>= other
+    <primitive: #'SmallInteger::>='>
+    ^ super >= other
 ].
 
 "

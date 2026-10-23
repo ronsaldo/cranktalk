@@ -38,3 +38,16 @@ Rectangle ![
 containsPoint: aPoint
     ^ origin <= aPoint and: [aPoint <= corner]
 ].
+
+Rectangle ![
+intersects: aRectangle
+    "Method from Pharo"
+    | rOrigin rCorner |
+	rOrigin := aRectangle origin.
+	rCorner := aRectangle corner.
+	rCorner x <= origin x ifTrue: [ ^ false ].
+	rCorner y <= origin y ifTrue: [ ^ false ].
+	rOrigin x >= corner x ifTrue: [ ^ false ].
+	rOrigin y >= corner y ifTrue: [ ^ false ].
+	^ true
+].

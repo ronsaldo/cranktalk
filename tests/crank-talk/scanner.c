@@ -197,6 +197,14 @@ void scanner_runTests(void)
         AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
     }
     {
+        crank_talk_oop_t tokensValue = scanString(context, "#<=");
+        AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
+
+        crank_talk_Array_t *tokens = (crank_talk_Array_t *)tokensValue;
+        AssertEquals(CrankTalkTokenKindSymbol, getTokenKind(tokens->elements[0]));
+        AssertEquals(CrankTalkTokenKindEndOfSource, getTokenKind(tokens->elements[1]));
+    }
+    {
         crank_talk_oop_t tokensValue = scanString(context, "#|");
         AssertEquals(2, crank_talk_object_getSizeInSlots(tokensValue));
 

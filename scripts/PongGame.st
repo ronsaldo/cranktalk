@@ -103,6 +103,16 @@ initialize
     halfExtent := 0.5@0.5.
 ].
 
+PongGameBall ![
+bounceVertical
+    velocity := velocity x @ velocity y negated
+].
+
+PongGameBall ![
+bounceHorizontal
+    velocity := velocity x negated @ velocity y
+].
+
 "Game state"
 Object << #PongGameState
     slots: {#firstPaddle. #secondPaddle. #ball. #topWall. #bottomWall. #leftWall. #rightWall. #player1Score. #player2Score};
@@ -192,6 +202,24 @@ updateWithTimestep: delta
     firstPaddle updateWithTimestep: delta.
     secondPaddle updateWithTimestep: delta.
     ball updateWithTimestep: delta.
+
+    ((ball bounds intersects: topWall bounds) or: [(ball bounds intersects: bottomWall bounds)]) ifTrue: [
+        ball bounceVertical
+    ].
+
+    ((ball bounds intersects: firstPaddle bounds) or: [(ball bounds intersects: secondPaddle bounds)]) ifTrue: [
+        ball bounceHorizontal
+    ].
+
+    (ball bounds intersects: leftWall bounds) ifTrue: [
+        player2Score := player2Score + 1.
+        self resetBall
+    ].
+
+    (ball bounds intersects: rightWall bounds) ifTrue: [
+        player1Score := player1Score + 1.
+        self resetBall
+    ].
 ].
 
 "Game morph"
@@ -281,12 +309,20 @@ PongGameMorph ![
 onKeyboardDownEvent: anEvent
     anEvent wasHandled ifTrue: [^ self].
 
-    anEvent symbol == OSK_UP ifTrue: [
+    anEvent symbol == OSK_w ifTrue: [
         gameState firstPaddle velocity: 0 @ 20.
     ].
 
-    anEvent symbol == OSK_DOWN ifTrue: [
+    anEvent symbol == OSK_s ifTrue: [
         gameState firstPaddle velocity: 0@ -20.
+    ].
+
+    anEvent symbol == OSK_UP ifTrue: [
+        gameState secondPaddle velocity: 0 @ 20.
+    ].
+
+    anEvent symbol == OSK_DOWN ifTrue: [
+        gameState secondPaddle velocity: 0@ -20.
     ].
 ].
 
@@ -294,12 +330,20 @@ PongGameMorph ![
 onKeyboardUpEvent: anEvent
     anEvent wasHandled ifTrue: [^ self].
 
-    anEvent symbol == OSK_UP ifTrue: [
+    anEvent symbol == OSK_w ifTrue: [
         gameState firstPaddle velocity y > 0 ifTrue: [gameState firstPaddle velocity: 0@0].
     ].
 
-    anEvent symbol == OSK_DOWN ifTrue: [
+    anEvent symbol == OSK_s ifTrue: [
         gameState firstPaddle velocity y < 0 ifTrue: [gameState firstPaddle velocity: 0@0].
+    ].
+
+    anEvent symbol == OSK_UP ifTrue: [
+        gameState secondPaddle velocity y > 0 ifTrue: [gameState secondPaddle velocity: 0@0].
+    ].
+
+    anEvent symbol == OSK_DOWN ifTrue: [
+        gameState secondPaddle velocity y < 0 ifTrue: [gameState secondPaddle velocity: 0@0].
     ].
 ].
 
