@@ -6,6 +6,7 @@
 #include "crank-talk/io.h"
 #include "crank-talk/message.h"
 #include "crank-talk/string.h"
+#include "crank-talk/utils.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -510,10 +511,15 @@ crank_talk_FormCanvas_fillRectangleWithColor_primitive(crank_talk_PrimitiveConte
     float scaleX = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->x);
     float scaleY = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->y);
 
-    float fMinX = (float)crank_talk_oop_numberAsFloat(rectangle->origin->x) * scaleX + originX;
-    float fMinY = (float)crank_talk_oop_numberAsFloat(rectangle->origin->y) * scaleY + originY;
-    float fMaxX = (float)crank_talk_oop_numberAsFloat(rectangle->corner->x) * scaleX + originX;
-    float fMaxY = (float)crank_talk_oop_numberAsFloat(rectangle->corner->y) * scaleY + originY;
+    float fOriginX = (float)crank_talk_oop_numberAsFloat(rectangle->origin->x) * scaleX + originX;
+    float fOriginY = (float)crank_talk_oop_numberAsFloat(rectangle->origin->y) * scaleY + originY;
+    float fCornerX = (float)crank_talk_oop_numberAsFloat(rectangle->corner->x) * scaleX + originX;
+    float fCornerY = (float)crank_talk_oop_numberAsFloat(rectangle->corner->y) * scaleY + originY;
+
+    float fMinX = crank_talk_fmin(fOriginX, fCornerX);
+    float fMinY = crank_talk_fmin(fOriginY, fCornerY);
+    float fMaxX = crank_talk_fmax(fOriginX, fCornerX);
+    float fMaxY = crank_talk_fmax(fOriginY, fCornerY);
 
     uint32_t fillColor = crank_talk_Color_encodeBGRA32(color);
     crank_talk_FormCanvas_fillRectangleWithColor(primContext->context, form, fMinX, fMinY, fMaxX, fMaxY, fillColor);
@@ -551,10 +557,15 @@ crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive(crank_talk_Pri
     float scaleX = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->x);
     float scaleY = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->y);
 
-    float fMinX = (float)crank_talk_oop_numberAsFloat(rectangle->origin->x) * scaleX + originX;
-    float fMinY = (float)crank_talk_oop_numberAsFloat(rectangle->origin->y) * scaleY + originY;
-    float fMaxX = (float)crank_talk_oop_numberAsFloat(rectangle->corner->x) * scaleX + originX;
-    float fMaxY = (float)crank_talk_oop_numberAsFloat(rectangle->corner->y) * scaleY + originY;
+    float fOriginX = (float)crank_talk_oop_numberAsFloat(rectangle->origin->x) * scaleX + originX;
+    float fOriginY = (float)crank_talk_oop_numberAsFloat(rectangle->origin->y) * scaleY + originY;
+    float fCornerX = (float)crank_talk_oop_numberAsFloat(rectangle->corner->x) * scaleX + originX;
+    float fCornerY = (float)crank_talk_oop_numberAsFloat(rectangle->corner->y) * scaleY + originY;
+
+    float fMinX = crank_talk_fmin(fOriginX, fCornerX);
+    float fMinY = crank_talk_fmin(fOriginY, fCornerY);
+    float fMaxX = crank_talk_fmax(fOriginX, fCornerX);
+    float fMaxY = crank_talk_fmax(fOriginY, fCornerY);
 
     uint32_t fillColor = crank_talk_Color_encodeBGRA32(color);
 
@@ -646,10 +657,15 @@ crank_talk_FormCanvas_translucenImageAtSourceRectWithColor_primitive(crank_talk_
     float scaleX = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->x);
     float scaleY = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->y);
 
-    float targetMinX = (float)crank_talk_oop_numberAsFloat(targetRect->origin->x)*scaleX + originX;
-    float targetMinY = (float)crank_talk_oop_numberAsFloat(targetRect->origin->y)*scaleY + originY;
-    float targetMaxX = (float)crank_talk_oop_numberAsFloat(targetRect->corner->x)*scaleX + originX;
-    float targetMaxY = (float)crank_talk_oop_numberAsFloat(targetRect->corner->y)*scaleY + originY;
+    float targetOriginX = (float)crank_talk_oop_numberAsFloat(targetRect->origin->x) * scaleX + originX;
+    float targetOriginY = (float)crank_talk_oop_numberAsFloat(targetRect->origin->y) * scaleY + originY;
+    float targetCornerX = (float)crank_talk_oop_numberAsFloat(targetRect->corner->x) * scaleX + originX;
+    float targetCornerY = (float)crank_talk_oop_numberAsFloat(targetRect->corner->y) * scaleY + originY;
+
+    float targetMinX = crank_talk_fmin(targetOriginX, targetCornerX);
+    float targetMinY = crank_talk_fmin(targetOriginY, targetCornerY);
+    float targetMaxX = crank_talk_fmax(targetOriginX, targetCornerX);
+    float targetMaxY = crank_talk_fmax(targetOriginY, targetCornerY);
 
     float blendColorR = crank_talk_oop_numberAsFloat(blendColor->r);
     float blendColorG = crank_talk_oop_numberAsFloat(blendColor->g);

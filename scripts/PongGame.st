@@ -139,7 +139,7 @@ drawOn: aCanvas
     | aspectRatio scaleFactor |
     super drawOn: aCanvas.
 
-    scaleFactor := self extent / (40.0@25.0).
+    scaleFactor := self extent / (40.0@ -25.0).
     aCanvas withTranslation: self extent * (0.5 @ 0.5) do: [
         aCanvas withScaleFactor: scaleFactor do: [
             gameState firstPaddle drawOn: aCanvas.
