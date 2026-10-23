@@ -28,6 +28,16 @@ position: newPosition
 ].
 
 PongGameEntity ![
+velocity
+    ^ velocity
+].
+
+PongGameEntity ![
+velocity: newVelocity
+    velocity := newVelocity
+].
+
+PongGameEntity ![
 halfExtent
     ^ halfExtent
 ].
@@ -82,7 +92,6 @@ PongGameBall ![
 initialize
     super initialize.
     halfExtent := 0.5@0.5.
-    velocity := -15.0@15.0.
 ].
 
 "Game state"
@@ -110,19 +119,24 @@ initialize
 
     firstPaddle position: -19@0.0.
     secondPaddle position: 19@0.0.
-    ball position: 0@0.
 
     player1Score := 0.
     player2Score := 0.
+    self resetBall.
+].
+
+PongGameState ![
+resetBall
+    ball position: 0@0; velocity: -10.0@10.0.
 ].
 
 PongGameState ![
 entitiesDo: aBlock
-    aBlock value: topWall.
-    aBlock value: bottomWall.
-
     aBlock value: leftWall.
     aBlock value: rightWall.
+
+    aBlock value: topWall.
+    aBlock value: bottomWall.
 
     aBlock value: firstPaddle.
     aBlock value: secondPaddle.
@@ -244,6 +258,40 @@ updateAnimation
     ].
 
     self changed
+].
+
+PongGameMorph ![
+onMouseMotionEvent: anEvent
+    anEvent wasHandled ifTrue: [^ self].
+
+    self takeKeyboardFocus.
+    anEvent wasHandled: true
+].
+
+PongGameMorph ![
+onKeyboardDownEvent: anEvent
+    anEvent wasHandled ifTrue: [^ self].
+
+    anEvent symbol == OSK_UP ifTrue: [
+        gameState firstPaddle velocity: 0 @ 20.
+    ].
+
+    anEvent symbol == OSK_DOWN ifTrue: [
+        gameState firstPaddle velocity: 0@ -20.
+    ].
+].
+
+PongGameMorph ![
+onKeyboardUpEvent: anEvent
+    anEvent wasHandled ifTrue: [^ self].
+
+    anEvent symbol == OSK_UP ifTrue: [
+        gameState firstPaddle velocity y > 0 ifTrue: [gameState firstPaddle velocity: 0@0].
+    ].
+
+    anEvent symbol == OSK_DOWN ifTrue: [
+        gameState firstPaddle velocity y < 0 ifTrue: [gameState firstPaddle velocity: 0@0].
+    ].
 ].
 
 PongGameMorph new openInWindow.
