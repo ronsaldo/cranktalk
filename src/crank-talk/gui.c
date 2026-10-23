@@ -510,10 +510,10 @@ crank_talk_FormCanvas_fillRectangleWithColor_primitive(crank_talk_PrimitiveConte
     float scaleX = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->x);
     float scaleY = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->y);
 
-    float fMinX = ((float)crank_talk_oop_numberAsFloat(rectangle->origin->x) + originX) * scaleX;
-    float fMinY = ((float)crank_talk_oop_numberAsFloat(rectangle->origin->y) + originY) * scaleY;
-    float fMaxX = ((float)crank_talk_oop_numberAsFloat(rectangle->corner->x) + originX) * scaleX;
-    float fMaxY = ((float)crank_talk_oop_numberAsFloat(rectangle->corner->y) + originY) * scaleY;
+    float fMinX = (float)crank_talk_oop_numberAsFloat(rectangle->origin->x) * scaleX + originX;
+    float fMinY = (float)crank_talk_oop_numberAsFloat(rectangle->origin->y) * scaleY + originY;
+    float fMaxX = (float)crank_talk_oop_numberAsFloat(rectangle->corner->x) * scaleX + originX;
+    float fMaxY = (float)crank_talk_oop_numberAsFloat(rectangle->corner->y) * scaleY + originY;
 
     uint32_t fillColor = crank_talk_Color_encodeBGRA32(color);
     crank_talk_FormCanvas_fillRectangleWithColor(primContext->context, form, fMinX, fMinY, fMaxX, fMaxY, fillColor);
@@ -551,10 +551,10 @@ crank_talk_FormCanvas_frameRectangleWithBorderWithColor_primitive(crank_talk_Pri
     float scaleX = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->x);
     float scaleY = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->y);
 
-    float fMinX = ((float)crank_talk_oop_numberAsFloat(rectangle->origin->x) + originX) * scaleX;
-    float fMinY = ((float)crank_talk_oop_numberAsFloat(rectangle->origin->y) + originY) * scaleY;
-    float fMaxX = ((float)crank_talk_oop_numberAsFloat(rectangle->corner->x) + originX) * scaleX;
-    float fMaxY = ((float)crank_talk_oop_numberAsFloat(rectangle->corner->y) + originY) * scaleY;
+    float fMinX = (float)crank_talk_oop_numberAsFloat(rectangle->origin->x) * scaleX + originX;
+    float fMinY = (float)crank_talk_oop_numberAsFloat(rectangle->origin->y) * scaleY + originY;
+    float fMaxX = (float)crank_talk_oop_numberAsFloat(rectangle->corner->x) * scaleX + originX;
+    float fMaxY = (float)crank_talk_oop_numberAsFloat(rectangle->corner->y) * scaleY + originY;
 
     uint32_t fillColor = crank_talk_Color_encodeBGRA32(color);
 
@@ -590,11 +590,16 @@ crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive(crank_talk_Pr
     if(crank_talk_oop_decodeSmallInteger(form->depth) != 32)
         crank_talk_error(primContext->context, "Only 32 bit forms are supported.");
         
+    float originX = (float)crank_talk_oop_numberAsFloat(formCanvas->super.origin->x);
+    float originY = (float)crank_talk_oop_numberAsFloat(formCanvas->super.origin->y);
+    float scaleX = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->x);
+    float scaleY = (float)crank_talk_oop_numberAsFloat(formCanvas->super.scaleFactor->y);
+
     crank_talk_Form_t *fontForm = fontFace->image;
     int fontImageWidth  = (int)crank_talk_oop_decodeSmallInteger(fontForm->width);
     int fontImageHeight = (int)crank_talk_oop_decodeSmallInteger(fontForm->height);
-    float currentBaselineX = (float)crank_talk_oop_numberAsFloat(baselineStart->x) + crank_talk_oop_numberAsFloat(formCanvas->super.origin->x);
-    float currentBaselineY = (float)crank_talk_oop_numberAsFloat(baselineStart->y) + crank_talk_oop_numberAsFloat(formCanvas->super.origin->y);
+    float currentBaselineX = (float)crank_talk_oop_numberAsFloat(baselineStart->x)*scaleX + originX;
+    float currentBaselineY = (float)crank_talk_oop_numberAsFloat(baselineStart->y)*scaleY + originY;
 
     // TODO: Decode UTF-8
     for(size_t i = stringStartIndex - 1; i < stringStopIndex; ++i)

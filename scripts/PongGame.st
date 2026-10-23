@@ -72,9 +72,9 @@ initialize
     secondPaddle := PongGamePaddle new.
     ball := PongGameBall new.
 
-    firstPaddle position: 1.0@12.0.
-    secondPaddle position: 39.0@12.0.
-    ball position: 20.0@12.0.
+    firstPaddle position: -19@0.0.
+    secondPaddle position: 19@0.0.
+    ball position: 0@0.
 
     player1Score := 0.
     player2Score := 0.
@@ -140,10 +140,12 @@ drawOn: aCanvas
     super drawOn: aCanvas.
 
     scaleFactor := self extent / (40.0@25.0).
-    aCanvas withScaleFactor: scaleFactor do: [
-        gameState firstPaddle drawOn: aCanvas.
-        gameState secondPaddle drawOn: aCanvas.
-        gameState ball drawOn: aCanvas.
+    aCanvas withTranslation: self extent * (0.5 @ 0.5) do: [
+        aCanvas withScaleFactor: scaleFactor do: [
+            gameState firstPaddle drawOn: aCanvas.
+            gameState secondPaddle drawOn: aCanvas.
+            gameState ball drawOn: aCanvas.
+        ].
     ].
 
     aCanvas
