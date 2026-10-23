@@ -83,6 +83,15 @@ initialize
     halfExtent := 0.5@3.0
 ].
 
+PongGamePaddle ![
+updateWithTimestep: delta
+    | height |
+    position := position + (velocity * (delta@delta)).
+    height := position y min: 12 - halfExtent y max: -12 + halfExtent y.
+    position := position x @ height
+
+].
+
 "Ball"
 PongGameEntity << #PongGameBall
     slots: {};

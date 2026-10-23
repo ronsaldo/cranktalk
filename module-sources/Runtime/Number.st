@@ -52,13 +52,19 @@ abs
 
 Number ![
 max: other
-    ^ self >= other ifTrue: [self] ifFalse: [other]
+    ^ self < other ifTrue: [other] ifFalse: [self]
 ].
 
 Number ![
 min: other
-    ^ self <= other ifTrue: [self] ifFalse: [other]
+    ^ self < other ifTrue: [self] ifFalse: [other]
 ].
+
+Number ![
+min: maxValue max: minValue
+    ^ (self min: maxValue) max: minValue
+].
+
 
 "Number adaptation"
 Number ![
