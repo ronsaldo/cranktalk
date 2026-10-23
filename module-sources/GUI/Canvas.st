@@ -11,6 +11,16 @@ initialize
 ].
 
 Canvas ![
+origin
+    ^ origin
+].
+
+Canvas ![
+scaleFactor
+    ^ scaleFactor
+].
+
+Canvas ![
 drawString: aString inRectangle: aRectangle color: aColor
     self drawString: aString inRectangle: aRectangle font: FontFace default color: aColor
 ].

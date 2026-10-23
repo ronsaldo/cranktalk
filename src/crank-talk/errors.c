@@ -227,10 +227,17 @@ crank_talk_BlockClosure_ensure_primitive(crank_talk_PrimitiveContext_t *primCont
 
     crank_talk_stackFrame_pushRecord(&ensureRecord.super);
 
-    crank_talk_oop_t result = crank_talk_send0(primContext->context, primContext->context->roots.valueSymbol, self);
+    struct {
+        crank_talk_oop_t result;
+    } gcFrame = {};
+    CRANK_TALK_STACKFRAME_PUSH_GC_ROOTS(gcFrameRecord, gcFrame);
+
+    gcFrame.result = crank_talk_send0(primContext->context, primContext->context->roots.valueSymbol, self);
+    crank_talk_send0(primContext->context, primContext->context->roots.valueSymbol, ensureBlock);
+    CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
 
     crank_talk_stackFrame_popRecord(&ensureRecord.super);
-    return crank_talk_Primitive_return(primContext, result);
+    return crank_talk_Primitive_return(primContext, gcFrame.result);
 }
 
 static void
