@@ -39,6 +39,11 @@ drawString: aString from: startIndex to: stopIndex inRectangle: aRectangle font:
 ].
 
 Canvas ![
+drawString: aString at: initialBaseline color: aColor
+    self drawString: aString from: 1 to: aString size at: initialBaseline font: FontFace default color: aColor
+].
+
+Canvas ![
 drawString: aString from: startIndex to: stopIndex at: initialBaseline font: aFontFace color: aColor
     self subclassResponsibility
 ].

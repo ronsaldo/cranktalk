@@ -611,6 +611,10 @@ crank_talk_FormCanvas_drawStringFromToAtWithFontAndColor_primitive(crank_talk_Pr
     int fontImageHeight = (int)crank_talk_oop_decodeSmallInteger(fontForm->height);
     float currentBaselineX = (float)crank_talk_oop_numberAsFloat(baselineStart->x)*scaleX + originX;
     float currentBaselineY = (float)crank_talk_oop_numberAsFloat(baselineStart->y)*scaleY + originY;
+    //printf("origin %f %f\n", originX, originY);
+    //printf("scale %f %f\n", scaleX, scaleY);
+    //printf("baselineStart %f %f\n", (float)crank_talk_oop_numberAsFloat(baselineStart->x), (float)crank_talk_oop_numberAsFloat(baselineStart->y));
+    //printf("baseline %f %f\n", currentBaselineX, currentBaselineY);
 
     // TODO: Decode UTF-8
     for(size_t i = stringStartIndex - 1; i < stringStopIndex; ++i)
