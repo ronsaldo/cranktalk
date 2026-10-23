@@ -28,6 +28,26 @@ position: newPosition
 ].
 
 PongGameEntity ![
+halfExtent
+    ^ halfExtent
+].
+
+PongGameEntity ![
+halfExtent: newHalfExtent
+    halfExtent := newHalfExtent
+].
+
+PongGameEntity ![
+color
+    ^ color
+].
+
+PongGameEntity ![
+color: newColor
+    color := newColor
+].
+
+PongGameEntity ![
 drawOn: aCanvas
     aCanvas fillRectangle: self bounds color: color
 ].
@@ -36,6 +56,11 @@ PongGameEntity ![
 updateWithTimestep: delta
     position := position + (velocity * (delta@delta)).
 ].
+
+"Wall"
+PongGameEntity << #PongGameWall
+    slots: {};
+    build.
 
 "Paddle"
 PongGameEntity << #PongGamePaddle
@@ -62,7 +87,7 @@ initialize
 
 "Game state"
 Object << #PongGameState
-    slots: {#firstPaddle. #secondPaddle. #ball. #player1Score. #player2Score};
+    slots: {#firstPaddle. #secondPaddle. #ball. #topWall. #bottomWall. #leftWall. #rightWall. #player1Score. #player2Score};
     build.
 
 PongGameState ![
@@ -71,6 +96,17 @@ initialize
     firstPaddle := PongGamePaddle new.
     secondPaddle := PongGamePaddle new.
     ball := PongGameBall new.
+    topWall := PongGameWall new.
+    bottomWall := PongGameWall new.
+
+    leftWall := PongGameWall new.
+    rightWall := PongGameWall new.
+
+    topWall position: 0@13; halfExtent: 20@1.
+    bottomWall position: 0@ -13; halfExtent: 20@1.
+
+    leftWall position: -20@0; halfExtent: 0.5@20; color: Color red.
+    rightWall position: 20@0; halfExtent: 0.5@20; color: Color red.
 
     firstPaddle position: -19@0.0.
     secondPaddle position: 19@0.0.
@@ -78,6 +114,29 @@ initialize
 
     player1Score := 0.
     player2Score := 0.
+].
+
+PongGameState ![
+entitiesDo: aBlock
+    aBlock value: topWall.
+    aBlock value: bottomWall.
+
+    aBlock value: leftWall.
+    aBlock value: rightWall.
+
+    aBlock value: firstPaddle.
+    aBlock value: secondPaddle.
+    aBlock value: ball.
+].
+
+PongGameState ![
+topWall
+    ^ topWall
+].
+
+PongGameState ![
+bottomWall
+    ^ bottomWall
 ].
 
 PongGameState ![
@@ -142,9 +201,9 @@ drawOn: aCanvas
     scaleFactor := self extent / (40.0@ -25.0).
     aCanvas withTranslation: self extent * (0.5 @ 0.5) do: [
         aCanvas withScaleFactor: scaleFactor do: [
-            gameState firstPaddle drawOn: aCanvas.
-            gameState secondPaddle drawOn: aCanvas.
-            gameState ball drawOn: aCanvas.
+            gameState entitiesDo: [:anEntity |
+                anEntity drawOn: aCanvas.
+            ].
         ].
     ].
 
