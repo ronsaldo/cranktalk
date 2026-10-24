@@ -26,7 +26,111 @@ crank_talk_SDL2ShutdownAudio(crank_talk_VMContext_t* context)
     crank_talk_audioDeviceOpenCount = 0;
 }
 
-static void crank_talk_SDL2AudioCallback(void *userdata, Uint8 * stream, int len)
+static void
+crank_talk_MixSoundSourceChannel(crank_talk_VMContext_t *context,
+    size_t bufferSize, float targetSamplingRate, float *destinationChannel,
+    bool isLooped, float gain, float sourceSamplingRate, float sourceDuration, float sourcePosition, int sourceSampleCount, const float *sourceChannel)
+{
+    float dt = 1.0f/targetSamplingRate;
+    float currentPosition = sourcePosition;
+    for(size_t i = 0; i < bufferSize; ++i)
+    {
+        float sample = 0.0f;
+        if(currentPosition >= sourceDuration)
+        {
+            if(isLooped)
+                currentPosition = crank_talk_floorMod(currentPosition, sourceDuration);
+        }
+
+        if(currentPosition <= sourceDuration)
+        {
+            float samplePosition = currentPosition*sourceSamplingRate;
+            float samplePositionFloor = floor(samplePosition);
+            float samplePositionFract = samplePosition - samplePositionFloor;
+            int sampleStartIndex = samplePositionFloor;
+            int sampleEndIndex = (sampleStartIndex + 1) % sourceSampleCount;
+            assert(sampleStartIndex < sourceSampleCount);
+            assert(sampleEndIndex < sourceSampleCount);
+
+            float startSample = sourceChannel[sampleStartIndex];
+            float endSample = sourceChannel[sampleEndIndex];
+            sample = crank_talk_fmix(startSample, endSample, samplePositionFract);
+        }
+
+        destinationChannel[i] += sample*gain;
+
+        currentPosition = currentPosition + dt;
+    }
+}
+
+static void
+crank_talk_MixSoundSource(crank_talk_VMContext_t *context, crank_talk_SoundSource_t *soundSource, size_t bufferSize)
+{
+    if(!soundSource->sample)
+        return;
+
+    int sampleCount = crank_talk_oop_decodeSmallInteger(soundSource->sample->sampleCount);
+    int sampleRate = crank_talk_oop_decodeSmallInteger(soundSource->sample->sampleRate);
+    float duration = crank_talk_oop_numberAsFloat(soundSource->sample->duration);
+    bool isLooped = crank_talk_oop_asBoolean(context, soundSource->isLooped);
+
+    float bufferDuration = (float)bufferSize / crank_talk_openAudioDeviceSpec.freq;
+    float sourceDuration = crank_talk_oop_numberAsFloat(soundSource->sample->duration);
+    float bufferPosition = crank_talk_oop_numberAsFloat(soundSource->position);
+    float leftGain = crank_talk_oop_numberAsFloat(soundSource->leftGain);
+    float rightGain = crank_talk_oop_numberAsFloat(soundSource->rightGain);
+
+    // Mix the channel
+    crank_talk_MixSoundSourceChannel(context, bufferSize, crank_talk_openAudioDeviceSpec.freq, context->leftSoundChannelBuffer,
+        isLooped, leftGain, sampleRate, sourceDuration, bufferPosition, sampleCount, (float*)soundSource->sample->leftSamples->elements);
+    crank_talk_MixSoundSourceChannel(context, bufferSize, crank_talk_openAudioDeviceSpec.freq, context->rightSoundChannelBuffer,
+        isLooped, rightGain, sampleRate, sourceDuration, bufferPosition, sampleCount, (float*)soundSource->sample->rightSamples->elements);
+
+
+    // Advance the position.
+    float newBufferPosition = bufferPosition + bufferDuration;
+    soundSource->position = crank_talk_oop_fromFloat(context, newBufferPosition);
+    if(newBufferPosition >= duration)
+    {
+        if(isLooped)
+            newBufferPosition = crank_talk_floorMod(newBufferPosition, sourceDuration);
+        else
+            soundSource->isPlaying = crank_talk_oop_fromBoolean(context, false);
+    }
+}
+
+static void
+crank_talk_removeNonActiveSources(crank_talk_VMContext_t *context, crank_talk_SoundSystem_t *soundSystem)
+{
+    crank_talk_SoundSource_t *currentSoundSource = soundSystem->firstPlayingSource;
+    soundSystem->firstPlayingSource = crank_talk_oop_nil();
+    soundSystem->lastPlayingSource = crank_talk_oop_nil();
+
+    while (currentSoundSource)
+    {
+        crank_talk_SoundSource_t *toAdd = currentSoundSource;
+        currentSoundSource = currentSoundSource->nextPlayingSource;
+        toAdd->nextPlayingSource = crank_talk_oop_nil();
+
+        if(crank_talk_oop_asBoolean(context, toAdd->isPlaying))
+        {
+            if(soundSystem->lastPlayingSource)
+            {
+                soundSystem->lastPlayingSource->nextPlayingSource = toAdd;
+                soundSystem->lastPlayingSource = toAdd;
+            }
+            else
+            {
+                soundSystem->firstPlayingSource = soundSystem->lastPlayingSource = toAdd;
+            }
+        }
+
+    }
+    
+}
+
+static void
+crank_talk_SDL2AudioCallback(void *userdata, Uint8 * stream, int len)
 {
     crank_talk_VMContext_t *context = userdata;
     size_t bufferSize = context->soundBufferSize;
@@ -41,20 +145,24 @@ static void crank_talk_SDL2AudioCallback(void *userdata, Uint8 * stream, int len
     {
         crank_talk_Mutex_lock(&context->soundSystemMutex);
         crank_talk_SoundSystem_t *soundSystem = (crank_talk_SoundSystem_t*)context->roots.activeSoundSystem;
-        crank_talk_SoundSource_t *currentSoundSource = soundSystem->firstPlayingSource;
-        while (currentSoundSource)
         {
-            printf("TODO: Play sound source %p\n", currentSoundSource);
-            currentSoundSource = currentSoundSource->nextPlayingSource;
+            crank_talk_SoundSource_t *currentSoundSource = soundSystem->firstPlayingSource;
+            while (currentSoundSource)
+            {
+                crank_talk_MixSoundSource(context, currentSoundSource, bufferSize);
+                currentSoundSource = currentSoundSource->nextPlayingSource;
+            }
         }
 
-        for(size_t i = 0; i < bufferSize; ++i)
+        crank_talk_removeNonActiveSources(context, soundSystem);
+
+        /*for(size_t i = 0; i < bufferSize; ++i)
         {
             float sample = (float)rand() / RAND_MAX*2.0 - 1.0;
             float gain = 0.01f;
             context->leftSoundChannelBuffer[i] += sample*gain;
             context->rightSoundChannelBuffer[i] += sample*gain;
-        }
+        }*/
 
         crank_talk_Mutex_unlock(&context->soundSystemMutex);
     }

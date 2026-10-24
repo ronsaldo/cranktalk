@@ -1,3 +1,6 @@
+| hitSoundSource |
+hitSoundSource := (SoundSample fromFileNamed: 'assets/pong/hit.wav') asSoundSource.
+
 "Pong game entity"
 Object << #PongGameEntity
     slots: {#position . #velocity. #halfExtent. #color};
@@ -204,11 +207,13 @@ updateWithTimestep: delta
     ball updateWithTimestep: delta.
 
     ((ball bounds intersects: topWall bounds) or: [(ball bounds intersects: bottomWall bounds)]) ifTrue: [
-        ball bounceVertical
+        ball bounceVertical.
+        hitSoundSource play.
     ].
 
     ((ball bounds intersects: firstPaddle bounds) or: [(ball bounds intersects: secondPaddle bounds)]) ifTrue: [
-        ball bounceHorizontal
+        ball bounceHorizontal.
+        hitSoundSource play.
     ].
 
     (ball bounds intersects: leftWall bounds) ifTrue: [
@@ -347,4 +352,5 @@ onKeyboardUpEvent: anEvent
 ].
 
 PongGameMorph new openInWindow.
+SoundSystem activate.
 OSWindow mainLoop.
