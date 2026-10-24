@@ -315,6 +315,7 @@ struct crank_talk_VMContextRoots_s
     // Sound
     crank_talk_oop_t SoundSampleClass;
     crank_talk_oop_t SoundSourceClass;
+    crank_talk_oop_t SoundStreamClass;
     crank_talk_oop_t SoundSystemClass;
     crank_talk_oop_t activeSoundSystem;
 

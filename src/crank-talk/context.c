@@ -1051,6 +1051,27 @@ crank_talk_context_createSoundDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(SoundSource, position),
         CrankTalkSlotDef(SoundSource, sample),
         NULL);
+    context->roots.SoundStreamClass = crank_talk_context_createClassAndMetaclass(context, "SoundStream", context->roots.ObjectClass, sizeof(crank_talk_SoundStream_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(SoundStream, nextPlayingStream),
+        
+        CrankTalkSlotDef(SoundStream, memory),
+
+        CrankTalkSlotDef(SoundStream, channelCount),
+        CrankTalkSlotDef(SoundStream, sampleCount),
+        CrankTalkSlotDef(SoundStream, sampleRate),
+        CrankTalkSlotDef(SoundStream, duration),
+        CrankTalkSlotDef(SoundStream, position),
+
+        CrankTalkSlotDef(SoundStream, isLooped),
+        CrankTalkSlotDef(SoundStream, isPlaying),
+        CrankTalkSlotDef(SoundStream, leftGain),
+        CrankTalkSlotDef(SoundStream, rightGain),
+
+        CrankTalkSlotDef(SoundStream, vorbisDecoder),
+
+        CrankTalkSlotDef(SoundStream, leftBuffer),
+        CrankTalkSlotDef(SoundStream, rightBuffer),
+        NULL);
     context->roots.SoundSystemClass = crank_talk_context_createClassAndMetaclass(context, "SoundSystem", context->roots.ObjectClass, sizeof(crank_talk_SoundSample_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(SoundSystem, firstPlayingSource),
         CrankTalkSlotDef(SoundSystem, lastPlayingSource),

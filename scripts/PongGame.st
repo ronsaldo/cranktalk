@@ -1,5 +1,6 @@
-| hitSoundSource |
+| hitSoundSource music |
 hitSoundSource := (SoundSample fromFileNamed: 'assets/pong/hit.wav') asSoundSource.
+music := SoundStream fromFileNamed: 'assets/pong/music.ogg'.
 
 "Pong game entity"
 Object << #PongGameEntity
@@ -353,4 +354,6 @@ onKeyboardUpEvent: anEvent
 
 PongGameMorph new openInWindow.
 SoundSystem activate.
+music isLooped: true; play.
 OSWindow mainLoop.
+music stop

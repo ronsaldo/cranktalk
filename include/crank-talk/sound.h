@@ -5,6 +5,7 @@
 
 typedef struct crank_talk_SoundSample_s crank_talk_SoundSample_t;
 typedef struct crank_talk_SoundSource_s crank_talk_SoundSource_t;
+typedef struct crank_talk_SoundStream_s crank_talk_SoundStream_t;
 typedef struct crank_talk_SoundSystem_s crank_talk_SoundSystem_t;
 
 struct crank_talk_SoundSample_s
@@ -29,11 +30,37 @@ struct crank_talk_SoundSource_s
     crank_talk_SoundSample_t *sample;
 };
 
+struct crank_talk_SoundStream_s
+{
+    crank_talk_Object_t super;
+    crank_talk_SoundStream_t *nextPlayingStream;
+
+    crank_talk_ByteArray_t *memory;
+
+    crank_talk_oop_t channelCount;
+    crank_talk_oop_t sampleCount;
+    crank_talk_oop_t sampleRate;
+    crank_talk_oop_t duration;
+    crank_talk_oop_t position;
+
+    crank_talk_oop_t isLooped;
+    crank_talk_oop_t isPlaying;
+    crank_talk_oop_t leftGain;
+    crank_talk_oop_t rightGain;
+
+    crank_talk_ExternalAddress_t *vorbisDecoder;
+
+    crank_talk_ByteArray_t *leftBuffer;
+    crank_talk_ByteArray_t *rightBuffer;
+};
+
 struct crank_talk_SoundSystem_s
 {
     crank_talk_Object_t super;
     crank_talk_SoundSource_t *firstPlayingSource;
     crank_talk_SoundSource_t *lastPlayingSource;
+    crank_talk_SoundStream_t *firstPlayingStream;
+    crank_talk_SoundStream_t *lastPlayingStream;
     crank_talk_oop_t sampleRate;
 };
 

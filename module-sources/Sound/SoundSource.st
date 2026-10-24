@@ -16,6 +16,11 @@ isLooped
 ].
 
 SoundSource ![
+isLooped: aBoolean
+    isLooped := aBoolean
+].
+
+SoundSource ![
 isPlaying
     ^ isPlaying
 ].
