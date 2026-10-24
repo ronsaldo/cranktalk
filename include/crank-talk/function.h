@@ -8,6 +8,7 @@ CRANK_TALK_API crank_talk_CompiledFunction_t *crank_talk_CompiledFunction_create
 CRANK_TALK_API crank_talk_oop_t crank_talk_apply(crank_talk_VMContext_t *context, crank_talk_oop_t function, size_t argumentCount, crank_talk_oop_t *arguments);
 
 CRANK_TALK_API void crank_talk_CompiledFunction_ensureAnalysis(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction);
+CRANK_TALK_API void crank_talk_CompiledFunction_discardIR(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction);
 CRANK_TALK_API void crank_talk_Functional_dumpToConsole(crank_talk_VMContext_t *context, crank_talk_oop_t functional);
 
 CRANK_TALK_API crank_talk_oop_t crank_talk_CompiledFunction_getSourcePositionAtPC(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction, size_t pc);

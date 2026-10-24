@@ -120,6 +120,8 @@ crank_talk_ParseTreeBlockNode_analyzeAndEvaluateWith(crank_talk_PrimitiveContext
     blockClosure->captureVector = (crank_talk_Array_t*)crank_talk_Array_create(primContext->context, 0);
     blockClosure->function = compiledFunction;
 
+    crank_talk_CompiledFunction_discardIR(primContext->context, compiledFunction);
+
     CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
 
     return crank_talk_Primitive_return(primContext, gcFrame.blockClosureValue);
@@ -526,6 +528,7 @@ crank_talk_ParseTreeMethodDefinitionNode_analyzeAndEvaluateWith(crank_talk_Primi
     compiledFunction->definitionArguments = (crank_talk_Array_t*)node->arguments;
     compiledFunction->definitionBody = (crank_talk_oop_t)node->body;
     crank_talk_CompiledFunction_ensureAnalysis(primContext->context, compiledFunction);
+    crank_talk_CompiledFunction_discardIR(primContext->context, compiledFunction);
 
     CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
 

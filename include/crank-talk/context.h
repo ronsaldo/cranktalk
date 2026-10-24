@@ -326,6 +326,9 @@ struct crank_talk_VMContext_s
 
     bool gcDisabled;
     crank_talk_dynarray_t markingStack;
+    size_t audioBufferSize;
+    float *leftAudioChannelBuffer;
+    float *rightAudioChannelBuffer;
 };
 
 CRANK_TALK_API crank_talk_VMContext_t *crank_talk_vm_createContext(void);

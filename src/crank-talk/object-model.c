@@ -346,6 +346,14 @@ crank_talk_SmalltalkImage_globals_primitive(crank_talk_PrimitiveContext_t *primC
 }
 
 static void
+crank_talk_SmalltalkImage_heapSize_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 1) return crank_talk_Primitive_fail(primContext);
+
+    return crank_talk_Primitive_return(primContext, crank_talk_oop_encodeSmallInteger(primContext->context->heap.totalSize));
+}
+
+static void
 crank_talk_SmalltalkImage_printStackTrace_primitive(crank_talk_PrimitiveContext_t *primContext)
 {
     if(primContext->argumentCount < 1) return crank_talk_Primitive_fail(primContext);
@@ -381,5 +389,6 @@ crank_talk_registerObjectPrimitives(crank_talk_VMContext_t* context)
 
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmalltalkImageClass, "garbageCollect", 1, "SmalltalkImage::garbageCollect", crank_talk_SmalltalkImage_garbageCollect_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmalltalkImageClass, "globals", 1, "SmalltalkImage::globals", crank_talk_SmalltalkImage_globals_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmalltalkImageClass, "heapSize", 1, "SmalltalkImage::heapSize", crank_talk_SmalltalkImage_heapSize_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, context->roots.SmalltalkImageClass, "printStackTrace", 1, "SmalltalkImage::printStackTrace", crank_talk_SmalltalkImage_printStackTrace_primitive);
 }

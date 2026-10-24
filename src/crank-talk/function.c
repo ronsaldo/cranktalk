@@ -365,6 +365,12 @@ crank_talk_CompiledFunction_ensureAnalysis(crank_talk_VMContext_t *context, cran
     crank_talk_CompiledFunction_ensureBytecodeGenerationAnalysis(context, compiledFunction);
 }
 
+CRANK_TALK_API void
+crank_talk_CompiledFunction_discardIR(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction)
+{
+    compiledFunction->hirFunction = crank_talk_oop_nil();
+}
+
 CRANK_TALK_API crank_talk_oop_t
 crank_talk_CompiledFunction_getSourcePositionAtPC(crank_talk_VMContext_t *context, crank_talk_CompiledFunction_t *compiledFunction, size_t pc)
 {

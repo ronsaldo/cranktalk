@@ -186,6 +186,7 @@ crank_talk_ParseTreeBlockNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t 
         blockClosure->function = compiledFunction;
 
         crank_talk_oop_t result = crank_talk_HIRConstantLiteralValue_create(primContext->context, gcFrame.blockClosureValue, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_CompiledFunction_discardIR(primContext->context, compiledFunction);
         CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
         return crank_talk_Primitive_return(primContext, result);
     }
@@ -199,6 +200,7 @@ crank_talk_ParseTreeBlockNode_analyzeAndBuildWith(crank_talk_PrimitiveContext_t 
         }
 
         crank_talk_oop_t result = crank_talk_HIRBuilder_makeClosure(primContext->context, buildContext->builder, compiledFunction, capturedValues, (crank_talk_oop_t)node->super.sourcePosition);
+        crank_talk_CompiledFunction_discardIR(primContext->context, compiledFunction);
         CRANK_TALK_STACKFRAME_POP_GC_ROOTS(gcFrameRecord);
         return crank_talk_Primitive_return(primContext, result);
     }

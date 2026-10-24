@@ -17,14 +17,20 @@ crank_talk_SDL2ShutdownAudio(crank_talk_VMContext_t* context)
     if(crank_talk_audioDeviceOpenCount == 0)
         return;
 
-    printf("TODO: crank_talk_SDL2ShutdownAudio\n");
+    if(crank_talk_openAudioDevice != 0)
+    {
+        SDL_CloseAudioDevice(crank_talk_openAudioDevice);
+        crank_talk_openAudioDevice = 0 ;
+    }
     crank_talk_audioDeviceOpenCount = 0;
 }
 
 static void crank_talk_SDL2AudioCallback(void *userdata, Uint8 * stream, int len)
 {
     memset(stream, 0, len);
-    printf("crank_talk_SDL2AudioCallback len: %d\n", len);
+    for(size_t i = 0; i < len; ++i)
+        stream[i] = rand();
+    //printf("crank_talk_SDL2AudioCallback len: %d\n", len);
 }
 
 static void
@@ -49,7 +55,15 @@ crank_talk_SoundSystem_activate_primitive(crank_talk_PrimitiveContext_t *primCon
         crank_talk_openAudioDevice = SDL_OpenAudioDevice(NULL, 0, &desiredSpec, &crank_talk_openAudioDeviceSpec, 0);
         printf("crank_talk_openAudioDevice: %d\n", crank_talk_openAudioDevice);
         if(crank_talk_openAudioDevice != 0)
+        {
+            ++crank_talk_audioDeviceOpenCount;
+
+            primContext->context->audioBufferSize = crank_talk_openAudioDeviceSpec.samples;
+            primContext->context->leftAudioChannelBuffer = realloc(primContext->context->leftAudioChannelBuffer, sizeof(float)*primContext->context->audioBufferSize);
+            primContext->context->rightAudioChannelBuffer = realloc(primContext->context->rightAudioChannelBuffer, sizeof(float)*primContext->context->audioBufferSize);
+    
             SDL_PauseAudioDevice(crank_talk_openAudioDevice, 0);
+        }
     }
 
     crank_talk_oop_t self = primContext->arguments[0];
@@ -66,8 +80,6 @@ crank_talk_SoundSystem_deactivate_primitive(crank_talk_PrimitiveContext_t *primC
         if(crank_talk_audioDeviceOpenCount == 0)
             crank_talk_SDL2ShutdownAudio(primContext->context);
     }
-        
-
 
     crank_talk_oop_t self = primContext->arguments[0];
     return crank_talk_Primitive_return(primContext, self);

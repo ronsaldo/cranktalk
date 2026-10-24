@@ -1101,6 +1101,8 @@ CRANK_TALK_API void
 crank_talk_vm_destroyContext(crank_talk_VMContext_t *context)
 {
     crank_talk_SDL2Shutdown(context);
+    free(context->leftAudioChannelBuffer);
+    free(context->rightAudioChannelBuffer);
     crank_talk_dynarray_destroy(&context->markingStack);
     crank_talk_heap_freeAll(&context->heap);
     crank_talk_PrimitiveTables_destroy(&context->primitiveTable);
