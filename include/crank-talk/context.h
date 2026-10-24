@@ -5,6 +5,7 @@
 #include "heap.h"
 #include "dynarray.h"
 #include "primitives.h"
+#include "threads.h"
 
 #define CrankAllocateVariadicObjectWithClassName(context, objectClassName, dataType, variadicByteSize) \
     crank_talk_heap_allocateOopWithSizeAndType(&context->heap, sizeof(crank_talk_ ## objectClassName##_t) + variadicByteSize, dataType, context->roots.objectClassName##Class)
@@ -326,9 +327,10 @@ struct crank_talk_VMContext_s
 
     bool gcDisabled;
     crank_talk_dynarray_t markingStack;
-    size_t audioBufferSize;
-    float *leftAudioChannelBuffer;
-    float *rightAudioChannelBuffer;
+    size_t soundBufferSize;
+    float *leftSoundChannelBuffer;
+    float *rightSoundChannelBuffer;
+    crank_talk_Mutex_t soundSystemMutex;
 };
 
 CRANK_TALK_API crank_talk_VMContext_t *crank_talk_vm_createContext(void);

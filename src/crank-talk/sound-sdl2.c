@@ -1,6 +1,7 @@
 #include "crank-talk/sound.h"
 #include "crank-talk/context.h"
 #include "crank-talk/message.h"
+#include "crank-talk/utils.h"
 #include <stdio.h>
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
@@ -27,10 +28,39 @@ crank_talk_SDL2ShutdownAudio(crank_talk_VMContext_t* context)
 
 static void crank_talk_SDL2AudioCallback(void *userdata, Uint8 * stream, int len)
 {
-    memset(stream, 0, len);
-    for(size_t i = 0; i < len; ++i)
-        stream[i] = rand();
-    //printf("crank_talk_SDL2AudioCallback len: %d\n", len);
+    crank_talk_VMContext_t *context = userdata;
+    size_t bufferSize = context->soundBufferSize;
+    assert(crank_talk_openAudioDeviceSpec.samples == bufferSize);
+    assert(len == bufferSize*2*2);
+
+    // Clear the buffers
+    memset(context->leftSoundChannelBuffer, 0, bufferSize *sizeof(float));
+    memset(context->rightSoundChannelBuffer, 0, bufferSize *sizeof(float));
+
+    // Fill the buffers
+    {
+        crank_talk_Mutex_lock(&context->soundSystemMutex);
+        for(size_t i = 0; i < bufferSize; ++i)
+        {
+            float sample = (float)rand() / RAND_MAX*2.0 - 1.0;
+            float gain = 0.1f;
+            context->leftSoundChannelBuffer[i] += sample*gain;
+            context->rightSoundChannelBuffer[i] += sample*gain;
+        }
+
+        crank_talk_Mutex_unlock(&context->soundSystemMutex);
+    }
+
+    // Encode the buffers
+    int16_t *s16Stream = (int16_t *)stream;
+    for(size_t i = 0; i < bufferSize; ++i)
+    {
+        float leftSample = crank_talk_fclamp(context->leftSoundChannelBuffer[i], -1, 1);
+        float rightSample = crank_talk_fclamp(context->rightSoundChannelBuffer[i], -1, 1);
+
+        s16Stream[i*2] = leftSample * INT16_MAX;
+        s16Stream[i*2 + 1] = rightSample * INT16_MAX;
+    }
 }
 
 static void
@@ -53,14 +83,13 @@ crank_talk_SoundSystem_activate_primitive(crank_talk_PrimitiveContext_t *primCon
         };
 
         crank_talk_openAudioDevice = SDL_OpenAudioDevice(NULL, 0, &desiredSpec, &crank_talk_openAudioDeviceSpec, 0);
-        printf("crank_talk_openAudioDevice: %d\n", crank_talk_openAudioDevice);
         if(crank_talk_openAudioDevice != 0)
         {
             ++crank_talk_audioDeviceOpenCount;
 
-            primContext->context->audioBufferSize = crank_talk_openAudioDeviceSpec.samples;
-            primContext->context->leftAudioChannelBuffer = realloc(primContext->context->leftAudioChannelBuffer, sizeof(float)*primContext->context->audioBufferSize);
-            primContext->context->rightAudioChannelBuffer = realloc(primContext->context->rightAudioChannelBuffer, sizeof(float)*primContext->context->audioBufferSize);
+            primContext->context->soundBufferSize = crank_talk_openAudioDeviceSpec.samples;
+            primContext->context->leftSoundChannelBuffer = realloc(primContext->context->leftSoundChannelBuffer, sizeof(float)*primContext->context->soundBufferSize);
+            primContext->context->rightSoundChannelBuffer = realloc(primContext->context->rightSoundChannelBuffer, sizeof(float)*primContext->context->soundBufferSize);
     
             SDL_PauseAudioDevice(crank_talk_openAudioDevice, 0);
         }
@@ -85,9 +114,18 @@ crank_talk_SoundSystem_deactivate_primitive(crank_talk_PrimitiveContext_t *primC
     return crank_talk_Primitive_return(primContext, self);
 }
 
+static void
+crank_talk_SoundSystem_current_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 1 ) return crank_talk_Primitive_fail(primContext);
+    return crank_talk_Primitive_return(primContext, primContext->context->roots.activeSoundSystem);
+}
+
 void
 crank_talk_registerSoundBackendPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.SoundSystemClass), "activate", 1, "SoundSystem::activate", crank_talk_SoundSystem_activate_primitive);
     crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.SoundSystemClass), "deactivate", 1, "SoundSystem::deactivate", crank_talk_SoundSystem_deactivate_primitive);
+ 
+    crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.SoundSystemClass), "current", 1, "SoundSystem::current", crank_talk_SoundSystem_current_primitive);       
 }

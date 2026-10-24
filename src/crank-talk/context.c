@@ -1086,6 +1086,7 @@ crank_talk_vm_createContext(void)
     crank_talk_PrimitiveTables_initialize(&context->primitiveTable);
     crank_talk_heap_initialize(&context->heap);
     crank_talk_dynarray_initialize(&context->markingStack, sizeof(crank_talk_oop_t), 1<<17);
+    crank_talk_Mutex_init(&context->soundSystemMutex);
     crank_talk_context_createCoreDefinitions(context);
     crank_talk_context_createFrontEndDefinitions(context);
     crank_talk_context_createIODefinitions(context);
@@ -1101,8 +1102,9 @@ CRANK_TALK_API void
 crank_talk_vm_destroyContext(crank_talk_VMContext_t *context)
 {
     crank_talk_SDL2Shutdown(context);
-    free(context->leftAudioChannelBuffer);
-    free(context->rightAudioChannelBuffer);
+    free(context->leftSoundChannelBuffer);
+    free(context->rightSoundChannelBuffer);
+    crank_talk_Mutex_destroy(&context->soundSystemMutex);
     crank_talk_dynarray_destroy(&context->markingStack);
     crank_talk_heap_freeAll(&context->heap);
     crank_talk_PrimitiveTables_destroy(&context->primitiveTable);
