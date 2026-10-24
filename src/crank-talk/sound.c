@@ -131,10 +131,7 @@ crank_talk_SoundSample_fromFileNamed_primitive(crank_talk_PrimitiveContext_t *pr
     }
 
     crank_talk_SoundSample_t *sample = (crank_talk_SoundSample_t *)CrankAllocateValuesObjectWithClassName(primContext->context, SoundSample);
-    sample->isLooped = crank_talk_oop_fromBoolean(primContext->context, false);
-    sample->isPlaying = crank_talk_oop_fromBoolean(primContext->context, false);
     sample->duration = crank_talk_oop_fromFloat(primContext->context, (float)sampleCount / (float)formatChunk.fmtChunk.samplesPerSecond);
-    sample->position = crank_talk_oop_fromFloat(primContext->context, 0.0);
     sample->sampleCount = crank_talk_oop_encodeSmallInteger(sampleCount);
     sample->sampleRate = crank_talk_oop_encodeSmallInteger(formatChunk.fmtChunk.samplesPerSecond);
     sample->leftSamples = leftSamples;
@@ -142,8 +139,42 @@ crank_talk_SoundSample_fromFileNamed_primitive(crank_talk_PrimitiveContext_t *pr
     return crank_talk_Primitive_return(primContext, (crank_talk_oop_t)sample);
 }
 
+static void
+crank_talk_SoundSource_play_primitive(crank_talk_PrimitiveContext_t *primContext)
+{
+    if(primContext->argumentCount < 1) return crank_talk_Primitive_fail(primContext);
+    crank_talk_oop_t self = primContext->arguments[0];
+
+    crank_talk_SoundSource_t *source = (crank_talk_SoundSource_t*)self;
+
+    crank_talk_Mutex_lock(&primContext->context->soundSystemMutex);
+    crank_talk_SoundSystem_t *soundSystem = (crank_talk_SoundSystem_t *)primContext->context->roots.activeSoundSystem;
+    if(soundSystem)
+    {
+        source->position = crank_talk_oop_fromFloat(primContext->context, 0.0);
+        if(!crank_talk_oop_asBoolean(primContext->context, source->isPlaying))
+        {
+            assert(!source->nextPlayingSource);
+            source->isPlaying = crank_talk_oop_fromBoolean(primContext->context, true);
+            if(soundSystem->lastPlayingSource)
+            {
+                soundSystem->lastPlayingSource->nextPlayingSource = source;
+                soundSystem->lastPlayingSource = source;
+            }
+            else
+            {
+                soundSystem->firstPlayingSource = soundSystem->lastPlayingSource = source;
+            }
+        }
+    }
+    crank_talk_Mutex_unlock(&primContext->context->soundSystemMutex);
+
+    return crank_talk_Primitive_return(primContext, self);
+}
+
 void
 crank_talk_registerSoundPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_createAndSetPrimitiveMethod(context, (crank_talk_oop_t)crank_talk_oop_getClass(context, context->roots.SoundSampleClass), "fromFileNamed:", 2, "SoundSample::fromFileNamed:", crank_talk_SoundSample_fromFileNamed_primitive);
+    crank_talk_createAndSetPrimitiveMethod(context, context->roots.SoundSourceClass, "play", 1, "SoundSource::play", crank_talk_SoundSource_play_primitive);
 }

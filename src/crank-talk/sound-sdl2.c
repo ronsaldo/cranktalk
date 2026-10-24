@@ -41,13 +41,12 @@ static void crank_talk_SDL2AudioCallback(void *userdata, Uint8 * stream, int len
     {
         crank_talk_Mutex_lock(&context->soundSystemMutex);
         crank_talk_SoundSystem_t *soundSystem = (crank_talk_SoundSystem_t*)context->roots.activeSoundSystem;
-        crank_talk_SoundSample_t *currentSoundSample = soundSystem->firstPlayingSample;
-        while (currentSoundSample)
+        crank_talk_SoundSource_t *currentSoundSource = soundSystem->firstPlayingSource;
+        while (currentSoundSource)
         {
-            printf("TODO: Play sample %p\n", currentSoundSample);
-            currentSoundSample = currentSoundSample->nextPlayingSample;
+            printf("TODO: Play sound source %p\n", currentSoundSource);
+            currentSoundSource = currentSoundSource->nextPlayingSource;
         }
-        
 
         for(size_t i = 0; i < bufferSize; ++i)
         {

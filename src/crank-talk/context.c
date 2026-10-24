@@ -1036,19 +1036,24 @@ static void
 crank_talk_context_createSoundDefinitions(crank_talk_VMContext_t* context)
 {
     context->roots.SoundSampleClass = crank_talk_context_createClassAndMetaclass(context, "SoundSample", context->roots.ObjectClass, sizeof(crank_talk_SoundSample_t), CrankTalkGCObjectDataTypeOops,
-        CrankTalkSlotDef(SoundSample, nextPlayingSample),
-        CrankTalkSlotDef(SoundSample, isLooped),
-        CrankTalkSlotDef(SoundSample, isPlaying),
         CrankTalkSlotDef(SoundSample, duration),
-        CrankTalkSlotDef(SoundSample, position),
         CrankTalkSlotDef(SoundSample, sampleCount),
         CrankTalkSlotDef(SoundSample, sampleRate),
         CrankTalkSlotDef(SoundSample, leftSamples),
         CrankTalkSlotDef(SoundSample, rightSamples),
         NULL);
+    context->roots.SoundSourceClass = crank_talk_context_createClassAndMetaclass(context, "SoundSource", context->roots.ObjectClass, sizeof(crank_talk_SoundSource_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(SoundSource, nextPlayingSource),
+        CrankTalkSlotDef(SoundSource, isLooped),
+        CrankTalkSlotDef(SoundSource, isPlaying),
+        CrankTalkSlotDef(SoundSource, leftGain),
+        CrankTalkSlotDef(SoundSource, rightGain),
+        CrankTalkSlotDef(SoundSource, position),
+        CrankTalkSlotDef(SoundSource, sample),
+        NULL);
     context->roots.SoundSystemClass = crank_talk_context_createClassAndMetaclass(context, "SoundSystem", context->roots.ObjectClass, sizeof(crank_talk_SoundSample_t), CrankTalkGCObjectDataTypeOops,
-        CrankTalkSlotDef(SoundSystem, firstPlayingSample),
-        CrankTalkSlotDef(SoundSystem, lastPlayingSample),
+        CrankTalkSlotDef(SoundSystem, firstPlayingSource),
+        CrankTalkSlotDef(SoundSystem, lastPlayingSource),
         CrankTalkSlotDef(SoundSystem, sampleRate),
         NULL);
 }

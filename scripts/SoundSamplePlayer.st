@@ -1,11 +1,11 @@
-| soundSample window |
+| soundSample soundSource window |
 soundSample := SoundSample fromFileNamed: 'assets/pong/hit.wav'.
-Stdio stdout print: soundSample; space; print: soundSample duration; space; print: soundSample position; lf.
+soundSource := soundSample asSoundSource.
 
 window := SimpleButtonMorph new
     label: 'Play sample';
     onClickAction: [:button |
-        Stdio stdout nextPutAll: 'TODO: play sample'; lf.
+        soundSource play
     ];
     openInWindow.
 

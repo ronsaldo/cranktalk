@@ -1,2 +1,3 @@
 thisContext 
-    loadFile: 'SoundSample.st'
+    loadFile: 'SoundSample.st';
+    loadFile: 'SoundSource.st'

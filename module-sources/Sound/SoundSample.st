@@ -1,21 +1,6 @@
 SoundSample ![
-isLooped
-    ^ isLooped
-].
-
-SoundSample ![
-isPlaying
-    ^ isPlaying
-].
-
-SoundSample ![
 duration
     ^ duration
-].
-
-SoundSample ![
-position
-    ^ position
 ].
 
 SoundSample ![
@@ -36,4 +21,9 @@ leftSamples
 SoundSample ![
 rightSamples
     ^ rightSamples
+].
+
+SoundSample ![
+asSoundSource
+    ^ SoundSource new sample: self; yourself
 ].
