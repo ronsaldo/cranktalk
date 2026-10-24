@@ -26,6 +26,12 @@ isPlaying
 ].
 
 SoundSource ![
+gain: aNumber
+    leftGain := aNumber.
+    rightGain := aNumber.
+].
+
+SoundSource ![
 leftGain
     ^ leftGain
 ].
