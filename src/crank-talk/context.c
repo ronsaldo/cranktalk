@@ -14,6 +14,7 @@
 #include "crank-talk/ordered-collection.h"
 #include "crank-talk/parse-tree.h"
 #include "crank-talk/set.h"
+#include "crank-talk/sound.h"
 #include "crank-talk/string.h"
 #include "crank-talk/time.h"
 #include <stdarg.h>
@@ -43,6 +44,8 @@ void crank_talk_registerOrderedCollectionPrimitives(crank_talk_VMContext_t* cont
 void crank_talk_registerParseTreePrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerScriptPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerSourcePositionPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerSoundBackendPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerSoundPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerTimePrimitives(crank_talk_VMContext_t* context);
 
@@ -1030,6 +1033,25 @@ crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
 }
 
 static void 
+crank_talk_context_createSoundDefinitions(crank_talk_VMContext_t* context)
+{
+    context->roots.SoundSampleClass = crank_talk_context_createClassAndMetaclass(context, "SoundSample", context->roots.ObjectClass, sizeof(crank_talk_SoundSample_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(SoundSample, nextPlayingSample),
+        CrankTalkSlotDef(SoundSample, isLooped),
+        CrankTalkSlotDef(SoundSample, isPlaying),
+        CrankTalkSlotDef(SoundSample, position),
+        CrankTalkSlotDef(SoundSample, sampleCount),
+        CrankTalkSlotDef(SoundSample, sampleRate),
+        CrankTalkSlotDef(SoundSample, samples),
+        NULL);
+    context->roots.SoundSystemClass = crank_talk_context_createClassAndMetaclass(context, "SoundSystem", context->roots.ObjectClass, sizeof(crank_talk_SoundSample_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(SoundSystem, firstPlayingSample),
+        CrankTalkSlotDef(SoundSystem, lastPlayingSample),
+        CrankTalkSlotDef(SoundSystem, sampleRate),
+        NULL);
+}
+
+static void 
 crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
 {
     crank_talk_registerAnalysisAndBuildPrimitives(context);
@@ -1051,6 +1073,8 @@ crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
     crank_talk_registerParseTreePrimitives(context);
     crank_talk_registerScriptPrimitives(context);
     crank_talk_registerSourcePositionPrimitives(context);
+    crank_talk_registerSoundBackendPrimitives(context);
+    crank_talk_registerSoundPrimitives(context);
     crank_talk_registerStringPrimitives(context);
     crank_talk_registerTimePrimitives(context);
 }
@@ -1067,6 +1091,7 @@ crank_talk_vm_createContext(void)
     crank_talk_context_createIODefinitions(context);
     crank_talk_context_createExceptionsDefinitions(context);
     crank_talk_context_createGUIDefinitions(context);
+    crank_talk_context_createSoundDefinitions(context);
     crank_talk_registerPrimitives(context);
     crank_talk_gc_collect(context);
     return context;

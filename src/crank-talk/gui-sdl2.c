@@ -13,15 +13,17 @@ static bool hasInitializedSDL2 = false;
 static bool isQuitting = false;
 static int targetFrameRate = 120;
 
-static void
-crank_talk_ensureSDL2Initialization()
+extern void crank_talk_SDL2ShutdownAudio(crank_talk_VMContext_t* context);
+
+void
+crank_talk_ensureSDL2Initialization(void)
 {
     if(hasInitializedSDL2)
         return;
 
     SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
 
     hasInitializedSDL2 = true;
 }
@@ -445,6 +447,9 @@ crank_talk_SDL2Shutdown(crank_talk_VMContext_t* context)
 {
     if(!hasInitializedSDL2)
         return;
+
+    // Shutdown the audio
+    crank_talk_SDL2ShutdownAudio(context);
 
     crank_talk_Array_t *openWindowList = (crank_talk_Array_t *)context->roots.openWindowList;
     size_t openWindowCount =  crank_talk_object_getSizeInSlots(context->roots.openWindowList);

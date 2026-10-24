@@ -309,8 +309,13 @@ struct crank_talk_VMContextRoots_s
 
     crank_talk_oop_t OSWindowRendererClass;
     crank_talk_oop_t OSWindowFormRendererClass;
-
     crank_talk_oop_t openWindowList;
+
+    // Sound
+    crank_talk_oop_t SoundSampleClass;
+    crank_talk_oop_t SoundSystemClass;
+    crank_talk_oop_t activeSoundSystem;
+
 };
 
 struct crank_talk_VMContext_s

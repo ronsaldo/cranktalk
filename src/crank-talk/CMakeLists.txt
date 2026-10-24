@@ -31,6 +31,8 @@ set(CrankTalk_Sources
     scanner.c
     script.c
     set.c
+    sound-sdl2.c
+    sound.c
     source-position.c
     stack-frame.c
     stb-impls.c
