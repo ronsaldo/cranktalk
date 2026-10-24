@@ -13,6 +13,7 @@ enum crank_talk_Opcode_e
 #define CRANK_TALK_OPCODE(x) CrankTalkOpcode ## x,
 #include "opcodes.inc"
 #undef CRANK_TALK_OPCODE
+    CrankTalkOpcodeCount
 };
 
 typedef enum crank_talk_OperandVectorName_e

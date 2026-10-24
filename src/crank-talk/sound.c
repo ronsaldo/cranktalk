@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define STB_VORBIS_HEADER_ONLY
+#include "stb_vorbis.c"
+
 #define WAVE_FORMAT_PCM 1
 
 typedef struct crank_talk_WaveFileHeader_s

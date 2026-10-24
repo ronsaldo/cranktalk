@@ -71,7 +71,14 @@ crank_talk_ParserState_currentSourcePosition(crank_talk_ParserState_t *state)
         return token->sourcePosition;
     }
 
+    if(state->tokenCount < 1)
+    {
+        crank_talk_CrankTalkToken_t *lastToken = (crank_talk_CrankTalkToken_t *)state->tokens->elements[0];
+        return lastToken->sourcePosition;
+    }
+
     crank_talk_CrankTalkToken_t *lastToken = (crank_talk_CrankTalkToken_t *)state->tokens->elements[state->tokenCount - 1];
+
     return lastToken->sourcePosition;
 }
 
@@ -400,6 +407,7 @@ crank_talk_parseLiteralArray(crank_talk_VMContext_t *context, crank_talk_ParserS
 {
     size_t startingPosition = state->position;
     crank_talk_CrankTalkToken_t *token = crank_talk_ParserState_next(state);
+    (void)token;
     assert(crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindLiteralArrayStart ||
         crank_talk_oop_decodeSmallInteger(token->kind) == CrankTalkTokenKindLeftParent);
 

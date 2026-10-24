@@ -23,6 +23,8 @@ const char *CrankTalkOpcodeStringTable[] = {
 CRANK_TALK_API const char *
 crank_talk_Opcode_toString(crank_talk_Opcode_t opcode)
 {
+    if(opcode >= CrankTalkOpcodeCount)
+        return "Unknown opcode";
     return CrankTalkOpcodeStringTable[opcode];
 }
 
