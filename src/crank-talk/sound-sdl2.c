@@ -40,10 +40,19 @@ static void crank_talk_SDL2AudioCallback(void *userdata, Uint8 * stream, int len
     // Fill the buffers
     {
         crank_talk_Mutex_lock(&context->soundSystemMutex);
+        crank_talk_SoundSystem_t *soundSystem = (crank_talk_SoundSystem_t*)context->roots.activeSoundSystem;
+        crank_talk_SoundSample_t *currentSoundSample = soundSystem->firstPlayingSample;
+        while (currentSoundSample)
+        {
+            printf("TODO: Play sample %p\n", currentSoundSample);
+            currentSoundSample = currentSoundSample->nextPlayingSample;
+        }
+        
+
         for(size_t i = 0; i < bufferSize; ++i)
         {
             float sample = (float)rand() / RAND_MAX*2.0 - 1.0;
-            float gain = 0.1f;
+            float gain = 0.01f;
             context->leftSoundChannelBuffer[i] += sample*gain;
             context->rightSoundChannelBuffer[i] += sample*gain;
         }
