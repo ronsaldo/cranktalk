@@ -31,6 +31,14 @@ typedef struct crank_talk_OSEvent_s crank_talk_OSEvent_t;
         typedef struct crank_talk_OSWindowAnimationUpdateEvent_s crank_talk_OSWindowAnimationUpdateEvent_t;
         typedef struct crank_talk_OSWindowExposeEvent_s crank_talk_OSWindowExposeEvent_t;
 
+    typedef struct crank_talk_OSGameControllerEvent_s crank_talk_OSGameControllerEvent_t;
+    typedef struct crank_talk_OSGameControllerDeviceEvent_s crank_talk_OSGameControllerDeviceEvent_t;
+        typedef struct crank_talk_OSGameControllerAddedDeviceEvent_s crank_talk_OSGameControllerAddedDeviceEvent_t;
+        typedef struct crank_talk_OSGameControllerRemovedDeviceEvent_s crank_talk_OSGameControllerRemovedDeviceEvent_t;
+    typedef struct crank_talk_OSGameControllerAxisEvent_s crank_talk_OSGameControllerAxisEvent_t;
+    typedef struct crank_talk_OSGameControllerButtonEvent_s crank_talk_OSGameControllerButtonEvent_t;
+        typedef struct crank_talk_OSGameControllerButtonPressEvent_s crank_talk_OSGameControllerButtonPressEvent_t;
+        typedef struct crank_talk_OSGameControllerButtonReleaseEvent_s crank_talk_OSGameControllerButtonReleaseEvent_t;
 
 typedef struct crank_talk_OSWindowRenderer_s crank_talk_OSWindowRenderer_t;
 typedef struct crank_talk_OSWindowFormRenderer_s crank_talk_OSWindowFormRenderer_t;
@@ -205,6 +213,50 @@ struct crank_talk_OSWindowAnimationUpdateEvent_s
 struct crank_talk_OSWindowExposeEvent_s
 {
     crank_talk_OSWindowEvent_t super;
+};
+
+struct crank_talk_OSGameControllerEvent_s
+{
+    crank_talk_OSEvent_t super;
+    crank_talk_oop_t deviceIndex;
+};
+
+struct crank_talk_OSGameControllerDeviceEvent_s
+{
+    crank_talk_OSGameControllerEvent_t super;
+};
+
+struct crank_talk_OSGameControllerAddedDeviceEvent_s
+{
+    crank_talk_OSGameControllerDeviceEvent_t super;
+};
+
+struct crank_talk_OSGameControllerRemovedDeviceEvent_s
+{
+    crank_talk_OSGameControllerDeviceEvent_t super;
+};
+
+struct crank_talk_OSGameControllerAxisEvent_s
+{
+    crank_talk_OSGameControllerEvent_t super;
+    crank_talk_oop_t axis;
+    crank_talk_oop_t value;
+};
+
+struct crank_talk_OSGameControllerButtonEvent_s
+{
+    crank_talk_OSGameControllerEvent_t super;
+    crank_talk_oop_t button;
+};
+
+struct crank_talk_OSGameControllerButtonPressEvent_s
+{
+    crank_talk_OSGameControllerButtonEvent_t super;
+};
+
+struct crank_talk_OSGameControllerButtonReleaseEvent_s
+{
+    crank_talk_OSGameControllerButtonEvent_t super;
 };
 
 struct crank_talk_OSWindowRenderer_s

@@ -309,6 +309,15 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t OSWindowAnimationUpdateEventClass;
     crank_talk_oop_t OSWindowExposeEventClass;
 
+    crank_talk_oop_t OSGameControllerEventClass;
+    crank_talk_oop_t OSGameControllerDeviceEventClass;
+    crank_talk_oop_t OSGameControllerAddedDeviceEventClass;
+    crank_talk_oop_t OSGameControllerRemovedDeviceEventClass;
+    crank_talk_oop_t OSGameControllerAxisEventClass;
+    crank_talk_oop_t OSGameControllerButtonEventClass;
+    crank_talk_oop_t OSGameControllerButtonPressEventClass;
+    crank_talk_oop_t OSGameControllerButtonReleaseEventClass;
+
     crank_talk_oop_t OSWindowRendererClass;
     crank_talk_oop_t OSWindowFormRendererClass;
     crank_talk_oop_t openWindowList;

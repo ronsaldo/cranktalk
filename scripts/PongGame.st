@@ -153,7 +153,7 @@ initialize
 PongGameState ![
 resetBall
     | directionX directionY direction velocity|
-    directionX := random nextBetween: -1.0 and: 1.0.
+    directionX := random nextBetween: -2.0 and: 2.0.
     directionY := random nextBetween: -1.0 and: 1.0.
     direction := (directionX@directionY) normalized.
     velocity := direction*(20.0@20.0).

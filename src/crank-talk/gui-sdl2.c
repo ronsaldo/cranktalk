@@ -173,7 +173,11 @@ sdl2_onControllerAddedEvent(crank_talk_VMContext_t *context, SDL_ControllerDevic
         return;
 
     SDL_GameControllerOpen(event->which);
-    printf("Controller Added %d\n", event->which);
+
+    crank_talk_OSGameControllerAddedDeviceEvent_t *deviceEvent = (crank_talk_OSGameControllerAddedDeviceEvent_t *)CrankAllocateValuesObjectWithClassName(context, OSGameControllerAddedDeviceEvent);
+    deviceEvent->super.super.deviceIndex = crank_talk_oop_encodeSmallInteger(event->which);
+
+    sdl2_dispatchEventToAllOpenWindows(context, (crank_talk_oop_t)deviceEvent);
 }
 
 static void
@@ -188,25 +192,38 @@ sdl2_onControllerRemovedEvent(crank_talk_VMContext_t *context, SDL_ControllerDev
         opened_game_controllers[event->which] = NULL;
     }
 
-    printf("Controller Removed\n");
+    crank_talk_OSGameControllerRemovedDeviceEvent_t *deviceEvent = (crank_talk_OSGameControllerRemovedDeviceEvent_t *)CrankAllocateValuesObjectWithClassName(context, OSGameControllerRemovedDeviceEvent);
+    deviceEvent->super.super.deviceIndex = crank_talk_oop_encodeSmallInteger(event->which);
+
+    sdl2_dispatchEventToAllOpenWindows(context, (crank_talk_oop_t)deviceEvent);
 }
 
 static void
 sdl2_onControllerAxisEvent(crank_talk_VMContext_t *context, SDL_ControllerAxisEvent *event)
 {
-    printf("Controller axis event\n");
+    crank_talk_OSGameControllerAxisEvent_t *axisEvent = (crank_talk_OSGameControllerAxisEvent_t *)CrankAllocateValuesObjectWithClassName(context, OSGameControllerAxisEvent);
+    axisEvent->super.deviceIndex = crank_talk_oop_encodeSmallInteger(event->which);
+    axisEvent->axis = crank_talk_oop_encodeSmallInteger(event->axis);
+    axisEvent->value = crank_talk_oop_fromFloat(context, (float)event->value / 32767);
+    sdl2_dispatchEventToAllOpenWindows(context, (crank_talk_oop_t)axisEvent);
 }
 
 static void
 sdl2_onControllerButtonDownEvent(crank_talk_VMContext_t *context, SDL_ControllerButtonEvent *event)
 {
-    printf("Controller button down event\n");
+    crank_talk_OSGameControllerButtonPressEvent_t *buttonEvent = (crank_talk_OSGameControllerButtonPressEvent_t *)CrankAllocateValuesObjectWithClassName(context, OSGameControllerButtonPressEvent);
+    buttonEvent->super.super.deviceIndex = crank_talk_oop_encodeSmallInteger(event->which);
+    buttonEvent->super.button = crank_talk_oop_encodeSmallInteger(event->button);
+    sdl2_dispatchEventToAllOpenWindows(context, (crank_talk_oop_t)buttonEvent);
 }
 
 static void
 sdl2_onControllerButtonUpEvent(crank_talk_VMContext_t *context, SDL_ControllerButtonEvent *event)
 {
-    printf("Controller button up event\n");
+    crank_talk_OSGameControllerButtonReleaseEvent_t *buttonEvent = (crank_talk_OSGameControllerButtonReleaseEvent_t *)CrankAllocateValuesObjectWithClassName(context, OSGameControllerButtonReleaseEvent);
+    buttonEvent->super.super.deviceIndex = crank_talk_oop_encodeSmallInteger(event->which);
+    buttonEvent->super.button = crank_talk_oop_encodeSmallInteger(event->button);
+    sdl2_dispatchEventToAllOpenWindows(context, (crank_talk_oop_t)buttonEvent);
 }
 
 static void

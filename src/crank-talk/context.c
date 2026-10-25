@@ -1028,6 +1028,25 @@ crank_talk_context_createGUIDefinitions(crank_talk_VMContext_t* context)
     context->roots.OSWindowAnimationUpdateEventClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowAnimationUpdateEvent", context->roots.OSWindowEventClass, sizeof(crank_talk_OSWindowAnimationUpdateEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
     context->roots.OSWindowExposeEventClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowExposeEvent", context->roots.OSWindowEventClass, sizeof(crank_talk_OSWindowExposeEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
 
+    context->roots.OSGameControllerEventClass = crank_talk_context_createClassAndMetaclass(context, "OSGameControllerEvent", context->roots.OSEventClass, sizeof(crank_talk_OSGameControllerEvent_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(OSGameControllerEvent, deviceIndex),
+        NULL);
+    context->roots.OSGameControllerDeviceEventClass = crank_talk_context_createClassAndMetaclass(context, "OSGameControllerDeviceEvent", context->roots.OSGameControllerEventClass, sizeof(crank_talk_OSGameControllerDeviceEvent_t), CrankTalkGCObjectDataTypeOops,
+        NULL);
+    context->roots.OSGameControllerAddedDeviceEventClass = crank_talk_context_createClassAndMetaclass(context, "OSGameControllerAddedDeviceEvent", context->roots.OSGameControllerDeviceEventClass, sizeof(crank_talk_OSGameControllerAddedDeviceEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.OSGameControllerRemovedDeviceEventClass = crank_talk_context_createClassAndMetaclass(context, "OSGameControllerRemovedDeviceEvent", context->roots.OSGameControllerDeviceEventClass, sizeof(crank_talk_OSGameControllerRemovedDeviceEvent_t), CrankTalkGCObjectDataTypeOops, NULL);
+    context->roots.OSGameControllerAxisEventClass = crank_talk_context_createClassAndMetaclass(context, "OSGameControllerAxisEvent", context->roots.OSGameControllerEventClass, sizeof(crank_talk_OSGameControllerAxisEvent_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(OSGameControllerAxisEvent, axis),
+        CrankTalkSlotDef(OSGameControllerAxisEvent, value),
+        NULL);
+    context->roots.OSGameControllerButtonEventClass = crank_talk_context_createClassAndMetaclass(context, "OSGameControllerButtonEvent", context->roots.OSGameControllerEventClass, sizeof(crank_talk_OSGameControllerButtonEvent_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(OSGameControllerButtonEvent, button),
+        NULL);
+    context->roots.OSGameControllerButtonPressEventClass = crank_talk_context_createClassAndMetaclass(context, "OSGameControllerButtonPressEvent", context->roots.OSGameControllerButtonEventClass, sizeof(crank_talk_OSGameControllerButtonPressEvent_t), CrankTalkGCObjectDataTypeOops,
+        NULL);
+    context->roots.OSGameControllerButtonReleaseEventClass = crank_talk_context_createClassAndMetaclass(context, "OSGameControllerButtonReleaseEvent", context->roots.OSGameControllerButtonEventClass, sizeof(crank_talk_OSGameControllerButtonReleaseEvent_t), CrankTalkGCObjectDataTypeOops,
+        NULL);
+
     context->roots.OSWindowRendererClass = crank_talk_context_createClassAndMetaclass(context, "OSWindowRenderer", context->roots.ObjectClass, sizeof(crank_talk_OSWindowRenderer_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(OSWindowRenderer, rendererHandle),
         NULL);

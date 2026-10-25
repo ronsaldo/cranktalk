@@ -130,3 +130,56 @@ OSWindowExposeEvent ![
 accept: anEventHandler
     ^ anEventHandler visitWindowExposeEvent: self
 ].
+
+"OSGameControllerEvent"
+OSGameControllerEvent ![
+deviceIndex
+    ^ deviceIndex
+].
+
+"OSGameControllerAddedDeviceEvent"
+OSGameControllerAddedDeviceEvent ![
+accept: anEventHandler
+    ^ anEventHandler visitGameControllerAddedDeviceEvent: self
+].
+
+"OSGameControllerRemovedDeviceEvent"
+OSGameControllerRemovedDeviceEvent ![
+accept: anEventHandler
+    ^ anEventHandler visitGameControllerRemovedDeviceEvent: self
+].
+
+"OSGameControllerAxisEvent"
+OSGameControllerAxisEvent ![
+accept: anEventHandler
+    ^ anEventHandler visitGameControllerAxisEvent: self
+].
+
+OSGameControllerAxisEvent ![
+axis
+    ^ axis
+].
+
+OSGameControllerAxisEvent ![
+value
+    ^ value
+].
+
+"OSGameControllerButtonEvent"
+OSGameControllerButtonEvent ![
+button
+    ^ button
+].
+
+"OSGameControllerButtonPressEvent"
+OSGameControllerButtonPressEvent ![
+accept: anEventHandler
+    ^ anEventHandler visitGameControllerButtonPressEvent: self
+].
+
+"OSGameControllerButtonReleaseEvent"
+OSGameControllerButtonReleaseEvent ![
+accept: anEventHandler
+    ^ anEventHandler visitGameControllerButtonReleaseEvent: self
+].
+

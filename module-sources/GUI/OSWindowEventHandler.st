@@ -49,3 +49,28 @@ visitWindowExposeEvent: anEvent
     anEvent window render.
     Stdio stdout nextPutAll: 'Window expose'; lf.
 ].
+
+OSWindowEventHandler ![
+visitGameControllerAddedDeviceEvent: anEvent
+    Stdio stdout nextPutAll: 'Game controller added'; lf.
+].
+
+OSWindowEventHandler ![
+visitGameControllerRemovedDeviceEvent: anEvent
+    Stdio stdout nextPutAll: 'Game controller removed'; lf.
+].
+
+OSWindowEventHandler ![
+visitGameControllerAxisEvent: anEvent
+    Stdio stdout print: anEvent deviceIndex; nextPutAll: ' controller axis '; print: anEvent axis; space; print: anEvent value; lf.
+].
+
+OSWindowEventHandler ![
+visitGameControllerButtonPressEvent: anEvent
+    Stdio stdout nextPutAll: 'Press '; print: anEvent deviceIndex; space; print: anEvent button; lf.
+].
+
+OSWindowEventHandler ![
+visitGameControllerButtonReleaseEvent: anEvent
+    Stdio stdout nextPutAll: 'Release '; print: anEvent deviceIndex; space; print: anEvent button; lf.
+].
