@@ -215,6 +215,7 @@ struct crank_talk_VMContextRoots_s
 
     // Time
     crank_talk_oop_t TimeClass;
+    crank_talk_oop_t RandomClass;
 
     // HIR
     crank_talk_oop_t HIRValueClass;
@@ -318,7 +319,6 @@ struct crank_talk_VMContextRoots_s
     crank_talk_oop_t SoundStreamClass;
     crank_talk_oop_t SoundSystemClass;
     crank_talk_oop_t activeSoundSystem;
-
 };
 
 struct crank_talk_VMContext_s

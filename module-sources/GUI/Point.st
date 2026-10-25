@@ -80,4 +80,11 @@ Point ![
     ^ x <= aPoint x and: [y <= aPoint y]
 ].
 
+Point ![
+normalized
+    | l |
+    l := ((x*x) + (y*y)) sqrt.
+    ^ (x / l) @ (y / l)
+].
+
 "Stdio stdout print: (0@1) + (2 @ -3); lf."

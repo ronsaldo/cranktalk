@@ -16,4 +16,6 @@ thisContext
     loadFile: 'SequenceableCollection.st';
     loadFile: 'OrderedCollection.st';
 
-    loadFile: 'Number.st'.
+    loadFile: 'Number.st';
+
+    loadFile: 'Random.st'.

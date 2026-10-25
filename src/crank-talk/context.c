@@ -13,6 +13,7 @@
 #include "crank-talk/io.h"
 #include "crank-talk/ordered-collection.h"
 #include "crank-talk/parse-tree.h"
+#include "crank-talk/random.h"
 #include "crank-talk/set.h"
 #include "crank-talk/sound.h"
 #include "crank-talk/string.h"
@@ -47,6 +48,7 @@ void crank_talk_registerSourcePositionPrimitives(crank_talk_VMContext_t* context
 void crank_talk_registerSoundBackendPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerSoundPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerStringPrimitives(crank_talk_VMContext_t* context);
+void crank_talk_registerRandomPrimitives(crank_talk_VMContext_t* context);
 void crank_talk_registerTimePrimitives(crank_talk_VMContext_t* context);
 
 static void
@@ -748,6 +750,11 @@ crank_talk_context_createFrontEndDefinitions(crank_talk_VMContext_t* context)
         CrankTalkSlotDef(Time, nanos),
         NULL);
 
+    // Random
+    context->roots.RandomClass = crank_talk_context_createClassAndMetaclass(context, "Random", context->roots.ObjectClass, sizeof(crank_talk_Random_t), CrankTalkGCObjectDataTypeOops,
+        CrankTalkSlotDef(Random, seed),
+        NULL);
+
     // HIR
     context->roots.HIRValueClass = crank_talk_context_createClassAndMetaclass(context, "HIRValue", context->roots.ObjectClass, sizeof(crank_talk_HIRValue_t), CrankTalkGCObjectDataTypeOops,
         CrankTalkSlotDef(HIRValue, sourcePosition),
@@ -1105,6 +1112,7 @@ crank_talk_registerPrimitives(crank_talk_VMContext_t* context)
     crank_talk_registerSoundPrimitives(context);
     crank_talk_registerStringPrimitives(context);
     crank_talk_registerTimePrimitives(context);
+    crank_talk_registerRandomPrimitives(context);
 }
 
 CRANK_TALK_API crank_talk_VMContext_t*

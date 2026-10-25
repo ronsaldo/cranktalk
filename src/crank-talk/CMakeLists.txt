@@ -28,6 +28,7 @@ set(CrankTalk_Sources
     parse-tree.c
     parser.c
     primitives.c
+    random.c
     scanner.c
     script.c
     set.c

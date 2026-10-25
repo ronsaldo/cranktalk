@@ -119,7 +119,7 @@ bounceHorizontal
 
 "Game state"
 Object << #PongGameState
-    slots: {#firstPaddle. #secondPaddle. #ball. #topWall. #bottomWall. #leftWall. #rightWall. #player1Score. #player2Score};
+    slots: {#firstPaddle. #secondPaddle. #ball. #topWall. #bottomWall. #leftWall. #rightWall. #player1Score. #player2Score. #random};
     build.
 
 PongGameState ![
@@ -145,12 +145,19 @@ initialize
 
     player1Score := 0.
     player2Score := 0.
+
+    random := Random seed: 42.
     self resetBall.
 ].
 
 PongGameState ![
 resetBall
-    ball position: 0@0; velocity: -10.0@10.0.
+    | directionX directionY direction velocity|
+    directionX := random nextBetween: -1.0 and: 1.0.
+    directionY := random nextBetween: -1.0 and: 1.0.
+    direction := (directionX@directionY) normalized.
+    velocity := direction*(20.0@20.0).
+    ball position: 0@0; velocity: velocity.
 ].
 
 PongGameState ![
