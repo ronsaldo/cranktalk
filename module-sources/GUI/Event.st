@@ -50,6 +50,38 @@ MouseEvent << #MouseWheelEvent
     slots: {#scrollAmount};
     build.
 
+Event << #WindowOpenEvent
+    slots: {};
+    build.
+
+Event << #GameControllerEvent
+    slots: {#deviceIndex};
+    build.
+
+GameControllerEvent << #GameControllerAddedEvent
+    slots: {};
+    build.
+
+GameControllerEvent << #GameControllerRemovedEvent
+    slots: {};
+    build.
+
+GameControllerEvent << #GameControllerAxisEvent
+    slots: {#axis . #value};
+    build.
+
+GameControllerEvent << #GameControllerButtonEvent
+    slots: {#button};
+    build.
+
+GameControllerButtonEvent << #GameControllerButtonPressEvent
+    slots: {};
+    build.
+
+GameControllerButtonEvent << #GameControllerButtonReleaseEvent
+    slots: {};
+    build.
+
 "Event"
 Event ![
 initialize
@@ -224,4 +256,82 @@ scrollAmount
 MouseWheelEvent ![
 scrollAmount: aPoint
     scrollAmount := aPoint
+].
+
+"WindowOpenEvent"
+WindowOpenEvent ![
+sentToMorph: morph
+    ^morph handleWindowOpenEvent: self
+].
+
+"GameControllerEvent"
+GameControllerEvent ![
+deviceIndex
+    ^ deviceIndex
+].
+
+GameControllerEvent ![
+deviceIndex: anIndex
+    deviceIndex := anIndex
+].
+
+"GameControlleAddedEvent"
+GameControllerAddedEvent ![
+sentToMorph: morph
+    ^morph handleGameControllerAddedEvent: self
+].
+
+"GameControlleRemovedEvent"
+GameControllerRemovedEvent ![
+sentToMorph: morph
+    ^morph handleGameControllerRemovedEvent: self
+].
+
+"GameControllerAxisEvent"
+GameControllerAxisEvent ![
+sentToMorph: morph
+    ^morph handleGameControllerAxisEvent: self
+].
+
+GameControllerAxisEvent ![
+axis
+    ^ axis
+].
+
+GameControllerAxisEvent ![
+axis: anInteger
+    axis := anInteger
+].
+
+GameControllerAxisEvent ![
+value
+    ^ value
+].
+
+GameControllerAxisEvent ![
+value: asFloat
+    value := asFloat
+].
+
+"GameControllerButtonEvent"
+GameControllerButtonEvent ![
+button
+    ^ button
+].
+
+GameControllerButtonEvent ![
+button: anInteger
+    button := anInteger
+].
+
+"GameControllerButtonPressEvent"
+GameControllerButtonPressEvent ![
+sentToMorph: morph
+    ^morph handleGameControllerButtonPressEvent: self
+].
+
+"GameControllerButtonReleaseEvent"
+GameControllerButtonReleaseEvent ![
+sentToMorph: morph
+    ^morph handleGameControllerButtonReleaseEvent: self
 ].

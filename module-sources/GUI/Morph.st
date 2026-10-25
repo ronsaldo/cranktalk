@@ -165,6 +165,19 @@ takeKeyboardFocus
 ].
 
 Morph ![
+gotGameControllerFocus
+].
+
+Morph ![
+lostGameControllerFocus
+].
+
+Morph ![
+takeGameControllerFocus
+    ^ self rootMorph setNewGameControllerFocus: self
+].
+
+Morph ![
 updateAnimation
     submorphs do: [:each | each updateAnimation]
 ].
@@ -271,6 +284,40 @@ handleMouseWheelEvent: anEvent
 ].
 
 Morph ![
+handleWindowOpenEvent: anEvent
+    self onWindowOpenEvent: anEvent.
+
+    submorphs do: [:each |
+        each processEvent: anEvent
+    ].
+].
+
+Morph ![
+handleGameControllerAddedEvent: anEvent
+    self onGameControllerAddedEvent: anEvent
+].
+
+Morph ![
+handleGameControllerRemovedEvent: anEvent
+    self onGameControllerRemovedEvent: anEvent
+].
+
+Morph ![
+handleGameControllerAxisEvent: anEvent
+    self onGameControllerAxisEvent: anEvent
+].
+
+Morph ![
+handleGameControllerButtonPressEvent: anEvent
+    self onGameControllerButtonPressEvent: anEvent
+].
+
+Morph ![
+handleGameControllerButtonReleaseEvent: anEvent
+    self onGameControllerButtonReleaseEvent: anEvent
+].
+
+Morph ![
 onKeyboardDownEvent: anEvent
     "Stdio stdout nextPutAll: 'onMouseMotionEvent '; print: anEvent position; space; print: anEvent delta; lf"
 ].
@@ -314,4 +361,33 @@ Morph ![
 onMouseWheelEvent: anEvent
     "Stdio stdout nextPutAll: 'onMouseWheelEvent '; print: anEvent position; space; print: anEvent scrollAmount; lf"
 ].
-    
+
+Morph ![
+onWindowOpenEvent: anEvent
+    "Stdio stdout nextPutAll: 'onWindowOpenEvent'; lf"
+].
+
+Morph ![
+onGameControllerAddedEvent: anEvent
+    "Stdio stdout nextPutAll: 'onGameControllerAddedEvent '; print: anEvent deviceIndex; lf"
+].
+
+Morph ![
+onGameControllerRemovedEvent: anEvent
+    "Stdio stdout nextPutAll: 'onGameControllerRemovedEvent '; print: anEvent deviceIndex; lf"
+].
+
+Morph ![
+onGameControllerAxisEvent: anEvent
+    "Stdio stdout nextPutAll: 'onGameControllerAxisEvent '; print: anEvent axis; space; print: anEvent value; lf"
+].
+
+Morph ![
+onGameControllerButtonPressEvent: anEvent
+    "Stdio stdout nextPutAll: 'onGameControllerButtonPressEvent '; print: anEvent button; lf"
+].
+
+Morph ![
+onGameControllerButtonReleaseEvent: anEvent
+    "Stdio stdout nextPutAll: 'onGameControllerButtonReleaseEvent '; print: anEvent button; lf"
+].

@@ -1,5 +1,5 @@
 Morph << #RootMorph
-    slots: {#currentKeyboardFocus . #currentMouseFocus};
+    slots: {#currentKeyboardFocus . #currentMouseFocus. #currentGameControllerFocus};
     build.
 
 RootMorph ![
@@ -47,5 +47,30 @@ setNewMouseFocus: newMouseFocus
 
     currentMouseFocus ~~ nil ifTrue: [
         currentMouseFocus gotMouseFocus
+    ].
+].
+
+RootMorph ![
+getGameControllerFocus
+    ^ currentGameControllerFocus
+].
+
+RootMorph ![
+processGameControllerEvent: aGameControllerEvent
+    currentGameControllerFocus ~~ nil ifTrue: [
+        currentGameControllerFocus processEvent: aGameControllerEvent
+    ].
+].
+
+RootMorph ![
+setNewGameControllerFocus: newGameContollerFocus
+    currentGameControllerFocus ~~ nil ifTrue: [
+        currentGameControllerFocus lostGameControllerFocus
+    ].
+
+    currentGameControllerFocus := newGameContollerFocus.
+
+    currentGameControllerFocus ~~ nil ifTrue: [
+        currentGameControllerFocus gotGameControllerFocus
     ].
 ].

@@ -36,7 +36,9 @@ open
             yourself);
         open;
         newFormRenderer;
-        yourself
+        yourself.
+
+    self processEvent: WindowOpenEvent new
 ].
 
 SystemWindowMorph ![
@@ -158,4 +160,48 @@ visitWindowExposeEvent: anEvent
 SystemWindowMorphEventHandler ![
 visitWindowAnimationUpdateEvent: anEvent
     systemWindowMorph updateAnimation; renderIfChanged
+].
+
+SystemWindowMorphEventHandler ![
+visitGameControllerAddedDeviceEvent: anEvent
+    systemWindowMorph processGameControllerEvent: (GameControllerAddedEvent new
+        deviceIndex: anEvent deviceIndex;
+        yourself
+    )
+].
+
+SystemWindowMorphEventHandler ![
+visitGameControllerRemovedDeviceEvent: anEvent
+    systemWindowMorph processGameControllerEvent: (GameControllerRemovedEvent new
+        deviceIndex: anEvent deviceIndex;
+        yourself
+    )
+].
+
+SystemWindowMorphEventHandler ![
+visitGameControllerAxisEvent: anEvent
+    systemWindowMorph processGameControllerEvent: (GameControllerAxisEvent new
+        deviceIndex: anEvent deviceIndex;
+        axis: anEvent axis;
+        value: anEvent value;
+        yourself
+    )
+].
+
+SystemWindowMorphEventHandler ![
+visitGameControllerButtonPressEvent: anEvent
+    systemWindowMorph processGameControllerEvent: (GameControllerButtonPressEvent new
+        deviceIndex: anEvent deviceIndex;
+        button: anEvent button;
+        yourself
+    )
+].
+
+SystemWindowMorphEventHandler ![
+visitGameControllerButtonReleaseEvent: anEvent
+    systemWindowMorph processGameControllerEvent: (GameControllerButtonReleaseEvent new
+        deviceIndex: anEvent deviceIndex;
+        button: anEvent button;
+        yourself
+    )
 ].

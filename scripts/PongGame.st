@@ -310,11 +310,9 @@ updateAnimation
 ].
 
 PongGameMorph ![
-onMouseMotionEvent: anEvent
-    anEvent wasHandled ifTrue: [^ self].
-
+onWindowOpenEvent: anEvent
     self takeKeyboardFocus.
-    anEvent wasHandled: true
+    self takeGameControllerFocus.
 ].
 
 PongGameMorph ![
