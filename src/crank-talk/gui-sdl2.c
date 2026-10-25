@@ -13,6 +13,10 @@ static bool hasInitializedSDL2 = false;
 static bool isQuitting = false;
 static int targetFrameRate = 120;
 
+#define CRANK_TALK_MAX_GAME_CONTROLLER_COUNT 16
+static SDL_GameController *opened_game_controllers[CRANK_TALK_MAX_GAME_CONTROLLER_COUNT];
+
+
 extern void crank_talk_SDL2ShutdownAudio(crank_talk_VMContext_t* context);
 
 void
@@ -23,7 +27,7 @@ crank_talk_ensureSDL2Initialization(void)
 
     SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_NOPARACHUTE);
 
     hasInitializedSDL2 = true;
 }
@@ -163,6 +167,49 @@ sdl2_onWindowEvent(crank_talk_VMContext_t *context, SDL_WindowEvent *event)
 }
 
 static void
+sdl2_onControllerAddedEvent(crank_talk_VMContext_t *context, SDL_ControllerDeviceEvent *event)
+{
+    if(event->which >= CRANK_TALK_MAX_GAME_CONTROLLER_COUNT)
+        return;
+
+    SDL_GameControllerOpen(event->which);
+    printf("Controller Added %d\n", event->which);
+}
+
+static void
+sdl2_onControllerRemovedEvent(crank_talk_VMContext_t *context, SDL_ControllerDeviceEvent *event)
+{
+    if(event->which >= CRANK_TALK_MAX_GAME_CONTROLLER_COUNT)
+        return;
+
+    if(opened_game_controllers[event->which])
+    {
+        SDL_GameControllerClose(opened_game_controllers[event->which]);
+        opened_game_controllers[event->which] = NULL;
+    }
+
+    printf("Controller Removed\n");
+}
+
+static void
+sdl2_onControllerAxisEvent(crank_talk_VMContext_t *context, SDL_ControllerAxisEvent *event)
+{
+    printf("Controller axis event\n");
+}
+
+static void
+sdl2_onControllerButtonDownEvent(crank_talk_VMContext_t *context, SDL_ControllerButtonEvent *event)
+{
+    printf("Controller button down event\n");
+}
+
+static void
+sdl2_onControllerButtonUpEvent(crank_talk_VMContext_t *context, SDL_ControllerButtonEvent *event)
+{
+    printf("Controller button up event\n");
+}
+
+static void
 processSDL2Event(crank_talk_VMContext_t *context, SDL_Event *event)
 {
     switch(event->type)
@@ -190,6 +237,21 @@ processSDL2Event(crank_talk_VMContext_t *context, SDL_Event *event)
         break;
     case SDL_WINDOWEVENT:
         sdl2_onWindowEvent(context, &event->window);
+        break;
+    case SDL_CONTROLLERDEVICEADDED:
+        sdl2_onControllerAddedEvent(context, &event->cdevice);
+        break;
+    case SDL_CONTROLLERDEVICEREMOVED:
+        sdl2_onControllerRemovedEvent(context, &event->cdevice);
+        break;
+    case SDL_CONTROLLERAXISMOTION:
+        sdl2_onControllerAxisEvent(context, &event->caxis);
+        break;
+    case SDL_CONTROLLERBUTTONDOWN:
+        sdl2_onControllerButtonDownEvent(context, &event->cbutton);
+        break;
+    case SDL_CONTROLLERBUTTONUP:
+        sdl2_onControllerButtonUpEvent(context, &event->cbutton);
         break;
     case SDL_QUIT:
         isQuitting = true;
