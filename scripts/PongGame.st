@@ -357,6 +357,25 @@ onKeyboardUpEvent: anEvent
     ].
 ].
 
+PongGameMorph ![
+onGameControllerAxisEvent: anEvent
+    | value  |
+
+    "Dead zone"
+    value := anEvent valueWithoutDeadZone.
+    anEvent deviceIndex == 0 ifTrue: [
+        anEvent isLeftY ifTrue: [
+            gameState firstPaddle velocity: 0@(value negated*20).
+        ].
+    ].
+
+    anEvent deviceIndex == 1 ifTrue: [
+        anEvent isLeftY ifTrue: [
+            gameState secondPaddle velocity: 0@(value negated*20).
+        ].
+    ].
+].
+
 PongGameMorph new openInWindow.
 SoundSystem activate.
 music gain: 0.1; isLooped: true; play.

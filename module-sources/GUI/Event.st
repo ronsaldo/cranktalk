@@ -313,6 +313,44 @@ value: asFloat
     value := asFloat
 ].
 
+GameControllerAxisEvent ![
+valueWithoutDeadZone
+    (-0.2 <= value and: [value <= 0.2]) ifTrue: [
+        ^ 0.0
+    ].
+    ^ value
+].
+
+GameControllerAxisEvent ![
+isLeftX
+    ^ axis == 0
+].
+
+GameControllerAxisEvent ![
+isLeftY
+    ^ axis == 1
+].
+
+GameControllerAxisEvent ![
+isRightX
+    ^ axis == 2
+].
+
+GameControllerAxisEvent ![
+isRightY
+    ^ axis == 3
+].
+
+GameControllerAxisEvent ![
+isLeftTrigger
+    ^ axis == 4
+].
+
+GameControllerAxisEvent ![
+isRightTrigger
+    ^ axis == 5
+].
+
 "GameControllerButtonEvent"
 GameControllerButtonEvent ![
 button
@@ -335,3 +373,4 @@ GameControllerButtonReleaseEvent ![
 sentToMorph: morph
     ^morph handleGameControllerButtonReleaseEvent: self
 ].
+
